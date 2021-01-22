@@ -1,0 +1,11 @@
+{
+  "app": "omsorgsdager",
+  "cluster": "dev-gcp",
+  "namespace": "omsorgspenger",
+  "team": "omsorgspenger",
+  "minReplicas": "1",
+  "maxReplicas": "1",
+  "ingresses": [
+    "https://omsorgsdager.dev.intern.nav.no"
+  ]
+}
