@@ -1,0 +1,61 @@
+{
+    "POST /utvidet-rett": true,
+    "request": {
+        "mottatt": "ZonedDateTime",
+        "søker": {
+            "identitetsnummer": ""
+        },
+        "barn": {
+            "identitetsnummer": ""
+        }
+    },
+    "response": {
+        "id": "1",
+        "søker": {},
+        "barn": {},
+        "status": "FORSLAG",
+        "gyldigFraOgMed": "LocalDate",
+        "gyldigTilOgMed": "LocalDate",
+        "aksjonspunkter": [
+            "VURDERE_LEGEERKLÆRING"
+        ]
+    },
+    "POST /utvidet-rett/aksjonspunkt": true,
+    "request": {
+        "VURDERE_LEGEERKLÆRING": {
+            "foo": true,
+            "bar": false
+        }
+    },
+    "response": {
+        "id": 1,
+        "status": "FORSLAG",
+        "søker": {},
+        "barn": {},
+        "gyldigFraOgMed": "LocalDate",
+        "gyldigTilOgMed": "LocalDate",
+        "aksjonspunkter": []
+    },
+    "PUT /utvidet-rett/{$id}/fastsett": true,
+    "request": {},
+    "response": {
+        "id": 1,
+        "status": "VEDTATT",
+        "søker": {},
+        "barn": {},
+        "gyldigFraOgMed": "LocalDate",
+        "gyldigTilOgMed": "LocalDate",
+        "aksjonspunkter": []
+    },
+    "DELETE /utvidet-rett/{$id}": true,
+    "response": {
+        "id": 1,
+        "søker": {},
+        "barn": {},
+        "status": "AVSLÅTT",
+        "gyldigFraOgMed": "LocalDate",
+        "gyldigTilOgMed": "LocalDate",
+        "aksjonspunkter": []
+    }
+}
+

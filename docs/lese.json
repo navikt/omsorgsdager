@@ -1,0 +1,17 @@
+{
+    "GET /utvidet-rett/{$id}": true,
+    "response": {
+        "id": "1",
+        "søker": {},
+        "barn": {},
+        "status": "FORSLAG",
+        "gyldigFraOgMed": "LocalDate",
+        "gyldigTilOgMed": "LocalDate",
+        "aksjonspunkter": [
+            "VURDERE_LEGEERKLÆRING"
+        ],
+        "lovhenvisninger": {
+            "FTL 9-5 3.ledd": "Foo"
+        }
+    }
+}
