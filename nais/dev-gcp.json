@@ -7,5 +7,10 @@
   "maxReplicas": "1",
   "ingresses": [
     "https://omsorgsdager.dev.intern.nav.no"
-  ]
+  ],
+  "database": {
+    "tier": "db-custom-1-3840",
+    "diskSize": "20",
+    "highAvailability": "false"
+  }
 }

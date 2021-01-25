@@ -8,6 +8,16 @@ metadata:
 spec:
   image: {{ image }}
   port: 8080
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_12
+        diskAutoresize: true
+        tier: { { database.tier } }
+        diskSize: { { database.diskSize } }
+        highAvailability: { { database.highAvailability } }
+        databases:
+          - name: omsorgsdager
+            envVarPrefix: DATABASE
   liveness:
     path: isalive
     initialDelay: 20
