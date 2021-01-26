@@ -5,6 +5,7 @@
   "team": "omsorgspenger",
   "minReplicas": "1",
   "maxReplicas": "1",
+  "azureTenant": "trygdeetaten.no",
   "ingresses": [
     "https://omsorgsdager.dev.intern.nav.no"
   ],
