@@ -1,27 +1,47 @@
 package no.nav.omsorgsdager.testutils
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.typesafe.config.ConfigFactory
-import io.ktor.config.ApplicationConfig
-import io.ktor.config.HoconApplicationConfig
-import io.ktor.server.engine.stop
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.createTestEnvironment
-import io.ktor.util.KtorExperimentalAPI
+import io.ktor.config.*
+import io.ktor.server.engine.*
+import io.ktor.server.testing.*
+import io.ktor.util.*
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
+import no.nav.omsorgsdager.ApplicationContext
+import no.nav.omsorgsdager.app
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
+import java.io.File
+import java.nio.file.Files.createTempDirectory
 import java.util.concurrent.TimeUnit
 
 internal class TestApplicationExtension : ParameterResolver {
 
     @KtorExperimentalAPI
     internal companion object {
-        private val mockedEnvironment = MockedEnvironment().start()
+
+        private fun embeddedPostgress(tempDir: File) = EmbeddedPostgres.builder()
+            .setOverrideWorkingDirectory(tempDir)
+            .setDataDirectory(tempDir.resolve("datadir"))
+            .start()
+
+        private val embeddedPostgres = embeddedPostgress(createTempDirectory("tmp_postgres").toFile())
+
+        val applicationContext = ApplicationContext.Builder(
+             env = mapOf(
+                 "DATABASE_HOST" to "localhost",
+                 "DATABASE_PORT" to "${embeddedPostgres.port}",
+                 "DATABASE_DATABASE" to "postgres",
+                 "DATABASE_USERNAME" to "postgres",
+                 "DATABASE_PASSWORD" to "postgres",
+             )
+         ).build()
+
         @KtorExperimentalAPI
         internal val testApplicationEngine = TestApplicationEngine(
             environment = createTestEnvironment {
-                config = getConfig(mockedEnvironment.appConfig)
+                config = HoconApplicationConfig(ConfigFactory.load().withoutPath("ktor.application.modules"))
+                module { app(applicationContext) }
             }
         )
 
@@ -30,15 +50,15 @@ internal class TestApplicationExtension : ParameterResolver {
             Runtime.getRuntime().addShutdownHook(
                 Thread {
                     testApplicationEngine.stop(10, 60, TimeUnit.SECONDS)
-                    mockedEnvironment.stop()
+                    embeddedPostgres.postgresDatabase.connection.close()
+                    embeddedPostgres.close()
                 }
             )
         }
     }
 
     private val støttedeParametre = listOf(
-        TestApplicationEngine::class.java,
-        WireMockServer::class.java
+        TestApplicationEngine::class.java
     )
 
     override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {
@@ -47,10 +67,7 @@ internal class TestApplicationExtension : ParameterResolver {
 
     @KtorExperimentalAPI
     override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Any {
-        return when (parameterContext.parameter.type) {
-            TestApplicationEngine::class.java -> testApplicationEngine
-            else -> mockedEnvironment.wireMockServer
-        }
+        return testApplicationEngine
     }
 }
 
