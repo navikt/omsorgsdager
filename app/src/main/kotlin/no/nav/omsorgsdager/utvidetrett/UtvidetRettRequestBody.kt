@@ -1,8 +1,8 @@
 package no.nav.omsorgsdager.utvidetrett
 
 internal data class UtvidetRettRequestBody(
-    val mottatt: String,
-    val söker: Identitetsnummer,
+    val mottattDato: String,
+    val søker: Identitetsnummer,
     val barn: List<Identitetsnummer>
 )
 

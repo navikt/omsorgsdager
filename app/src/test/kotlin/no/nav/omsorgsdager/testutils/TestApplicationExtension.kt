@@ -6,12 +6,23 @@ import io.ktor.server.engine.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
+import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
+import no.nav.helse.dusseldorf.testsupport.jws.Azure
+import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
+import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
+import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
+import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsTokenUrl
 import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.app
+import no.nav.omsorgsdager.config.ServiceUser
+import no.nav.omsorgsdager.testutils.wiremock.pdlApiBaseUrl
+import no.nav.omsorgsdager.testutils.wiremock.stubPdlApi
+import no.nav.omsorgsdager.testutils.wiremock.stubTilgangApi
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 import java.io.File
+import java.net.URI
 import java.nio.file.Files.createTempDirectory
 import java.util.concurrent.TimeUnit
 
@@ -26,16 +37,34 @@ internal class TestApplicationExtension : ParameterResolver {
             .start()
 
         private val embeddedPostgres = embeddedPostgress(createTempDirectory("tmp_postgres").toFile())
+        private val wireMockServer = WireMockBuilder()
+            .withAzureSupport()
+            .build()
+            .stubTilgangApi()
+            .stubPdlApi()
 
         val applicationContext = ApplicationContext.Builder(
-             env = mapOf(
-                 "DATABASE_HOST" to "localhost",
-                 "DATABASE_PORT" to "${embeddedPostgres.port}",
-                 "DATABASE_DATABASE" to "postgres",
-                 "DATABASE_USERNAME" to "postgres",
-                 "DATABASE_PASSWORD" to "postgres",
-             )
-         ).build()
+            env = mapOf(
+                "DATABASE_HOST" to "localhost",
+                "DATABASE_PORT" to "${embeddedPostgres.port}",
+                "DATABASE_DATABASE" to "postgres",
+                "DATABASE_USERNAME" to "postgres",
+                "DATABASE_PASSWORD" to "postgres",
+                "PDL_BASE_URL" to wireMockServer.pdlApiBaseUrl(),
+                "STS_TOKEN_ENDPOINT" to wireMockServer.getNaisStsTokenUrl(),
+                "PROXY_SCOPES" to "/.default",
+                "TILGANGSSTYRING_URL" to "test/.default",
+                "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
+                "AZURE_V2_JWKS_URI" to (wireMockServer.getAzureV2JwksUrl()),
+                "AZURE_APP_CLIENT_ID" to "omsorgsdager"
+            ),
+            serviceUser = ServiceUser("foo", "bar"),
+            accessTokenClient = ClientSecretAccessTokenClient(
+                clientId = "omsorgsdager",
+                clientSecret = "azureSecret",
+                tokenEndpoint = URI(wireMockServer.getAzureV2TokenUrl()),
+            )
+        ).build()
 
         @KtorExperimentalAPI
         internal val testApplicationEngine = TestApplicationEngine(
@@ -52,6 +81,7 @@ internal class TestApplicationExtension : ParameterResolver {
                     testApplicationEngine.stop(10, 60, TimeUnit.SECONDS)
                     embeddedPostgres.postgresDatabase.connection.close()
                     embeddedPostgres.close()
+                    wireMockServer.stop()
                 }
             )
         }
