@@ -17,16 +17,15 @@ import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
-import no.nav.omsorgsdager.Environment
+import no.nav.omsorgsdager.config.Environment
 import no.nav.omsorgsdager.config.ServiceUser
-import no.nav.omsorgsdager.hentRequiredEnv
+import no.nav.omsorgsdager.config.hentRequiredEnv
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
 internal class PdlClient(
         env: Environment,
         accessTokenClient: AccessTokenClient,
-        private val serviceUser: ServiceUser,
         private val httpClient: HttpClient,
         private val objectMapper: ObjectMapper
 ) : HealthCheck {
@@ -39,7 +38,7 @@ internal class PdlClient(
         return httpClient.post<HttpStatement>("$pdlBaseUrl") {
             header(HttpHeaders.Authorization, getAuthorizationHeader())
             header("Nav-Consumer-Token", getAuthorizationHeader())
-            header("Nav-Consumer-Id", "omsorgsdager")
+            header("Nav-Consumer-Id", "srvomsorgsdager")
             header("TEMA", "OMS")
             accept(ContentType.Application.Json)
             contentType(ContentType.Application.Json)

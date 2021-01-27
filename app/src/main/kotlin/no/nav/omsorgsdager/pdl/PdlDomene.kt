@@ -1,5 +1,7 @@
 package no.nav.omsorgsdager.pdl
 
+import no.nav.omsorgsdager.pdl.Queries.query
+
 typealias Identitetsnummer = String
 
 data class GraphqlQuery(
@@ -29,6 +31,11 @@ data class PdlErrorExtension(
 )
 
 fun hentIdenterQuery(fnr: Set<String>): GraphqlQuery {
-    val query = GraphqlQuery::class.java.getResource("/pdl/hentIdenterBolk.graphql").readText().replace("[\n\r]", "")
     return GraphqlQuery(query, Variables(fnr.toList()))
 }
+
+private object Queries {
+        @JvmStatic
+        val query = GraphqlQuery::class.java.getResource("/pdl/hentIdenterBolk.graphql").readText().replace("[\n\r]", "")
+}
+

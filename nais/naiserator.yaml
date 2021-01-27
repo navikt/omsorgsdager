@@ -8,6 +8,10 @@ metadata:
 spec:
   image: {{ image }}
   port: 8080
+  azure:
+    application:
+      enabled: true
+      tenant: {{ azureTenant }}
   gcp:
     sqlInstances:
       - type: POSTGRES_12
@@ -48,3 +52,13 @@ spec:
     path: /metrics
   secureLogs:
     enabled: true
+  filesFrom:
+    - secret: omsorgsdager-srvusercredentials
+      mountPath: /var/run/secrets/nais.io/service_user
+  env:
+  {{#each env}}
+     - name: {{@key}}
+  value: {{this}}
+  {{/each}}
+  - name: TILGANGSSTYRING_URL
+    value: http://omsorgspenger-tilgangsstyring.omsorgspenger.svc.cluster.local

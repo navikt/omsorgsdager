@@ -8,7 +8,11 @@ import io.ktor.client.features.json.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
+import no.nav.omsorgsdager.config.DataSourceBuilder
+import no.nav.omsorgsdager.config.Environment
 import no.nav.omsorgsdager.config.ServiceUser
+import no.nav.omsorgsdager.config.hentRequiredEnv
+import no.nav.omsorgsdager.config.migrate
 import no.nav.omsorgsdager.config.readServiceUserCredentials
 import no.nav.omsorgsdager.pdl.PdlClient
 import java.net.URI
@@ -17,7 +21,8 @@ import javax.sql.DataSource
 internal class ApplicationContext(
     internal val env: Environment,
     internal val dataSource: DataSource,
-    internal val healthService: HealthService
+    internal val healthService: HealthService,
+    internal val tilgangsstyringRestClient: TilgangsstyringRestClient
 ) {
 
     internal fun start() {
@@ -50,7 +55,6 @@ internal class ApplicationContext(
             val benyttetPdlClient = pdlClient ?: PdlClient(
                 env = benyttetEnv,
                 accessTokenClient = benyttetAccessTokenClient,
-                serviceUser = benyttetServiceUser,
                 httpClient = benyttetHttpClient,
                 objectMapper = objectMapper
             )
@@ -64,9 +68,11 @@ internal class ApplicationContext(
                 dataSource = benyttetDataSource,
                 healthService = HealthService(
                     healthChecks = setOf(
-                        benyttetPdlClient
+                        benyttetPdlClient,
+                        benyttetTilgangsstyringRestClient
                     )
-                )
+                ),
+                tilgangsstyringRestClient = benyttetTilgangsstyringRestClient
             )
         }
 

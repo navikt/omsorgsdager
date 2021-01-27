@@ -15,6 +15,8 @@ import java.util.*
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
+import no.nav.omsorgsdager.config.Environment
+import no.nav.omsorgsdager.config.hentRequiredEnv
 import org.slf4j.LoggerFactory
 
 internal class TilgangsstyringRestClient(
@@ -25,13 +27,17 @@ internal class TilgangsstyringRestClient(
     private val logger = LoggerFactory.getLogger(TilgangsstyringRestClient::class.java)
     private val tilgangUrl = env.hentRequiredEnv("TILGANGSSTYRING_URL")
 
-    internal suspend fun sjekkTilgang(identer: Set<String>, authHeader: String, beskrivelse: String): Boolean {
+    internal suspend fun sjekkTilgang(
+        identer: Set<String>,
+        authHeader: String,
+        beskrivelse: String,
+        operasjon: Operasjon): Boolean {
         return kotlin.runCatching {
             httpClient.post<HttpStatement>("$tilgangUrl/api/tilgang/personer") {
                 header(HttpHeaders.Authorization, authHeader)
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
                 header(HttpHeaders.XCorrelationId, UUID.randomUUID().toString())
-                body = PersonerRequestBody(identer, Operasjon.Visning, beskrivelse)
+                body = PersonerRequestBody(identer, operasjon, beskrivelse)
             }.execute()
         }.håndterResponse()
     }
@@ -79,7 +85,8 @@ internal class TilgangsstyringRestClient(
 }
 
 enum class Operasjon {
-    Visning
+    Visning,
+    Endring
 }
 
 data class PersonerRequestBody(

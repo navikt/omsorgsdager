@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager
+package no.nav.omsorgsdager.config
 
 typealias Environment = Map<String, String>
 

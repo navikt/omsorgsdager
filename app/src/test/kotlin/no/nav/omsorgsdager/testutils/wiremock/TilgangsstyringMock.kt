@@ -15,7 +15,7 @@ internal const val catchAllPriority = 9
 
 private fun WireMockServer.stubTilgangsstyringOk(): WireMockServer {
     WireMock.stubFor(
-        WireMock.post(
+        WireMock.any(
             WireMock
                 .urlPathMatching(".*$apiPath.*")
         ).atPriority(catchAllPriority)
@@ -46,7 +46,23 @@ private fun WireMockServer.stubTilgangsstyringIkkeTilgang(): WireMockServer {
     return this
 }
 
+private fun WireMockServer.stubTilgangsstyringHelseSjekkM(): WireMockServer {
+    WireMock.stubFor(
+        WireMock.any(
+            WireMock
+                .urlPathMatching(".*$apiPath.*/isalive")
+        ).atPriority(catchAllPriority)
+            .willReturn(
+                aResponse()
+                    .withStatus(200)
+            )
+    )
+
+    return this
+}
+
 internal fun WireMockServer.stubTilgangApi() = stubTilgangsstyringOk()
     .stubTilgangsstyringIkkeTilgang()
+    .stubTilgangsstyringHelseSjekkM()
 
 internal fun WireMockServer.tilgangApiBaseUrl() = baseUrl() + apiPath

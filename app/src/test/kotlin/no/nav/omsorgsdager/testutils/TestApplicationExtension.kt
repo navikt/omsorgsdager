@@ -18,6 +18,7 @@ import no.nav.omsorgsdager.config.ServiceUser
 import no.nav.omsorgsdager.testutils.wiremock.pdlApiBaseUrl
 import no.nav.omsorgsdager.testutils.wiremock.stubPdlApi
 import no.nav.omsorgsdager.testutils.wiremock.stubTilgangApi
+import no.nav.omsorgsdager.testutils.wiremock.tilgangApiBaseUrl
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
@@ -53,7 +54,7 @@ internal class TestApplicationExtension : ParameterResolver {
                 "PDL_BASE_URL" to wireMockServer.pdlApiBaseUrl(),
                 "STS_TOKEN_ENDPOINT" to wireMockServer.getNaisStsTokenUrl(),
                 "PROXY_SCOPES" to "/.default",
-                "TILGANGSSTYRING_URL" to "test/.default",
+                "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl(),
                 "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
                 "AZURE_V2_JWKS_URI" to (wireMockServer.getAzureV2JwksUrl()),
                 "AZURE_APP_CLIENT_ID" to "omsorgsdager"

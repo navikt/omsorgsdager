@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager
+package no.nav.omsorgsdager.config
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
