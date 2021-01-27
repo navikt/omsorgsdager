@@ -1,5 +1,6 @@
 # omsorgsdager
 
+[Swagger dokumentasjon](https://editor.swagger.io/?url=https://raw.githubusercontent.com/navikt/omsorgsdager/main/docs/openapi.yaml) 
 
 ## Henvendelser
 
