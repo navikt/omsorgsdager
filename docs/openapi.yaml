@@ -31,19 +31,19 @@ paths:
       responses:
         201:
           description: Opprettet et vedtak. Ved opprettelse vil det alltid ha status=FORSLAG
-            ettersom det minst vil være ett aksjonspunkt i listen over aksjonspunter.
+            ettersom det minst vil være ett aksjonspunkt som kreves.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UtvidetRettSoknadResponse'
-  /utvidet-rett/{vedtakId}/aksjonspunkt:
+  /utvidet-rett/{behandlingId}/aksjonspunkt:
     put:
       tags:
       - Utvidet rett - skriv
       parameters:
-      - name: vedtakId
+      - name: behandlingId
         in: path
-        description: ID på vedtaket
+        description: Behandling ID
         required: true
         schema:
           type: string
@@ -57,26 +57,26 @@ paths:
         required: true
       responses:
         200:
-          description: Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles i listen med aksjonspunkter
+          description: Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles i 'kreverAksjonspunter'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UtvidetRettSoknadResponse'
-  /utvidet-rett/{vedtakId}/fastsett:
+  /utvidet-rett/{behandlingId}/fastsett:
     put:
       tags:
       - Utvidet rett - skriv
       summary: Fastsette vedtaket
       parameters:
-      - name: vedtakId
+      - name: behandlingId
         in: path
-        description: ID på vedtaket
+        description: Behandling ID
         required: true
         schema:
           type: string
       responses:
         200:
-          description: Status=FASTSATT og aksjonspunkter=[]
+          description: Status=FASTSATT
           content:
             application/json:
               schema:
@@ -87,15 +87,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UtvidetRettSoknadResponse'
-  /utvidet-rett/{vedtakId}/deaktiver:
+  /utvidet-rett/{behandlingId}/deaktiver:
     put:
       tags:
       - Utvidet rett - skriv
       summary: Deaktiver vedtaket
       parameters:
-      - name: vedtakId
+      - name: behandlingId
         in: path
-        description: ID på vedtaket
+        description: Behandling ID
         required: true
         schema:
           type: string
@@ -106,14 +106,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UtvidetRettSoknadResponse'
-  /utvidet-rett/{vedtakId}:
+  /utvidet-rett/{behandlingId}:
     get:
       tags:
       - Utvidet rett - les
       parameters:
-      - name: vedtakId
+      - name: behandlingId
         in: path
-        description: ID på vedtaket
+        description: Behandling ID
         required: true
         schema:
           type: string
@@ -125,15 +125,59 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HentUtvidetRettResponse'
+  /utvidet-rett/{p}:
+    get:
+      tags:
+      - Utvidet rett - les
+      parameters:
+      - name: saksnummer
+        in: path
+        required: true
+        schema:
+          type: string
+          example: ABC123
+      - name: status
+        in: query
+        description: Status
+        required: false
+        schema:
+          type: string
+          description: Filtrering på status
+          enum:
+          - FORSLAG
+          - FASTSATT
+          - DEAKTIVERT
+      - name: gyldigFraOgMed
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          example: "2020-01-01"
+      - name: gyldigTilOgMed
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+          example: "2020-02-01"
+      summary: Hente alle vedtak på saksnummer med filtrering
+      responses:
+        200:
+          description: Henter alle vedtak for et saksnummer med filtrering
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HentAlleUtvidetRettResponse'
 components:
   schemas:
     UtvidetRettSoknad:
       type: object
       properties:
-        søknadId:
+        saksnummer:
           type: string
           format: string
-          example: '"123123"'
+          example: '"OBC123"'
         behandlingId:
           type: string
           format: string
@@ -170,16 +214,6 @@ components:
     UtvidetRettSoknadResponse:
       type: object
       properties:
-        vedtakId:
-          type: string
-          format: string
-          example: '"666"'
-        gyldigFraOgMed:
-          type: string
-          format: date
-        gyldigTilOgMed:
-          type: string
-          format: date
         status:
           type: string
           description: Status på vedtaket
@@ -187,15 +221,18 @@ components:
           - FORSLAG
           - FASTSATT
           - DEAKTIVERT
-        kreverAksjonspunkter:
-          type: array
-          items:
-            type: string
-            description: Status på vedtaket
-            enum:
-            - LEGEERKLÆRING
-            - MEDLEMSKAP
-            - YRKESAKTIVITET
+        uløsteAksjonspunkter:
+          type: object
+          properties:
+            LEGEERKLÆRING:
+              type: object
+              properties: {}
+            MEDLEMSKAP:
+              type: object
+              properties: {}
+            YRKESAKTIVITET:
+              type: object
+              properties: {}
     AksjonspunktRequest:
       type: object
       properties:
@@ -226,14 +263,13 @@ components:
           - FORSLAG
           - FASTSATT
           - DEAKTIVERT
-        kreverAksjonspunkter:
-          type: array
-          items:
-            type: string
-            description: Status på vedtaket
-            enum:
-            - LEGEERKLÆRING
-        aksjonspunkter:
+        uløsteAksjonspunkter:
+          type: object
+          properties:
+            LEGEERKLÆRING:
+              type: object
+              properties: {}
+        løsteAksjonspunkter:
           type: object
           properties:
             MEDLEMSKAP:
@@ -251,4 +287,11 @@ components:
             FTL 9-5 2.ledd:
               type: string
               example: "ikke omsorgen for barnet"
+    HentAlleUtvidetRettResponse:
+      type: object
+      properties:
+        vedtak:
+          type: array
+          items:
+            $ref: '#/components/schemas/HentUtvidetRettResponse'
       

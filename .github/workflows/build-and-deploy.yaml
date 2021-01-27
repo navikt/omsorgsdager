@@ -10,6 +10,7 @@ on:
       - '.gitignore'
       - 'LICENSE'
       - 'CODEOWNERS'
+      - 'docs/openapi.yaml'
   workflow_dispatch:
 
 env:
