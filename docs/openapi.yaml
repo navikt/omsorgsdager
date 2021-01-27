@@ -193,19 +193,19 @@ components:
             type: string
             description: Status på vedtaket
             enum:
-            - VURDER_LEGEERKLÆRING
-            - VURDER_MEDLEMSKAP
-            - VURDER_YRKESAKTIVITET
+            - LEGEERKLÆRING
+            - MEDLEMSKAP
+            - YRKESAKTIVITET
     AksjonspunktRequest:
       type: object
       properties:
-        VURDER_LEGEERKLÆRING:
+        LEGEERKLÆRING:
           type: object
           properties: {}
-        VURDER_MEDLEMSKAP:
+        MEDLEMSKAP:
           type: object
           properties: {}
-        VURDER_YRKESAKTIVITET:
+        YRKESAKTIVITET:
           type: object
           properties: {}
     HentUtvidetRettResponse:
@@ -232,14 +232,14 @@ components:
             type: string
             description: Status på vedtaket
             enum:
-            - VURDER_LEGEERKLÆRING
+            - LEGEERKLÆRING
         aksjonspunkter:
           type: object
           properties:
-            VURDER_MEDLEMSKAP:
+            MEDLEMSKAP:
               type: object
               properties: {}
-            VURDER_YRKESAKTIVITET:
+            YRKESAKTIVITET:
               type: object
               properties: {}
         lovhenvisnigner:
