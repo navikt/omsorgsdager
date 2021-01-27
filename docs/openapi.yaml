@@ -1,7 +1,25 @@
 openapi: 3.0.1
 info:
   title: Omsorgsdager
-  description: Håndtering av omsorgsdager
+  description: >
+    Håndtering av omsorgsdager<br/><br/>
+    <b>Utvidet rett omfatter</b><br>
+    - Kronisk sykt barn<br/>
+    - Midliertidig alene</br></br>
+
+    <b>Autentisering & autorisering</b></br>
+    <b>Generelt</b></br>
+    - Authorization header med `Bearer` scheme</br>
+    - `les`-operasjoner med persontoken kan gjøres for alle i en `k9-*`-gruppe</br>
+    - `skriv`-operasjoner med persontoken kan gjøres kun av `saksbehandler/overstyrer/beslutter`</br>
+    - Ha lov til å se detaljer om de involverte partene i behandlingen (mtp. skjermingskoder/egen ansatt)</br>
+    - `HTTP 401` ved manglende/ikke støttet token</br>
+    - `HTTP 403` ved manglende tilganger</br>
+    <b>Azure</b></br>
+    - System & persontoken scopet til omsorgsdager-tjenesten (`audience`)</br>
+    - Systemtokens må ha `role=access_as_application`</br>
+    <b>OpenAM</b></br>
+    - Systemtokens må tilhøre en client som er allowlisted i tjenesten (`azp`)
   contact:
     email: omsorgspenger@nav.no
   license:
@@ -9,47 +27,51 @@ info:
     url: https://github.com/navikt/omsorgsdager/blob/main/LICENSE
   version: 1.0.0
 servers:
-- url: https://omsorgsdager.dev.intern.nav.no/api
-- url: https://omsorgsdager.intern.nav.no/api
+  - url: https://omsorgsdager.dev.intern.nav.no/api
+  - url: https://omsorgsdager.intern.nav.no/api
 tags:
-- name: Utvidet rett - skriv
-  description: Skriveoperasjoner for utvidet rett
-- name: Utvidet rett - les
-  description: Leseoperasjoner for utvidet rett
+  - name: Kronisk sykt barn - skriv
+    description: Skriveoperasjoner for kronisk sykt barn
+  - name: Kronisk sykt barn - les
+    description: Leseoperasjoner for kronisk sykt barn
 paths:
-  /utvidet-rett:
+  /kronisk-sykt-barn:
     post:
       tags:
-      - Utvidet rett - skriv
-      summary: Registrere ny søknad om utvidet rett
+        - Kronisk sykt barn - skriv
+      summary: Registrere ny søknad for kronisk sykt barn
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UtvidetRettSoknad'
+              $ref: '#/components/schemas/KroniskSyktBarnSoknadRequest'
         required: true
       responses:
         201:
-          description: Opprettet et vedtak. Ved opprettelse vil det alltid ha status=FORSLAG
-            ettersom det minst vil være ett aksjonspunkt som kreves.
+          description: >
+            - Opprettet et vedtak. Ved opprettelse vil det alltid ha `status=FORSLAG`
+            ettersom det minst vil være ett aksjonspunkt i `uløsteAksjonspunkter`
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
-  /utvidet-rett/{behandlingId}/aksjonspunkt:
+                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+  /kronisk-sykt-barn/{behandlingId}/aksjonspunkt:
     put:
       tags:
-      - Utvidet rett - skriv
+        - Kronisk sykt barn - skriv
       parameters:
-      - name: behandlingId
-        in: path
-        description: Behandling ID
-        required: true
-        schema:
-          type: string
+        - name: behandlingId
+          in: path
+          description: Behandling ID
+          required: true
+          schema:
+            type: string
       summary: Legge til eller oppdatere aksjonspunkt
       requestBody:
-        description: Legge til/oppdatere løsning på aksjonspunkt. Kan sende med på ett eller flere aksjonspunkt samtidig.
+        description: >
+          - Legge til/oppdatere løsning på aksjonspunkt. Kan sende med på ett eller flere aksjonspunkt samtidig.<br/>
+
+          - For de aksjonspunktene som inneholder informasjon overskrives eventuell tidligere vurderinger gjort på aksjonspunktet.
         content:
           application/json:
             schema:
@@ -57,66 +79,74 @@ paths:
         required: true
       responses:
         200:
-          description: Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles i 'kreverAksjonspunter'
+          description: Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles i `uløsteAksjonspunkter`
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
-  /utvidet-rett/{behandlingId}/fastsett:
+                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+        409:
+          description: Om vedtaket allerede har `status=FASTSATT`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+  /kronisk-sykt-barn/{behandlingId}/fastsett:
     put:
       tags:
-      - Utvidet rett - skriv
+        - Kronisk sykt barn - skriv
       summary: Fastsette vedtaket
       parameters:
-      - name: behandlingId
-        in: path
-        description: Behandling ID
-        required: true
-        schema:
-          type: string
+        - name: behandlingId
+          in: path
+          description: Behandling ID
+          required: true
+          schema:
+            type: string
       responses:
         200:
-          description: Status=FASTSATT
+          description: >
+            `status=FASTSATT`
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
+                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
-          description: Om det er uløste aksjonspunkter på vedtaket. 
+          description: Om det er uløste aksjonspunkter på vedtaket.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
-  /utvidet-rett/{behandlingId}/deaktiver:
+                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+  /kronisk-sykt-barn/{behandlingId}/deaktiver:
     put:
       tags:
-      - Utvidet rett - skriv
+        - Kronisk sykt barn - skriv
       summary: Deaktiver vedtaket
       parameters:
-      - name: behandlingId
-        in: path
-        description: Behandling ID
-        required: true
-        schema:
-          type: string
+        - name: behandlingId
+          in: path
+          description: Behandling ID
+          required: true
+          schema:
+            type: string
       responses:
         200:
-          description: Status=DEAKTIVERT
+          description: >
+            `status=DEAKTIVERT`
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
-  /utvidet-rett/{behandlingId}:
+                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+  /kronisk-sykt-barn/{behandlingId}:
     get:
       tags:
-      - Utvidet rett - les
+        - Kronisk sykt barn - les
       parameters:
-      - name: behandlingId
-        in: path
-        description: Behandling ID
-        required: true
-        schema:
-          type: string
+        - name: behandlingId
+          in: path
+          description: Behandling ID
+          required: true
+          schema:
+            type: string
       summary: Hente et vedtak
       responses:
         200:
@@ -124,43 +154,47 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HentUtvidetRettResponse'
-  /utvidet-rett/{p}:
+                $ref: '#/components/schemas/HentKroniskSyktBarnResponse'
+  /kronisk-sykt-barn/{saksnummer}:
     get:
       tags:
-      - Utvidet rett - les
+        - Kronisk sykt barn - les
+      description: >
+        - Henter vedtak om kronisk sykt barn aggregert for et saksnummer.</br>
+
+        - For `saksnummer+barn+periode` man kun ha ett vedtak, så vil kun være det siste med `status=FASTSATT` som blir aggregert på saksnummer.
       parameters:
-      - name: saksnummer
-        in: path
-        required: true
-        schema:
-          type: string
-          example: ABC123
-      - name: status
-        in: query
-        description: Status
-        required: false
-        schema:
-          type: string
-          description: Filtrering på status
-          enum:
-          - FORSLAG
-          - FASTSATT
-          - DEAKTIVERT
-      - name: gyldigFraOgMed
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date
-          example: "2020-01-01"
-      - name: gyldigTilOgMed
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date
-          example: "2020-02-01"
+        - name: saksnummer
+          in: path
+          required: true
+          schema:
+            type: string
+            example: ABC123
+        - name: status
+          in: query
+          description: Status
+          required: false
+          schema:
+            type: string
+            description: Filtrering på status
+            enum:
+              - FORSLAG
+              - FASTSATT
+              - DEAKTIVERT
+        - name: gyldigFraOgMed
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2020-01-01"
+        - name: gyldigTilOgMed
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2020-02-01"
       summary: Hente alle vedtak på saksnummer med filtrering
       responses:
         200:
@@ -168,10 +202,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HentAlleUtvidetRettResponse'
+                $ref: '#/components/schemas/HentGjeldendeKroniskSyktBarnResponse'
 components:
   schemas:
-    UtvidetRettSoknad:
+    KroniskSyktBarnSoknadRequest:
       type: object
       properties:
         saksnummer:
@@ -211,16 +245,16 @@ components:
         fødselsdato:
           type: string
           format: date
-    UtvidetRettSoknadResponse:
+    KroniskSyktBarnSoknadResponse:
       type: object
       properties:
         status:
           type: string
           description: Status på vedtaket
           enum:
-          - FORSLAG
-          - FASTSATT
-          - DEAKTIVERT
+            - FORSLAG
+            - FASTSATT
+            - DEAKTIVERT
         uløsteAksjonspunkter:
           type: object
           properties:
@@ -245,11 +279,15 @@ components:
         YRKESAKTIVITET:
           type: object
           properties: {}
-    HentUtvidetRettResponse:
+    HentKroniskSyktBarnResponse:
       type: object
       properties:
         barn:
           $ref: '#/components/schemas/Barn'
+        behandlingId:
+          type: string
+          format: string
+          example: UUID-123-123
         gyldigFraOgMed:
           type: string
           format: date
@@ -260,9 +298,9 @@ components:
           type: string
           description: Status på vedtaket
           enum:
-          - FORSLAG
-          - FASTSATT
-          - DEAKTIVERT
+            - FORSLAG
+            - FASTSATT
+            - DEAKTIVERT
         uløsteAksjonspunkter:
           type: object
           properties:
@@ -287,11 +325,11 @@ components:
             FTL 9-5 2.ledd:
               type: string
               example: "ikke omsorgen for barnet"
-    HentAlleUtvidetRettResponse:
+    HentGjeldendeKroniskSyktBarnResponse:
       type: object
       properties:
         vedtak:
           type: array
           items:
-            $ref: '#/components/schemas/HentUtvidetRettResponse'
+            $ref: '#/components/schemas/HentKroniskSyktBarnResponse'
       
