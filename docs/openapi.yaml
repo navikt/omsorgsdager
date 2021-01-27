@@ -1,0 +1,254 @@
+openapi: 3.0.1
+info:
+  title: Omsorgsdager
+  description: Håndtering av omsorgsdager
+  contact:
+    email: omsorgspenger@nav.no
+  license:
+    name: MIT
+    url: https://github.com/navikt/omsorgsdager/LICENSE
+  version: 1.0.0
+servers:
+- url: https://omsorgsdager.dev.intern.nav.no/api
+- url: https://omsorgsdager.intern.nav.no/api
+tags:
+- name: Utvidet rett - skriv
+  description: Skriveoperasjoner for utvidet rett
+- name: Utvidet rett - les
+  description: Leseoperasjoner for utvidet rett
+paths:
+  /utvidet-rett:
+    post:
+      tags:
+      - Utvidet rett - skriv
+      summary: Registrere ny søknad om utvidet rett
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtvidetRettSoknad'
+        required: true
+      responses:
+        201:
+          description: Opprettet et vedtak. Ved opprettelse vil det alltid ha status=FORSLAG
+            ettersom det minst vil være ett aksjonspunkt i listen over aksjonspunter.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
+  /utvidet-rett/{vedtakId}/aksjonspunkt:
+    put:
+      tags:
+      - Utvidet rett - skriv
+      parameters:
+      - name: vedtakId
+        in: path
+        description: ID på vedtaket
+        required: true
+        schema:
+          type: string
+      summary: Legge til eller oppdatere aksjonspunkt
+      requestBody:
+        description: Legge til/oppdatere løsning på aksjonspunkt. Kan sende med på ett eller flere aksjonspunkt samtidig.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AksjonspunktRequest'
+        required: true
+      responses:
+        200:
+          description: Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles i listen med aksjonspunkter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
+  /utvidet-rett/{vedtakId}/fastsett:
+    put:
+      tags:
+      - Utvidet rett - skriv
+      summary: Fastsette vedtaket
+      parameters:
+      - name: vedtakId
+        in: path
+        description: ID på vedtaket
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Status=FASTSATT og aksjonspunkter=[]
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
+        409:
+          description: Om det er uløste aksjonspunkter på vedtaket. 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
+  /utvidet-rett/{vedtakId}/deaktiver:
+    put:
+      tags:
+      - Utvidet rett - skriv
+      summary: Deaktiver vedtaket
+      parameters:
+      - name: vedtakId
+        in: path
+        description: ID på vedtaket
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Status=DEAKTIVERT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtvidetRettSoknadResponse'
+  /utvidet-rett/{vedtakId}:
+    get:
+      tags:
+      - Utvidet rett - les
+      parameters:
+      - name: vedtakId
+        in: path
+        description: ID på vedtaket
+        required: true
+        schema:
+          type: string
+      summary: Hente et vedtak
+      responses:
+        200:
+          description: Henter vedtaket slik det ser ut nå
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HentUtvidetRettResponse'
+components:
+  schemas:
+    UtvidetRettSoknad:
+      type: object
+      properties:
+        søknadId:
+          type: string
+          format: string
+          example: '"123123"'
+        behandlingId:
+          type: string
+          format: string
+          example: '"UUID-123-123"'
+        mottatt:
+          type: string
+          format: date-time
+        søker:
+          $ref: '#/components/schemas/Soker'
+        barn:
+          $ref: '#/components/schemas/Barn'
+    Soker:
+      type: object
+      properties:
+        identitetsnummer:
+          type: string
+          format: string
+          example: '"29099011112"'
+        fødselsdato:
+          type: string
+          format: date
+        jobberINorge:
+          type: boolean
+    Barn:
+      type: object
+      properties:
+        identitetsnummer:
+          type: string
+          format: string
+          example: '"29099011111"'
+        fødselsdato:
+          type: string
+          format: date
+    UtvidetRettSoknadResponse:
+      type: object
+      properties:
+        vedtakId:
+          type: string
+          format: string
+          example: '"666"'
+        gyldigFraOgMed:
+          type: string
+          format: date
+        gyldigTilOgMed:
+          type: string
+          format: date
+        status:
+          type: string
+          description: Status på vedtaket
+          enum:
+          - FORSLAG
+          - FASTSATT
+          - DEAKTIVERT
+        kreverAksjonspunkter:
+          type: array
+          items:
+            type: string
+            description: Status på vedtaket
+            enum:
+            - VURDER_LEGEERKLÆRING
+            - VURDER_MEDLEMSKAP
+            - VURDER_YRKESAKTIVITET
+    AksjonspunktRequest:
+      type: object
+      properties:
+        VURDER_LEGEERKLÆRING:
+          type: object
+          properties: {}
+        VURDER_MEDLEMSKAP:
+          type: object
+          properties: {}
+        VURDER_YRKESAKTIVITET:
+          type: object
+          properties: {}
+    HentUtvidetRettResponse:
+      type: object
+      properties:
+        barn:
+          $ref: '#/components/schemas/Barn'
+        gyldigFraOgMed:
+          type: string
+          format: date
+        gyldigTilOgMed:
+          type: string
+          format: date
+        status:
+          type: string
+          description: Status på vedtaket
+          enum:
+          - FORSLAG
+          - FASTSATT
+          - DEAKTIVERT
+        kreverAksjonspunkter:
+          type: array
+          items:
+            type: string
+            description: Status på vedtaket
+            enum:
+            - VURDER_LEGEERKLÆRING
+        aksjonspunkter:
+          type: object
+          properties:
+            VURDER_MEDLEMSKAP:
+              type: object
+              properties: {}
+            VURDER_YRKESAKTIVITET:
+              type: object
+              properties: {}
+        lovhenvisnigner:
+          type: object
+          properties:
+            FTL 9-5 3.ledd:
+              type: string
+              example: "søkeren bor ikke i norge"
+            FTL 9-5 2.ledd:
+              type: string
+              example: "ikke omsorgen for barnet"
+      
