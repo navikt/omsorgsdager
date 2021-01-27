@@ -52,7 +52,6 @@ spec:
     path: /metrics
   secureLogs:
     enabled: true
-<<<<<<< HEAD
   filesFrom:
     - secret: omsorgsdager-srvusercredentials
       mountPath: /var/run/secrets/nais.io/service_user
@@ -63,5 +62,3 @@ spec:
   {{/each}}
   - name: TILGANGSSTYRING_URL
     value: http://omsorgspenger-tilgangsstyring.omsorgspenger.svc.cluster.local
-=======
->>>>>>> main

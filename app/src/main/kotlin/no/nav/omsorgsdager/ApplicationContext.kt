@@ -10,11 +10,13 @@ import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.omsorgsdager.config.DataSourceBuilder
 import no.nav.omsorgsdager.config.Environment
+import no.nav.omsorgsdager.config.KafkaBuilder.kafkaProducer
 import no.nav.omsorgsdager.config.ServiceUser
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.config.migrate
 import no.nav.omsorgsdager.config.readServiceUserCredentials
 import no.nav.omsorgsdager.pdl.PdlClient
+import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource
 
@@ -22,7 +24,8 @@ internal class ApplicationContext(
     internal val env: Environment,
     internal val dataSource: DataSource,
     internal val healthService: HealthService,
-    internal val tilgangsstyringRestClient: TilgangsstyringRestClient
+    internal val tilgangsstyringRestClient: TilgangsstyringRestClient,
+    internal val kafkaProducer: KafkaProducer<String, String>
 ) {
 
     internal fun start() {
@@ -38,7 +41,8 @@ internal class ApplicationContext(
         var httpClient: HttpClient? = null,
         var accessTokenClient: AccessTokenClient? = null,
         var pdlClient: PdlClient? = null,
-        var tilgangsstyringRestClient: TilgangsstyringRestClient? = null
+        var tilgangsstyringRestClient: TilgangsstyringRestClient? = null,
+        var kafkaProducer: KafkaProducer<String, String>? = null,
         ) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
@@ -62,6 +66,7 @@ internal class ApplicationContext(
                 httpClient = benyttetHttpClient,
                 env = benyttetEnv
             )
+            val benyttetKafkaProducer =  kafkaProducer ?: benyttetEnv.kafkaProducer()
 
             return ApplicationContext(
                 env = benyttetEnv,
@@ -72,7 +77,8 @@ internal class ApplicationContext(
                         benyttetTilgangsstyringRestClient
                     )
                 ),
-                tilgangsstyringRestClient = benyttetTilgangsstyringRestClient
+                tilgangsstyringRestClient = benyttetTilgangsstyringRestClient,
+                kafkaProducer = benyttetKafkaProducer
             )
         }
 

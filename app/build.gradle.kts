@@ -4,6 +4,7 @@ val junitJupiterVersion = "5.7.0"
 val dusseldorfVersion = "1.5.0.ae98b7c"
 val ktorVersion = "1.5.0"
 val jsonassertVersion = "1.5.0"
+val kafkaVersion = "2.4.0"
 
 // Database
 val flywayVersion = "7.5.0"
@@ -34,6 +35,7 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
+    implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
 
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")
