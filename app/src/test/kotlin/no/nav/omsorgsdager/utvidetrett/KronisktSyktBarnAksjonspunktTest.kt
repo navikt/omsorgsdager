@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager
+package no.nav.omsorgsdager.utvidetrett
 
 import io.ktor.http.*
 import io.ktor.server.testing.*
@@ -9,21 +9,28 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(TestApplicationExtension::class)
-internal class UtvidetRettAksjonsTest(
+internal class KronisktSyktBarnAksjonspunktTest(
     private val testApplicationEngine: TestApplicationEngine
 ) {
 
     @Test
     fun `Gyldig post ger forvented respons`() {
-
+        val body = """
+            {
+                "LEGEERKLÆRING": {},
+                "MEDLEMSKAP": {},
+                "YRKESAKTIVITET": {} 
+            }
+        """.trimIndent()
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/utvidet-rett/aksjonspunkt") {
+            handleRequest(HttpMethod.Put, "/kroniskt-sykt-barn/1234/aksjonspunkt") {
                 addHeader(HttpHeaders.Authorization,
                     "Bearer "+Azure.V2_0.generateJwt("omsorgsdager", "omsorgsdager"))
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                setBody("{}")
+                setBody(body)
             }.apply {
                 Assertions.assertEquals(HttpStatusCode.NotImplemented, response.status())
+                Assertions.assertTrue(response.content.isNullOrEmpty())
             }
         }
 

@@ -5,6 +5,7 @@ import io.ktor.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
+import io.mockk.mockk
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
@@ -55,6 +56,7 @@ internal class TestApplicationExtension : ParameterResolver {
                 "STS_TOKEN_ENDPOINT" to wireMockServer.getNaisStsTokenUrl(),
                 "PROXY_SCOPES" to "/.default",
                 "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl(),
+                "KAFKA_BOOTSTRAP_SERVERS" to "test",
                 "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
                 "AZURE_V2_JWKS_URI" to (wireMockServer.getAzureV2JwksUrl()),
                 "AZURE_APP_CLIENT_ID" to "omsorgsdager"
@@ -64,7 +66,8 @@ internal class TestApplicationExtension : ParameterResolver {
                 clientId = "omsorgsdager",
                 clientSecret = "azureSecret",
                 tokenEndpoint = URI(wireMockServer.getAzureV2TokenUrl()),
-            )
+            ),
+            kafkaProducer = mockk()
         ).build()
 
         @KtorExperimentalAPI

@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager
+package no.nav.omsorgsdager.utvidetrett
 
 import io.ktor.http.*
 import io.ktor.server.testing.*
@@ -11,14 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.skyscreamer.jsonassert.JSONAssert
 
 @ExtendWith(TestApplicationExtension::class)
-internal class UtvidetRettTest(
+internal class KronisktSyktBarnPostTest(
     private val testApplicationEngine: TestApplicationEngine
 ) {
 
     @Test
     fun `UtvidetRett post request med ugyldig body returns 400`() {
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/utvidet-rett") {
+            handleRequest(HttpMethod.Post, "/kroniskt-sykt-barn") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 addHeader(HttpHeaders.Authorization, "Bearer "+Azure.V2_0.generateJwt("omsorgsdager", "omsorgsdager"))
                 setBody(
@@ -38,7 +38,7 @@ internal class UtvidetRettTest(
     @Test
     fun `Post uten gyldig bearer token gir 403`() {
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/utvidet-rett") {
+            handleRequest(HttpMethod.Post, "/kroniskt-sykt-barn") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 addHeader(HttpHeaders.Authorization,
                     "Bearer "+Azure.V2_0.generateJwt("omsorgsdager", "noenannen"))
@@ -51,7 +51,7 @@ internal class UtvidetRettTest(
     @Test
     fun `Post uten authorization gir 401`() {
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/utvidet-rett") {
+            handleRequest(HttpMethod.Post, "/kroniskt-sykt-barn") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             }.apply {
                 Assertions.assertEquals(HttpStatusCode.Unauthorized, response.status())
@@ -64,12 +64,17 @@ internal class UtvidetRettTest(
         @Language("JSON")
         val payload = """
             {
-                "mottatt": "ZonedDateTime",
+                "saksnummer": "test",
+                "behandlingId": "test",
+                "mottatt": "LocalDateTime",
                 "søker": {
-                    "identitetsnummer": "123"
+                    "identitetsnummer": "123",
+                    "fødselsdato": "test",
+                    "jobberINorge": true
                 },
                 "barn": {
-                    "identitetsnummer": "123"
+                    "identitetsnummer": "123",
+                    "fødselsdato": "123"
                 }
             }
         """.trimIndent()
@@ -77,30 +82,24 @@ internal class UtvidetRettTest(
         @Language("JSON")
         val expectedJson = """
             {
-                "id": "1",
-                "søker": {},
-                "barn": {},
                 "status": "FORSLAG",
-                "gyldigFraOgMed": "LocalDate",
-                "gyldigTilOgMed": "LocalDate",
-                "aksjonspunkter": [
-                    "VURDERE_LEGEERKLÆRING"
-                ]
+                "uløsteAksjonspunkter": {
+                    "VURDERE_LEGEERKLÆRING": {},
+                    "MEDLEMSKAP": {},
+                    "YRKESAKTIVITET": {}
+                }
             }
         """.trimIndent()
 
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/utvidet-rett") {
+            handleRequest(HttpMethod.Post, "/kroniskt-sykt-barn") {
                 addHeader(HttpHeaders.Authorization,
                     "Bearer "+Azure.V2_0.generateJwt("omsorgsdager", "omsorgsdager"))
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(payload)
             }.apply {
                 Assertions.assertEquals(HttpStatusCode.OK, response.status())
-                Assertions.assertNotNull(response.content)
-                Assertions.assertTrue(response.content!!.contains("123"))
-                Assertions.assertTrue(response.content!!.contains("VURDERE_LEGEERKLÆRING"))
-                //JSONAssert.assertEquals(expectedJson, response.content, false)
+                JSONAssert.assertEquals(expectedJson, response.content, false)
             }
         }
 

@@ -2,7 +2,6 @@ package no.nav.omsorgsdager
 
 import io.ktor.application.*
 import io.ktor.auth.*
-import io.ktor.client.features.*
 import io.ktor.features.*
 import io.ktor.jackson.*
 import io.ktor.routing.*
@@ -17,7 +16,7 @@ import no.nav.helse.dusseldorf.ktor.core.DefaultStatusPages
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.omsorgsdager.config.hentRequiredEnv
-import no.nav.omsorgsdager.utvidetrett.UtvidetRett
+import no.nav.omsorgsdager.utvidetrett.KronisktSyktBarn
 import java.net.URI
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -60,8 +59,9 @@ internal fun Application.app(
         HealthRoute(healthService = applicationContext.healthService)
         DefaultProbeRoutes()
         authenticate(*issuers.allIssuers()) {
-            UtvidetRett(
-                tilgangsstyringRestClient = applicationContext.tilgangsstyringRestClient
+            KronisktSyktBarn(
+                tilgangsstyringRestClient = applicationContext.tilgangsstyringRestClient,
+                kafkaProducer = applicationContext.kafkaProducer
             )
         }
     }

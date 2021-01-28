@@ -5,6 +5,7 @@ val dusseldorfVersion = "1.5.0.ae98b7c"
 val ktorVersion = "1.5.0"
 val jsonassertVersion = "1.5.0"
 val kafkaVersion = "2.4.0"
+val mockkVersion = "1.10.5"
 
 // Database
 val flywayVersion = "7.5.0"
@@ -48,6 +49,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
     testImplementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
+    testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
