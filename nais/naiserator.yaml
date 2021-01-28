@@ -12,6 +12,10 @@ spec:
     application:
       enabled: true
       tenant: {{ azureTenant }}
+  accessPolicy:
+    outbound:
+      rules:
+        - application: omsorgspenger-tilgangsstyring
   gcp:
     sqlInstances:
       - type: POSTGRES_12
