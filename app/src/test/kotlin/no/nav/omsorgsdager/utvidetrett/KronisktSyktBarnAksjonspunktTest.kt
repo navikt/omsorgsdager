@@ -19,7 +19,7 @@ internal class KronisktSyktBarnAksjonspunktTest(
             {
                 "LEGEERKLÆRING": {},
                 "MEDLEMSKAP": {},
-                "YRKESAKTIVITET": {} 
+                "YRKESAKTIVITET": {}
             }
         """.trimIndent()
         with(testApplicationEngine) {

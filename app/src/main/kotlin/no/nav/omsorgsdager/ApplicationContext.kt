@@ -16,6 +16,7 @@ import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.config.migrate
 import no.nav.omsorgsdager.config.readServiceUserCredentials
 import no.nav.omsorgsdager.pdl.PdlClient
+import no.nav.omsorgsdager.utvidetrett.UtvidettRepository
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource
@@ -25,7 +26,8 @@ internal class ApplicationContext(
     internal val dataSource: DataSource,
     internal val healthService: HealthService,
     internal val tilgangsstyringRestClient: TilgangsstyringRestClient,
-    internal val kafkaProducer: KafkaProducer<String, String>
+    internal val kafkaProducer: KafkaProducer<String, String>,
+    internal val utvidettRepository: UtvidettRepository
 ) {
 
     internal fun start() {
@@ -43,6 +45,7 @@ internal class ApplicationContext(
         var pdlClient: PdlClient? = null,
         var tilgangsstyringRestClient: TilgangsstyringRestClient? = null,
         var kafkaProducer: KafkaProducer<String, String>? = null,
+        var utvidettRepository: UtvidettRepository? = null
         ) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
@@ -67,6 +70,7 @@ internal class ApplicationContext(
                 env = benyttetEnv
             )
             val benyttetKafkaProducer =  kafkaProducer ?: benyttetEnv.kafkaProducer()
+            val benyttetUtvidettRepository = utvidettRepository ?: UtvidettRepository(benyttetDataSource)
 
             return ApplicationContext(
                 env = benyttetEnv,
@@ -78,7 +82,8 @@ internal class ApplicationContext(
                     )
                 ),
                 tilgangsstyringRestClient = benyttetTilgangsstyringRestClient,
-                kafkaProducer = benyttetKafkaProducer
+                kafkaProducer = benyttetKafkaProducer,
+                utvidettRepository = benyttetUtvidettRepository
             )
         }
 

@@ -16,7 +16,7 @@ import no.nav.helse.dusseldorf.ktor.core.DefaultStatusPages
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.omsorgsdager.config.hentRequiredEnv
-import no.nav.omsorgsdager.utvidetrett.KronisktSyktBarn
+import no.nav.omsorgsdager.utvidetrett.KronisktSyktBarnRoute
 import java.net.URI
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -59,9 +59,10 @@ internal fun Application.app(
         HealthRoute(healthService = applicationContext.healthService)
         DefaultProbeRoutes()
         authenticate(*issuers.allIssuers()) {
-            KronisktSyktBarn(
+            KronisktSyktBarnRoute(
                 tilgangsstyringRestClient = applicationContext.tilgangsstyringRestClient,
-                kafkaProducer = applicationContext.kafkaProducer
+                kafkaProducer = applicationContext.kafkaProducer,
+                utvidettRepository = applicationContext.utvidettRepository
             )
         }
     }

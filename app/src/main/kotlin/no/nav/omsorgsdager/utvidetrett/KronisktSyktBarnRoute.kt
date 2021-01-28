@@ -12,9 +12,10 @@ import no.nav.omsorgsdager.utvidetrett.dto.AksjonspunktRequest
 import no.nav.omsorgsdager.utvidetrett.dto.KronisktSyktBarnSoknadRequest
 import org.apache.kafka.clients.producer.KafkaProducer
 
-internal fun Route.KronisktSyktBarn(
+internal fun Route.KronisktSyktBarnRoute(
     tilgangsstyringRestClient: TilgangsstyringRestClient,
-    kafkaProducer: KafkaProducer<String, String>
+    kafkaProducer: KafkaProducer<String, String>,
+    utvidettRepository: UtvidettRepository
 ) {
 
     route("/kroniskt-sykt-barn") {
