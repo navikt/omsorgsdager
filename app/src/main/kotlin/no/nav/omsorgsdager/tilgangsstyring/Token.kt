@@ -5,7 +5,7 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import io.ktor.application.*
 import io.ktor.http.*
 
-internal class Token(
+internal data class Token(
     internal val jwt: String,
     internal val clientId: String,
     internal val erPersonToken: Boolean,

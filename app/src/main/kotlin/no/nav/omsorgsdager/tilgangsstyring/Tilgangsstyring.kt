@@ -21,7 +21,7 @@ internal class Tilgangsstyring(
             }
             false -> {
                 logger.info("Sjekker om system har tilgang.")
-                if (token.harTilgangSomSystem) {
+                if (!token.harTilgangSomSystem) {
                     logger.warn("Systemet ${token.clientId} har ikke tilgang til tjenesten. Forsøkte $operasjon")
                     throw Throwblem(problemDetails)
                 }
