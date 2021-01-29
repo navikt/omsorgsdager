@@ -6,6 +6,7 @@ val ktorVersion = "1.5.0"
 val jsonassertVersion = "1.5.0"
 val kafkaVersion = "2.4.0"
 val mockkVersion = "1.10.5"
+val assertjVersion = "3.19.0"
 
 // Database
 val flywayVersion = "7.5.0"
@@ -53,6 +54,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
+    testImplementation("org.assertj:assertj-core:$assertjVersion")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }

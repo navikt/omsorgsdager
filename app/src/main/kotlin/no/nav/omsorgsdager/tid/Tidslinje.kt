@@ -4,25 +4,25 @@ import no.nav.omsorgsdager.tid.Periode.Companion.erFørEllerLik
 import no.nav.omsorgsdager.tid.Periode.Companion.nesteDag
 import java.time.LocalDate
 
-internal class Tidsserie(
+internal class Tidslinje(
     private val initiellePerioder : List<Periode>) {
     private val nyePerioder = mutableListOf<Periode>()
     internal fun nyePerioder() : List<Periode> = nyePerioder
 
-    internal fun leggTil(periode: Periode) : Tidsserie {
-        val dagerIkkeITidsserie = mutableListOf<LocalDate>()
+    internal fun leggTil(periode: Periode) : Tidslinje {
+        val dagerIkkeITidslinje = mutableListOf<LocalDate>()
         var current = periode.fom
         while (current.erFørEllerLik(periode.tom)) {
-            if (!current.finnesITidsserie()) {
-                dagerIkkeITidsserie.add(current)
+            if (!current.finnesITidlinje()) {
+                dagerIkkeITidslinje.add(current)
             }
             current = current.nesteDag()
         }
-        nyePerioder.addAll(dagerIkkeITidsserie.periodiser())
+        nyePerioder.addAll(dagerIkkeITidslinje.periodiser())
         return this
     }
 
-    private fun LocalDate.finnesITidsserie() =
+    private fun LocalDate.finnesITidlinje() =
         initiellePerioder.any { it.inneholder(this) } || nyePerioder.any { it.inneholder(this) }
 
     private fun List<LocalDate>.periodiser() : List<Periode> {
