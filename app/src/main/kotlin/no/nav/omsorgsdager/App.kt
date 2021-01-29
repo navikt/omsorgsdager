@@ -1,5 +1,6 @@
 package no.nav.omsorgsdager
 
+import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
@@ -17,6 +18,7 @@ import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.utvidetrett.KronisktSyktBarnRoute
+import org.flywaydb.core.Flyway
 import java.net.URI
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -26,8 +28,15 @@ internal fun Application.app(
     applicationContext: ApplicationContext = ApplicationContext.Builder().build()
 ) {
 
+    /*Flyway.configure()
+        .dataSource(applicationContext.dataSource)
+        .load()
+        .migrate()
+    */
     install(ContentNegotiation) {
-        jackson()
+        jackson {
+            disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+        }
     }
 
     install(StatusPages) {

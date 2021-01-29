@@ -61,7 +61,6 @@ internal class TestApplicationExtension : ParameterResolver {
                 "AZURE_V2_JWKS_URI" to (wireMockServer.getAzureV2JwksUrl()),
                 "AZURE_APP_CLIENT_ID" to "omsorgsdager"
             ),
-            serviceUser = ServiceUser("foo", "bar"),
             accessTokenClient = ClientSecretAccessTokenClient(
                 clientId = "omsorgsdager",
                 clientSecret = "azureSecret",
@@ -102,17 +101,4 @@ internal class TestApplicationExtension : ParameterResolver {
     override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Any {
         return testApplicationEngine
     }
-}
-
-@KtorExperimentalAPI
-private fun getConfig(config: MutableMap<String, String>): ApplicationConfig {
-    config.medAppConfig(8083)
-    val fileConfig = ConfigFactory.load()
-    val testConfig = ConfigFactory.parseMap(config)
-    val mergedConfig = testConfig.withFallback(fileConfig)
-    return HoconApplicationConfig(mergedConfig)
-}
-
-internal fun MutableMap<String, String>.medAppConfig(port: Int) = also {
-    it.putIfAbsent("ktor.deployment.port", "$port")
 }

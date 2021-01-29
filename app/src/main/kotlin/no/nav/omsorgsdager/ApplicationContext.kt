@@ -39,7 +39,6 @@ internal class ApplicationContext(
     internal class Builder(
         var env: Environment? = null,
         var dataSource: DataSource? = null,
-        var serviceUser: ServiceUser? = null,
         var httpClient: HttpClient? = null,
         var accessTokenClient: AccessTokenClient? = null,
         var pdlClient: PdlClient? = null,
@@ -53,7 +52,6 @@ internal class ApplicationContext(
                 install(JsonFeature) { serializer = JacksonSerializer(objectMapper) }
             }
             val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
-            val benyttetServiceUser = serviceUser ?: readServiceUserCredentials()
             val benyttetAccessTokenClient = accessTokenClient?: ClientSecretAccessTokenClient(
                 clientId = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_ID"),
                 clientSecret = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_SECRET"),
