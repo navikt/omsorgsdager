@@ -6,13 +6,14 @@ val ktorVersion = "1.5.0"
 val jsonassertVersion = "1.5.0"
 val kafkaVersion = "2.4.0"
 val mockkVersion = "1.10.5"
+val assertjVersion = "3.19.0"
 
 // Database
-val flywayVersion = "7.5.0"
-val hikariVersion = "3.4.5"
+val flywayVersion = "7.5.2"
+val hikariVersion = "4.0.1"
 val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.18"
-val embeddedPostgres = "1.2.9"
+val embeddedPostgres = "1.2.10"
 
 val mainClass = "no.nav.omsorgsdager.AppKt"
 
@@ -53,6 +54,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
+    testImplementation("org.assertj:assertj-core:$assertjVersion")
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }
