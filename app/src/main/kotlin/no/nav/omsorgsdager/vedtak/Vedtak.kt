@@ -4,7 +4,12 @@ import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.tid.Tidslinje
 import java.time.ZonedDateTime
 
+typealias Saksnummer = String
+typealias BehandlingId = String
+
 internal interface Vedtak {
+    val saksnummer: Saksnummer
+    val behandlingId: BehandlingId
     val status: VedtakStatus
     val statusSistEndret: ZonedDateTime
     val barn: Any

@@ -8,6 +8,8 @@ internal data class Periode(
 
     constructor(iso: String) : this(LocalDate.parse(iso.split("/")[0]), LocalDate.parse(iso.split("/")[1]))
     constructor(år: Int) : this("$år-01-01/$år-12-31")
+    constructor(enkeltdag: LocalDate) : this(fom = enkeltdag, tom = enkeltdag)
+
     init {
         require(tom.isAfter(fom) || fom.isEqual(tom)) {"Ugylidg periode. fom=$fom, tom=$tom"}
     }
