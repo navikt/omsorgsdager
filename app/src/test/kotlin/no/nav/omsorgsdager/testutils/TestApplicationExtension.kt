@@ -83,7 +83,6 @@ internal class TestApplicationExtension : ParameterResolver {
             Runtime.getRuntime().addShutdownHook(
                 Thread {
                     testApplicationEngine.stop(10, 60, TimeUnit.SECONDS)
-                    embeddedPostgres.postgresDatabase.connection.close()
                     embeddedPostgres.close()
                     wireMockServer.stop()
                 }

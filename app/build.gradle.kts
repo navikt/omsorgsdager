@@ -9,11 +9,11 @@ val mockkVersion = "1.10.5"
 val assertjVersion = "3.19.0"
 
 // Database
-val flywayVersion = "7.5.0"
-val hikariVersion = "3.4.5"
+val flywayVersion = "7.5.2"
+val hikariVersion = "4.0.1"
 val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.18"
-val embeddedPostgres = "1.2.9"
+val embeddedPostgres = "1.2.10"
 
 val mainClass = "no.nav.omsorgsdager.AppKt"
 
