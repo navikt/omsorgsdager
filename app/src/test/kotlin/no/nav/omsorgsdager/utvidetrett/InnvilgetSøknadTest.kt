@@ -57,7 +57,7 @@ internal class InnvilgetSøknadTest(
         """.trimIndent()
 
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/kroniskt-sykt-barn") {
+            handleRequest(HttpMethod.Post, "/api/kroniskt-sykt-barn") {
                 addHeader(HttpHeaders.Authorization, accessToken)
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(payload)
@@ -65,7 +65,7 @@ internal class InnvilgetSøknadTest(
                 Assertions.assertEquals(HttpStatusCode.OK, response.status())
             }
 
-            handleRequest(HttpMethod.Put, "/kroniskt-sykt-barn/456/aksjonspunkt") {
+            handleRequest(HttpMethod.Put, "/api/kroniskt-sykt-barn/456/aksjonspunkt") {
                 addHeader(HttpHeaders.Authorization, accessToken)
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(aksjonspunktRequest)
@@ -74,7 +74,7 @@ internal class InnvilgetSøknadTest(
                 JSONAssert.assertEquals(aksjonspunktExpectedJson, response.content, true)
             }
 
-            handleRequest(HttpMethod.Put, "/kroniskt-sykt-barn/456/fastsett") {
+            handleRequest(HttpMethod.Put, "/api/kroniskt-sykt-barn/456/fastsett") {
                 addHeader(HttpHeaders.Authorization, accessToken)
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             }.apply {
@@ -82,7 +82,7 @@ internal class InnvilgetSøknadTest(
                 assert(response.content!!.contains("FASTSATT"))
             }
 
-            handleRequest(HttpMethod.Put, "/kroniskt-sykt-barn/456/deaktiver") {
+            handleRequest(HttpMethod.Put, "/api/kroniskt-sykt-barn/456/deaktiver") {
                 addHeader(HttpHeaders.Authorization, accessToken)
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             }.apply {

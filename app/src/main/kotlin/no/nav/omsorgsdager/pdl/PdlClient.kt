@@ -18,7 +18,6 @@ import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
 import no.nav.omsorgsdager.config.Environment
-import no.nav.omsorgsdager.config.ServiceUser
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import org.json.JSONObject
 import org.slf4j.LoggerFactory

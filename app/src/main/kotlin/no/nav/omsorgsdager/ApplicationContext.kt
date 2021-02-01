@@ -8,15 +8,17 @@ import io.ktor.client.features.json.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
+import no.nav.omsorgsdager.config.*
 import no.nav.omsorgsdager.config.DataSourceBuilder
 import no.nav.omsorgsdager.config.Environment
 import no.nav.omsorgsdager.config.KafkaBuilder.kafkaProducer
-import no.nav.omsorgsdager.config.ServiceUser
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.config.migrate
-import no.nav.omsorgsdager.config.readServiceUserCredentials
 import no.nav.omsorgsdager.pdl.PdlClient
-import no.nav.omsorgsdager.utvidetrett.UtvidettRepository
+import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
+import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
+import no.nav.omsorgsdager.tilgangsstyring.TokenResolver
+import no.nav.omsorgsdager.kronisksyktbarn.UtvidettRepository
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource
@@ -25,10 +27,11 @@ internal class ApplicationContext(
     internal val env: Environment,
     internal val dataSource: DataSource,
     internal val healthService: HealthService,
-    internal val tilgangsstyringRestClient: TilgangsstyringRestClient,
+    internal val omsorgspengerTilgangsstyringGateway: OmsorgspengerTilgangsstyringGateway,
+    internal val tokenResolver: TokenResolver,
+    internal val tilgangsstyring: Tilgangsstyring,
     internal val kafkaProducer: KafkaProducer<String, String>,
-    internal val utvidettRepository: UtvidettRepository
-) {
+    internal val utvidettRepository: UtvidettRepository) {
 
     internal fun start() {
         dataSource.migrate()
@@ -42,10 +45,11 @@ internal class ApplicationContext(
         var httpClient: HttpClient? = null,
         var accessTokenClient: AccessTokenClient? = null,
         var pdlClient: PdlClient? = null,
-        var tilgangsstyringRestClient: TilgangsstyringRestClient? = null,
+        var omsorgspengerTilgangsstyringGateway: OmsorgspengerTilgangsstyringGateway? = null,
+        var tokenResolver: TokenResolver? = null,
+        var tilgangsstyring: Tilgangsstyring? = null,
         var kafkaProducer: KafkaProducer<String, String>? = null,
-        var utvidettRepository: UtvidettRepository? = null
-        ) {
+        var utvidettRepository: UtvidettRepository? = null) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
             val benyttetHttpClient = httpClient ?: HttpClient {
@@ -63,11 +67,23 @@ internal class ApplicationContext(
                 httpClient = benyttetHttpClient,
                 objectMapper = objectMapper
             )
-            val benyttetTilgangsstyringRestClient = tilgangsstyringRestClient ?: TilgangsstyringRestClient(
+            val benyttetOmsorgspengerTilgangsstyringGateway = omsorgspengerTilgangsstyringGateway ?: OmsorgspengerTilgangsstyringGateway(
                 httpClient = benyttetHttpClient,
-                env = benyttetEnv
+                omsorgspengerTilgangsstyringUri = URI.create(benyttetEnv.hentRequiredEnv("TILGANGSSTYRING_URL"))
             )
-            val benyttetKafkaProducer =  kafkaProducer ?: benyttetEnv.kafkaProducer()
+
+            val benyttetTokenResolver = tokenResolver ?: TokenResolver(
+                azureIssuers = setOf(benyttetEnv.hentRequiredEnv("AZURE_V2_ISSUER")),
+                openAmIssuers = setOf(benyttetEnv.hentRequiredEnv("OPEN_AM_ISSUER")),
+                openAmAuthorizedClients = benyttetEnv.hentRequiredEnv("OPEN_AM_AUTHORIZED_CLIENTS").csv()
+            )
+
+            val benyttetTilgangsstyring = tilgangsstyring ?: Tilgangsstyring(
+                tokenResolver = benyttetTokenResolver,
+                omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway
+            )
+
+            val benyttetKafkaProducer = kafkaProducer ?: benyttetEnv.kafkaProducer()
             val benyttetUtvidettRepository = utvidettRepository ?: UtvidettRepository(benyttetDataSource)
 
             return ApplicationContext(
@@ -76,12 +92,14 @@ internal class ApplicationContext(
                 healthService = HealthService(
                     healthChecks = setOf(
                         benyttetPdlClient,
-                        benyttetTilgangsstyringRestClient
+                        benyttetOmsorgspengerTilgangsstyringGateway
                     )
                 ),
-                tilgangsstyringRestClient = benyttetTilgangsstyringRestClient,
                 kafkaProducer = benyttetKafkaProducer,
-                utvidettRepository = benyttetUtvidettRepository
+                utvidettRepository = benyttetUtvidettRepository,
+                omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
+                tokenResolver = benyttetTokenResolver,
+                tilgangsstyring = benyttetTilgangsstyring
             )
         }
 

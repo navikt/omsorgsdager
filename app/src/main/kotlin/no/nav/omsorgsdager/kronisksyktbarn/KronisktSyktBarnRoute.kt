@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager.utvidetrett
+package no.nav.omsorgsdager.kronisksyktbarn
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -8,19 +8,17 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.pipeline.*
-import no.nav.omsorgsdager.Operasjon
-import no.nav.omsorgsdager.TilgangsstyringRestClient
-import no.nav.omsorgsdager.utvidetrett.dto.AksjonspunktRequest
-import no.nav.omsorgsdager.utvidetrett.dto.KronisktSyktBarnGrunnlag
+import no.nav.omsorgsdager.tilgangsstyring.Operasjon
+import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
+import no.nav.omsorgsdager.kronisksyktbarn.dto.KronisktSyktBarnGrunnlag
 import no.nav.omsorgsdager.vedtak.Aksjonspunkt
 import no.nav.omsorgsdager.vedtak.VedtakResponse
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
 
-internal fun Route.KronisktSyktBarnRoute(
-    tilgangsstyringRestClient: TilgangsstyringRestClient,
+internal fun Route.KroniskSyktBarnRoute(
+    tilgangsstyring: Tilgangsstyring,
     kafkaProducer: KafkaProducer<String, String>,
     utvidettRepository: UtvidettRepository
 ) {
@@ -37,26 +35,14 @@ internal fun Route.KronisktSyktBarnRoute(
                 return@post
             }
 
-            val authHeader = call.request.headers[HttpHeaders.Authorization]
-                ?: return@post call.respond(HttpStatusCode.Unauthorized)
-
-            val identer = setOf(
-                request["barn"]["identitetsnummer"].toString(),
-                request["søker"]["identitetsnummer"].toString()
-            )
-
-            val harTilgang = tilgangsstyringRestClient.sjekkTilgang(
-                identer = identer,
-                authHeader = authHeader,
-                beskrivelse = "Registrere ny søknad før kroniskt sykt barn",
-                operasjon = Operasjon.Endring
-            )
-
-            if (!harTilgang) {
-                return@post call.respond(HttpStatusCode.Forbidden)
-            }
-
             val grunnlag = KronisktSyktBarnGrunnlag(request as ObjectNode)
+
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.NyBehandlingKroniskSyktBarn.copy(
+                identitetsnummer = setOf(
+                    grunnlag.søker.identitetsnummer,
+                    grunnlag.barn.identitetsnummer
+                )
+            ))
 
             val response = VedtakResponse(
                 status = VedtakStatus.FORSLAG,
@@ -76,23 +62,13 @@ internal fun Route.KronisktSyktBarnRoute(
                 return@put
             }
 
-            val authHeader = call.request.headers[HttpHeaders.Authorization]
-                ?: return@put call.respond(HttpStatusCode.Unauthorized)
-
             val behandlingId = call.parameters["behandlingId"]
 
             // TODO: Hent behandling + identer
 
-            val harTilgang = tilgangsstyringRestClient.sjekkTilgang(
-                identer = setOf("123"),
-                authHeader = authHeader,
-                beskrivelse = "Legge till eller oppdatere aksjonspunkt",
-                operasjon = Operasjon.Endring
-            )
-
-            if (!harTilgang) {
-                return@put call.respond(HttpStatusCode.Forbidden)
-            }
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.LøseAksjonspunktKroniskSyktBarn.copy(
+                identitetsnummer = setOf("123") // TODO
+            ))
 
             // TODO: status=FASTSATT throws HttpStatusCode.Conflict
             val response = VedtakResponse(
@@ -105,25 +81,14 @@ internal fun Route.KronisktSyktBarnRoute(
 
         put("/{behandlingId}/fastsett") {
 
-            val authHeader = call.request.headers[HttpHeaders.Authorization]
-                ?: return@put call.respond(HttpStatusCode.Unauthorized)
-
             val behandlingId = call.parameters["behandlingId"]
 
             // TODO: Hent behandlingId + identer + aksjonspunkter
             val aksjonspunkter = listOf(Aksjonspunkt("VURDERE_LEGEERKLÆRING"))
-            val identer = setOf("123", "456")
 
-            val harTilgang = tilgangsstyringRestClient.sjekkTilgang(
-                identer = identer,
-                authHeader = authHeader,
-                beskrivelse = "Fastsette vedtak",
-                operasjon = Operasjon.Endring
-            )
-
-            if (!harTilgang) {
-                return@put call.respond(HttpStatusCode.Forbidden)
-            }
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.FastsetteKroniskSyktBarn.copy(
+                identitetsnummer = setOf("123","456") // TODO
+            ))
 
             // se efter uløste Aksjonspunkter
             val uløsteAksjonspunkter = 0
@@ -145,24 +110,14 @@ internal fun Route.KronisktSyktBarnRoute(
         }
 
         put("/{behandlingId}/deaktiver") {
-            val authHeader = call.request.headers[HttpHeaders.Authorization]
-                ?: return@put call.respond(HttpStatusCode.Unauthorized)
 
             val behandlingId = call.parameters["behandlingId"]
 
             // TODO: Hent behandlingId + identer
-            val identer = setOf("123", "456")
 
-            val harTilgang = tilgangsstyringRestClient.sjekkTilgang(
-                identer = identer,
-                authHeader = authHeader,
-                beskrivelse = "Fastsette vedtak",
-                operasjon = Operasjon.Endring
-            )
-
-            if (!harTilgang) {
-                return@put call.respond(HttpStatusCode.Forbidden)
-            }
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.DeaktivereKroniskSyktBarn.copy(
+                identitetsnummer = setOf("123", "456") // TODO
+            ))
 
             val response = VedtakResponse(
                 status = VedtakStatus.DEAKTIVERT,
@@ -176,24 +131,14 @@ internal fun Route.KronisktSyktBarnRoute(
         }
 
         get("/{behandlingId}") {
-            val authHeader = call.request.headers[HttpHeaders.Authorization]
-                ?: return@get call.respond(HttpStatusCode.Unauthorized)
 
             val behandlingId = call.parameters["behandlingId"]
 
             // TODO: Hent behandling + identer
-            val identer = setOf("123", "456")
 
-            val harTilgang = tilgangsstyringRestClient.sjekkTilgang(
-                identer = identer,
-                authHeader = authHeader,
-                beskrivelse = "Hente ett vedtak",
-                operasjon = Operasjon.Visning
-            )
-
-            if (!harTilgang) {
-                return@get call.respond(HttpStatusCode.Forbidden)
-            }
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.HenteKroniskSyktBarnBehandling.copy(
+                identitetsnummer = setOf("123", "456")
+            ))
 
             val behandling = """
                 {
@@ -223,24 +168,13 @@ internal fun Route.KronisktSyktBarnRoute(
         }
 
         get("{saksnummer}") {
-            val authHeader = call.request.headers[HttpHeaders.Authorization]
-                ?: return@get call.respond(HttpStatusCode.Unauthorized)
-
             val behandlingId = call.parameters["behandlingId"]
 
             // TODO: Hent behandling + identer
-            val identer = setOf("123", "456")
 
-            val harTilgang = tilgangsstyringRestClient.sjekkTilgang(
-                identer = identer,
-                authHeader = authHeader,
-                beskrivelse = "Hente ett vedtak",
-                operasjon = Operasjon.Visning
-            )
-
-            if (!harTilgang) {
-                return@get call.respond(HttpStatusCode.Forbidden)
-            }
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.HenteKroniskSyktBarnSak.copy(
+                identitetsnummer = setOf("123", "456")
+            ))
 
             val behandling = """
                 {
@@ -269,5 +203,42 @@ internal fun Route.KronisktSyktBarnRoute(
             call.respond(HttpStatusCode.OK, behandling)
         }
     }
+}
 
+private object Operasjoner {
+    val NyBehandlingKroniskSyktBarn = Operasjon(
+        type = Operasjon.Type.Endring,
+        beskrivelse = "Registrere ny behandling på søknad om kronisk sykt barn",
+        identitetsnummer = setOf()
+    )
+
+    val FastsetteKroniskSyktBarn = Operasjon(
+        type = Operasjon.Type.Endring,
+        beskrivelse = "Fastsette vedtak for kronisk sykt barn",
+        identitetsnummer = setOf()
+    )
+
+    val DeaktivereKroniskSyktBarn = Operasjon(
+        type = Operasjon.Type.Endring,
+        beskrivelse = "Deaktivere vedtak for kronisk sykt barn",
+        identitetsnummer = setOf()
+    )
+
+    val HenteKroniskSyktBarnBehandling = Operasjon(
+        type = Operasjon.Type.Visning,
+        beskrivelse = "Hente vedtak for kronisk sykt barn",
+        identitetsnummer = setOf()
+    )
+
+    val HenteKroniskSyktBarnSak = Operasjon(
+        type = Operasjon.Type.Visning,
+        beskrivelse = "Hente gjeldende vedtak for kronisk sykt barn",
+        identitetsnummer = setOf()
+    )
+
+    val LøseAksjonspunktKroniskSyktBarn = Operasjon(
+        type = Operasjon.Type.Visning,
+        beskrivelse = "Løse aksjonspunkt for kronisk sykt barn",
+        identitetsnummer = setOf()
+    )
 }

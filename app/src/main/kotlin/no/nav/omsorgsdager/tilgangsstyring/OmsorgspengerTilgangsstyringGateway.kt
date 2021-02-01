@@ -11,10 +11,10 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.util.toByteArray
-import java.util.*
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
+import no.nav.omsorgsdager.CorrelationId
 import org.slf4j.LoggerFactory
 import java.net.URI
 
@@ -27,12 +27,13 @@ internal class OmsorgspengerTilgangsstyringGateway(
 
     internal suspend fun harTilgang(
         token: Token,
-        operasjon: Operasjon): Boolean {
+        operasjon: Operasjon,
+        correlationId: CorrelationId): Boolean {
         return kotlin.runCatching {
             httpClient.post<HttpStatement>(personTilgangUri) {
                 header(HttpHeaders.Authorization, token.authorizationHeader)
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
-                header(HttpHeaders.XCorrelationId, UUID.randomUUID().toString()) // TODO
+                header(HttpHeaders.XCorrelationId, correlationId)
                 body = PersonerRequestBody(
                     identitetsnummer = operasjon.identitetsnummer,
                     beskrivelse = operasjon.beskrivelse,
