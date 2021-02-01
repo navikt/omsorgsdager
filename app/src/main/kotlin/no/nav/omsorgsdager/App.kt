@@ -18,7 +18,6 @@ import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.utvidetrett.KronisktSyktBarnRoute
-import org.flywaydb.core.Flyway
 import java.net.URI
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -69,7 +68,7 @@ internal fun Application.app(
         DefaultProbeRoutes()
         authenticate(*issuers.allIssuers()) {
             KronisktSyktBarnRoute(
-                tilgangsstyringRestClient = applicationContext.tilgangsstyringRestClient,
+                tilgangsstyring = applicationContext.tilgangsstyring,
                 kafkaProducer = applicationContext.kafkaProducer,
                 utvidettRepository = applicationContext.utvidettRepository
             )
