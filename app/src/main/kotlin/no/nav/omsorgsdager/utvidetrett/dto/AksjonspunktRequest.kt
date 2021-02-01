@@ -1,7 +1,7 @@
 package no.nav.omsorgsdager.utvidetrett.dto
 
 data class AksjonspunktRequest(
-    val LEGEERKLÆRING: Object,
-    val MEDLEMSKAP: Object,
-    val YRKESAKTIVITET: Object
+    val LEGEERKLÆRING: Any,
+    val MEDLEMSKAP: Any,
+    val YRKESAKTIVITET: Any
 )

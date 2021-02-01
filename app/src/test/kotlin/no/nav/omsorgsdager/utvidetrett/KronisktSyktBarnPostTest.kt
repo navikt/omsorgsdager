@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.skyscreamer.jsonassert.JSONAssert
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 @ExtendWith(TestApplicationExtension::class)
 internal class KronisktSyktBarnPostTest(
@@ -66,15 +69,15 @@ internal class KronisktSyktBarnPostTest(
             {
                 "saksnummer": "test",
                 "behandlingId": "test",
-                "mottatt": "LocalDateTime",
+                "mottatt": "${ZonedDateTime.now()}",
                 "søker": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "test",
+                    "fødselsdato": "${LocalDate.now().minusYears(30)}",
                     "jobberINorge": true
                 },
                 "barn": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "123"
+                    "fødselsdato": "${LocalDate.now().minusYears(1)}"
                 }
             }
         """.trimIndent()
@@ -84,9 +87,7 @@ internal class KronisktSyktBarnPostTest(
             {
                 "status": "FORSLAG",
                 "uløsteAksjonspunkter": {
-                    "VURDERE_LEGEERKLÆRING": {},
-                    "MEDLEMSKAP": {},
-                    "YRKESAKTIVITET": {}
+                    "VURDERE_LEGEERKLÆRING": {}
                 }
             }
         """.trimIndent()
