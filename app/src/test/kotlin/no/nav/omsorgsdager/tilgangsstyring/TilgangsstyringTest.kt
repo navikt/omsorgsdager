@@ -6,9 +6,10 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.jws.NaisSts
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
+import java.util.*
 
 internal class TilgangsstyringTest {
     private val omsorgspengerTilgangsstyringGatewayMock = mockk<OmsorgspengerTilgangsstyringGateway>()
@@ -170,10 +171,7 @@ internal class TilgangsstyringTest {
         jwt: String?,
         forventetResultatVisning: Boolean,
         forventetResultatEndring: Boolean) {
-        val call = call(authorizationHeader = when (jwt) {
-            null -> null
-            else -> "Bearer $jwt"
-        })
+        val call = call(authorizationHeader = "Bearer $jwt")
         assertEquals(forventetResultatVisning, VisningOperasjon.kanGjøreOperasjon(call))
         assertEquals(forventetResultatEndring, EndringOperasjon.kanGjøreOperasjon(call))
     }
@@ -183,7 +181,7 @@ internal class TilgangsstyringTest {
     }}
 
     private fun tilgangsstyringGatewayKaltAkkurat(n: Int) {
-        coVerify(exactly = n) { omsorgspengerTilgangsstyringGatewayMock.harTilgang(any(), any()) }
+        coVerify(exactly = n) { omsorgspengerTilgangsstyringGatewayMock.harTilgang(any(), any(), any()) }
     }
 
     private fun mockTilgangsstyringGateway(
@@ -192,11 +190,13 @@ internal class TilgangsstyringTest {
         tilgangEndring: Boolean) {
         coEvery { omsorgspengerTilgangsstyringGatewayMock.harTilgang(
             token = match { it.jwt == jwt },
-            operasjon = match { it.type == Operasjon.Type.Visning })
+            operasjon = match { it.type == Operasjon.Type.Visning },
+            correlationId = any())
         }.returns(tilgangVisning)
         coEvery { omsorgspengerTilgangsstyringGatewayMock.harTilgang(
             token = match { it.jwt == jwt },
-            operasjon = match { it.type == Operasjon.Type.Endring })
+            operasjon = match { it.type == Operasjon.Type.Endring },
+            correlationId = any())
         }.returns(tilgangEndring)
     }
 
@@ -245,13 +245,10 @@ internal class TilgangsstyringTest {
             )
         )
 
-
-        private fun call(authorizationHeader: String?) = mockk<ApplicationCall>().also {
-            every { it.request.headers }.returns(when(authorizationHeader) {
-                null -> Headers.Empty
-                else -> Headers.build {
-                    this.append(HttpHeaders.Authorization, authorizationHeader)
-                }
+        private fun call(authorizationHeader: String) = mockk<ApplicationCall>().also {
+            every { it.request.headers }.returns(Headers.build {
+                append(HttpHeaders.Authorization, authorizationHeader)
+                append(HttpHeaders.XCorrelationId, "${UUID.randomUUID()}")
             })
         }
     }

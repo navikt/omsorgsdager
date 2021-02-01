@@ -3,6 +3,7 @@ package no.nav.omsorgsdager.tilgangsstyring
 import io.ktor.application.*
 import no.nav.helse.dusseldorf.ktor.core.DefaultProblemDetails
 import no.nav.helse.dusseldorf.ktor.core.Throwblem
+import no.nav.omsorgsdager.correlationId
 import org.slf4j.LoggerFactory
 
 internal class Tilgangsstyring(
@@ -11,10 +12,14 @@ internal class Tilgangsstyring(
 
     internal suspend fun verifiserTilgang(call: ApplicationCall, operasjon: Operasjon) {
         val token = tokenResolver.resolve(call)
+        val correlationId = call.correlationId()
         when (token.erPersonToken) {
             true -> {
                 logger.info("Sjekker om person har har tilgang.")
-                if (!omsorgspengerTilgangsstyringGateway.harTilgang(token = token, operasjon = operasjon)) {
+                if (!omsorgspengerTilgangsstyringGateway.harTilgang(
+                        token = token,
+                        operasjon = operasjon,
+                        correlationId= correlationId)) {
                     logger.warn("Personen kan ikke gjøre operasjonen $operasjon")
                     throw Throwblem(problemDetails)
                 }
