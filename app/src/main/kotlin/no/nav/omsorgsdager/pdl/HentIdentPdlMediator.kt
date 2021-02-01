@@ -1,7 +1,6 @@
-package no.nav.omsorgsdager
+package no.nav.omsorgsdager.pdl
 
-import no.nav.omsorgsdager.pdl.Identitetsnummer
-import no.nav.omsorgsdager.pdl.PdlClient
+import no.nav.omsorgsdager.Identitetsnummer
 
 internal class HentIdentPdlMediator(
         internal val pdlClient: PdlClient

@@ -79,8 +79,7 @@ internal fun Application.app(
             route("/api") {
                 KroniskSyktBarnRoute(
                     tilgangsstyring = applicationContext.tilgangsstyring,
-                    kafkaProducer = applicationContext.kafkaProducer,
-                    utvidettRepository = applicationContext.utvidettRepository
+                    kroniskSyktBarnRepository = applicationContext.kroniskSyktBarnRepository
                 )
             }
         }

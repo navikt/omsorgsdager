@@ -1,11 +1,10 @@
 package no.nav.omsorgsdager.vedtak
 
+import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.tid.Tidslinje
 import java.time.ZonedDateTime
-
-typealias Saksnummer = String
-typealias BehandlingId = String
 
 internal interface Vedtak {
     val saksnummer: Saksnummer

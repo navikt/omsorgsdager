@@ -14,6 +14,8 @@ import no.nav.omsorgsdager.config.Environment
 import no.nav.omsorgsdager.config.KafkaBuilder.kafkaProducer
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.config.migrate
+import no.nav.omsorgsdager.kronisksyktbarn.InMemoryKroniskSyktBarnRespository
+import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnRepository
 import no.nav.omsorgsdager.pdl.PdlClient
 import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
@@ -31,7 +33,8 @@ internal class ApplicationContext(
     internal val tokenResolver: TokenResolver,
     internal val tilgangsstyring: Tilgangsstyring,
     internal val kafkaProducer: KafkaProducer<String, String>,
-    internal val utvidettRepository: UtvidettRepository) {
+    internal val utvidettRepository: UtvidettRepository,
+    internal val kroniskSyktBarnRepository: KroniskSyktBarnRepository) {
 
     internal fun start() {
         dataSource.migrate()
@@ -49,7 +52,8 @@ internal class ApplicationContext(
         var tokenResolver: TokenResolver? = null,
         var tilgangsstyring: Tilgangsstyring? = null,
         var kafkaProducer: KafkaProducer<String, String>? = null,
-        var utvidettRepository: UtvidettRepository? = null) {
+        var utvidettRepository: UtvidettRepository? = null,
+        var kroniskSyktBarnRepository: KroniskSyktBarnRepository? = null) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
             val benyttetHttpClient = httpClient ?: HttpClient {
@@ -99,7 +103,8 @@ internal class ApplicationContext(
                 utvidettRepository = benyttetUtvidettRepository,
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
                 tokenResolver = benyttetTokenResolver,
-                tilgangsstyring = benyttetTilgangsstyring
+                tilgangsstyring = benyttetTilgangsstyring,
+                kroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryKroniskSyktBarnRespository()
             )
         }
 

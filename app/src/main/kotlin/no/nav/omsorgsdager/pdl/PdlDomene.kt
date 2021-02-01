@@ -2,8 +2,6 @@ package no.nav.omsorgsdager.pdl
 
 import no.nav.omsorgsdager.pdl.Queries.query
 
-typealias Identitetsnummer = String
-
 data class GraphqlQuery(
         val query: String,
         val variables: Variables

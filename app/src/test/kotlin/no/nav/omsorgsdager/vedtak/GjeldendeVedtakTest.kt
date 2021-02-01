@@ -1,5 +1,7 @@
 package no.nav.omsorgsdager.vedtak
 
+import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
 import org.assertj.core.api.Assertions.assertThat

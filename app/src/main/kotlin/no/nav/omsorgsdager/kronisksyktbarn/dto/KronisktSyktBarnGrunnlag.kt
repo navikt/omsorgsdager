@@ -1,8 +1,8 @@
 package no.nav.omsorgsdager.kronisksyktbarn.dto
 
 import com.fasterxml.jackson.databind.node.ObjectNode
-import no.nav.omsorgsdager.vedtak.BehandlingId
-import no.nav.omsorgsdager.vedtak.Saksnummer
+import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Saksnummer
 import java.time.ZonedDateTime
 
 data class KronisktSyktBarnGrunnlag(

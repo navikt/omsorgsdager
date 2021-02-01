@@ -8,20 +8,19 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.pipeline.*
+import no.nav.omsorgsdager.aksjonspunkt.UløstAksjonspunkt
 import no.nav.omsorgsdager.tilgangsstyring.Operasjon
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
 import no.nav.omsorgsdager.kronisksyktbarn.dto.KronisktSyktBarnGrunnlag
-import no.nav.omsorgsdager.vedtak.Aksjonspunkt
+import no.nav.omsorgsdager.tid.Periode.Companion.utÅretBarnetFyller18
 import no.nav.omsorgsdager.vedtak.VedtakResponse
 import no.nav.omsorgsdager.vedtak.VedtakStatus
-import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.LoggerFactory
+import java.time.ZonedDateTime
 
 internal fun Route.KroniskSyktBarnRoute(
     tilgangsstyring: Tilgangsstyring,
-    kafkaProducer: KafkaProducer<String, String>,
-    utvidettRepository: UtvidettRepository
-) {
+    kroniskSyktBarnRepository: KroniskSyktBarnRepository) {
 
     val logger = LoggerFactory.getLogger("no.nav.omsorgsdager.KronisktSyktBarnRoute")
 
@@ -44,9 +43,22 @@ internal fun Route.KroniskSyktBarnRoute(
                 )
             ))
 
+            val uløsteAksjonspunkter = setOf(UløstAksjonspunkt(navn = "VURDERE_LEGEERKLÆRING"))
+            kroniskSyktBarnRepository.nyttVedtak(
+                vedtak = KroniskSyktBarnVedtak(
+                    saksnummer = grunnlag.saksnummer,
+                    behandlingId = grunnlag.behandlingId,
+                    status = VedtakStatus.FORSLAG,
+                    statusSistEndret = ZonedDateTime.now(),
+                    barn = grunnlag.barn,
+                    periode = grunnlag.barn.fødselsdato.utÅretBarnetFyller18()
+                ),
+                uløsteAksjonspunkter = uløsteAksjonspunkter
+            )
+
             val response = VedtakResponse(
                 status = VedtakStatus.FORSLAG,
-                uløsteAksjonspunkter = listOf(Aksjonspunkt("VURDERE_LEGEERKLÆRING"))
+                uløsteAksjonspunkter = uløsteAksjonspunkter
             )
 
             //utvidettRepository.lagre(request.behandlingId(), request.toString())
@@ -73,7 +85,7 @@ internal fun Route.KroniskSyktBarnRoute(
             // TODO: status=FASTSATT throws HttpStatusCode.Conflict
             val response = VedtakResponse(
                 status = VedtakStatus.FORSLAG,
-                uløsteAksjonspunkter = listOf(Aksjonspunkt(navn="MEDLEMSKAP"))
+                uløsteAksjonspunkter = setOf(UløstAksjonspunkt(navn="MEDLEMSKAP"))
             )
 
             call.respond(HttpStatusCode.OK, response.toJson())
@@ -84,7 +96,7 @@ internal fun Route.KroniskSyktBarnRoute(
             val behandlingId = call.parameters["behandlingId"]
 
             // TODO: Hent behandlingId + identer + aksjonspunkter
-            val aksjonspunkter = listOf(Aksjonspunkt("VURDERE_LEGEERKLÆRING"))
+            val aksjonspunkter = setOf(UløstAksjonspunkt(navn = "VURDERE_LEGEERKLÆRING"))
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.FastsetteKroniskSyktBarn.copy(
                 identitetsnummer = setOf("123","456") // TODO
@@ -98,7 +110,8 @@ internal fun Route.KroniskSyktBarnRoute(
 
             val response = VedtakResponse(
                 status = VedtakStatus.FASTSATT,
-                uløsteAksjonspunkter = emptyList())
+                uløsteAksjonspunkter = emptySet()
+            )
 
 
             // TODO: Oppdater db
@@ -121,7 +134,8 @@ internal fun Route.KroniskSyktBarnRoute(
 
             val response = VedtakResponse(
                 status = VedtakStatus.DEAKTIVERT,
-                uløsteAksjonspunkter = emptyList())
+                uløsteAksjonspunkter = emptySet()
+            )
 
 
             // TODO: Oppdater db
