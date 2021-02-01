@@ -9,13 +9,10 @@ import io.mockk.mockk
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
-import no.nav.helse.dusseldorf.testsupport.wiremock.WireMockBuilder
-import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
-import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
-import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsTokenUrl
+import no.nav.helse.dusseldorf.testsupport.jws.NaisSts
+import no.nav.helse.dusseldorf.testsupport.wiremock.*
 import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.app
-import no.nav.omsorgsdager.config.ServiceUser
 import no.nav.omsorgsdager.testutils.wiremock.pdlApiBaseUrl
 import no.nav.omsorgsdager.testutils.wiremock.stubPdlApi
 import no.nav.omsorgsdager.testutils.wiremock.stubTilgangApi
@@ -59,9 +56,12 @@ internal class TestApplicationExtension : ParameterResolver {
                 "KAFKA_BOOTSTRAP_SERVERS" to "test",
                 "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
                 "AZURE_V2_JWKS_URI" to (wireMockServer.getAzureV2JwksUrl()),
-                "AZURE_APP_CLIENT_ID" to "omsorgsdager"
+                "AZURE_APP_CLIENT_ID" to "omsorgsdager",
+                "OPEN_AM_ISSUER" to NaisSts.getIssuer(),
+                "OPEN_AM_JWKS_URI" to (wireMockServer.getNaisStsJwksUrl()),
+                "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak"
             ),
-            accessTokenClient = ClientSecretAccessTokenClient(
+            accessTokenClient = ClientSecretAccessTokenClient( // TODO: Why?
                 clientId = "omsorgsdager",
                 clientSecret = "azureSecret",
                 tokenEndpoint = URI(wireMockServer.getAzureV2TokenUrl()),

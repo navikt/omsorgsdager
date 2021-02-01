@@ -16,6 +16,8 @@ spec:
     outbound:
       rules:
         - application: omsorgspenger-tilgangsstyring
+      external:
+        - host: {{ proxyHost }}
   gcp:
     sqlInstances:
       - type: POSTGRES_12
