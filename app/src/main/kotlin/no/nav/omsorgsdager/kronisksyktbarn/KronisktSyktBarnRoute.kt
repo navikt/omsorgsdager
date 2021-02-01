@@ -17,7 +17,7 @@ import no.nav.omsorgsdager.vedtak.VedtakStatus
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.slf4j.LoggerFactory
 
-internal fun Route.KronisktSyktBarnRoute(
+internal fun Route.KroniskSyktBarnRoute(
     tilgangsstyring: Tilgangsstyring,
     kafkaProducer: KafkaProducer<String, String>,
     utvidettRepository: UtvidettRepository

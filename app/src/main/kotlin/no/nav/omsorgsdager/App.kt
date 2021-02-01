@@ -17,7 +17,7 @@ import no.nav.helse.dusseldorf.ktor.core.DefaultStatusPages
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.omsorgsdager.config.hentRequiredEnv
-import no.nav.omsorgsdager.kronisksyktbarn.KronisktSyktBarnRoute
+import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnRoute
 import java.net.URI
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -43,15 +43,24 @@ internal fun Application.app(
         AuthStatusPages()
     }
 
-    val alias = "azure-v2"
     val azureV2 = Issuer(
         issuer = applicationContext.env.hentRequiredEnv("AZURE_V2_ISSUER"),
         jwksUri = URI(applicationContext.env.hentRequiredEnv("AZURE_V2_JWKS_URI")),
         audience = applicationContext.env.hentRequiredEnv("AZURE_APP_CLIENT_ID"),
-        alias = alias
+        alias = "azure-v2"
     )
 
-    val issuers = mapOf(alias to azureV2).withoutAdditionalClaimRules()
+    val openAm = Issuer(
+        issuer = applicationContext.env.hentRequiredEnv("OPEN_AM_ISSUER"),
+        jwksUri = URI(applicationContext.env.hentRequiredEnv("OPEN_AM_JWKS_URI")),
+        audience = null,
+        alias = "open-am"
+    )
+
+    val issuers = mapOf(
+        azureV2.alias() to azureV2,
+        openAm.alias() to openAm
+    ).withoutAdditionalClaimRules()
 
     install(Authentication) {
         multipleJwtIssuers(issuers)
@@ -68,7 +77,7 @@ internal fun Application.app(
         DefaultProbeRoutes()
         authenticate(*issuers.allIssuers()) {
             route("/api") {
-                KronisktSyktBarnRoute(
+                KroniskSyktBarnRoute(
                     tilgangsstyring = applicationContext.tilgangsstyring,
                     kafkaProducer = applicationContext.kafkaProducer,
                     utvidettRepository = applicationContext.utvidettRepository
