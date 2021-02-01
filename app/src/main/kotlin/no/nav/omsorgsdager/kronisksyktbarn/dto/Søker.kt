@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager.utvidetrett.dto
+package no.nav.omsorgsdager.kronisksyktbarn.dto
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import java.time.LocalDate

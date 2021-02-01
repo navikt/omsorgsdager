@@ -18,7 +18,7 @@ import no.nav.omsorgsdager.pdl.PdlClient
 import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver
-import no.nav.omsorgsdager.utvidetrett.UtvidettRepository
+import no.nav.omsorgsdager.kronisksyktbarn.UtvidettRepository
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource

@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager.utvidetrett.dto
+package no.nav.omsorgsdager.kronisksyktbarn.dto
 
 data class AksjonspunktRequest(
     val LEGEERKLÆRING: Any,

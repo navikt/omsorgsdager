@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.skyscreamer.jsonassert.JSONAssert
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 @ExtendWith(TestApplicationExtension::class)
@@ -21,7 +20,7 @@ internal class KronisktSyktBarnPostTest(
     @Test
     fun `UtvidetRett post request med ugyldig body returns 400`() {
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/kroniskt-sykt-barn") {
+            handleRequest(HttpMethod.Post, "/api/kroniskt-sykt-barn") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 addHeader(HttpHeaders.Authorization, "Bearer "+Azure.V2_0.generateJwt("omsorgsdager", "omsorgsdager"))
                 setBody(
@@ -41,7 +40,7 @@ internal class KronisktSyktBarnPostTest(
     @Test
     fun `Post uten gyldig bearer token gir 403`() {
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/kroniskt-sykt-barn") {
+            handleRequest(HttpMethod.Post, "/api/kroniskt-sykt-barn") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 addHeader(HttpHeaders.Authorization,
                     "Bearer "+Azure.V2_0.generateJwt("omsorgsdager", "noenannen"))
@@ -54,7 +53,7 @@ internal class KronisktSyktBarnPostTest(
     @Test
     fun `Post uten authorization gir 401`() {
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/kroniskt-sykt-barn") {
+            handleRequest(HttpMethod.Post, "/api/kroniskt-sykt-barn") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             }.apply {
                 Assertions.assertEquals(HttpStatusCode.Unauthorized, response.status())
@@ -93,7 +92,7 @@ internal class KronisktSyktBarnPostTest(
         """.trimIndent()
 
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Post, "/kroniskt-sykt-barn") {
+            handleRequest(HttpMethod.Post, "/api/kroniskt-sykt-barn") {
                 addHeader(HttpHeaders.Authorization,
                     "Bearer "+Azure.V2_0.generateJwt("omsorgsdager", "omsorgsdager"))
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())

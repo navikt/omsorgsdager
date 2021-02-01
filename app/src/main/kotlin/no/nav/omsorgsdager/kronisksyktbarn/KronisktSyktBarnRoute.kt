@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager.utvidetrett
+package no.nav.omsorgsdager.kronisksyktbarn
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -10,7 +10,7 @@ import io.ktor.routing.*
 import io.ktor.util.pipeline.*
 import no.nav.omsorgsdager.tilgangsstyring.Operasjon
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
-import no.nav.omsorgsdager.utvidetrett.dto.KronisktSyktBarnGrunnlag
+import no.nav.omsorgsdager.kronisksyktbarn.dto.KronisktSyktBarnGrunnlag
 import no.nav.omsorgsdager.vedtak.Aksjonspunkt
 import no.nav.omsorgsdager.vedtak.VedtakResponse
 import no.nav.omsorgsdager.vedtak.VedtakStatus

@@ -28,7 +28,7 @@ internal class KronisktSyktBarnAksjonspunktTest(
             }
         """.trimIndent()
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Put, "/kroniskt-sykt-barn/1234/aksjonspunkt") {
+            handleRequest(HttpMethod.Put, "/api/kroniskt-sykt-barn/1234/aksjonspunkt") {
                 addHeader(HttpHeaders.Authorization, accessToken)
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 setBody(body)
@@ -48,7 +48,7 @@ internal class KronisktSyktBarnAksjonspunktTest(
                 }
         """.trimIndent()
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Put, "/kroniskt-sykt-barn/123/fastsett") {
+            handleRequest(HttpMethod.Put, "/api/kroniskt-sykt-barn/123/fastsett") {
                 addHeader(HttpHeaders.Authorization, accessToken)
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             }
@@ -67,7 +67,7 @@ internal class KronisktSyktBarnAksjonspunktTest(
                 }
         """.trimIndent()
         with(testApplicationEngine) {
-            handleRequest(HttpMethod.Put, "/kroniskt-sykt-barn/123/deaktiver") {
+            handleRequest(HttpMethod.Put, "/api/kroniskt-sykt-barn/123/deaktiver") {
                 addHeader(HttpHeaders.Authorization, accessToken)
                 addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             }
