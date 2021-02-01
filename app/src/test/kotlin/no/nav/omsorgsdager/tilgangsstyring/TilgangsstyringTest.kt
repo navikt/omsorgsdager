@@ -1,0 +1,258 @@
+package no.nav.omsorgsdager.tilgangsstyring
+
+import io.ktor.application.*
+import io.ktor.http.*
+import io.mockk.*
+import kotlinx.coroutines.runBlocking
+import no.nav.helse.dusseldorf.testsupport.jws.Azure
+import no.nav.helse.dusseldorf.testsupport.jws.NaisSts
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+
+internal class TilgangsstyringTest {
+    private val omsorgspengerTilgangsstyringGatewayMock = mockk<OmsorgspengerTilgangsstyringGateway>()
+
+    private val tilgangsstyring = Tilgangsstyring(
+        tokenResolver = TokenResolver(
+            azureIssuers = setOf(Azure.V2_0.getIssuer()),
+            openAmIssuers = setOf(NaisSts.getIssuer()),
+            openAmAuthorizedClients = setOf("k9-sak")
+        ),
+        omsorgspengerTilgangsstyringGateway = omsorgspengerTilgangsstyringGatewayMock
+    )
+
+    @BeforeEach
+    fun clear() {
+        clearMocks(omsorgspengerTilgangsstyringGatewayMock)
+    }
+
+
+    @Test
+    fun `Azure system token med tilgang`() {
+        assertOperasjoner(
+            jwt = azureSystemToken(medTilgang = true),
+            forventetResultatVisning = true,
+            forventetResultatEndring = true
+        )
+        tilgangsstyringGatewayKaltAkkurat(0)
+    }
+
+    @Test
+    fun `Azure system token uten tilgang`() {
+        assertOperasjoner(
+            jwt = azureSystemToken(medTilgang = false),
+            forventetResultatVisning = false,
+            forventetResultatEndring = false
+        )
+        tilgangsstyringGatewayKaltAkkurat(0)
+    }
+
+    @Test
+    fun `Azure person token som kun kan lese`() {
+        val jwt = azurePersonToken()
+        mockTilgangsstyringGateway(
+            jwt = jwt,
+            tilgangVisning = true,
+            tilgangEndring = false
+        )
+        assertOperasjoner(
+            jwt = jwt,
+            forventetResultatVisning = true,
+            forventetResultatEndring = false
+
+        )
+        tilgangsstyringGatewayKaltAkkurat(2)
+    }
+
+    @Test
+    fun `Azure person token som kan lese og skrive`() {
+        val jwt = azurePersonToken()
+        mockTilgangsstyringGateway(
+            jwt = jwt,
+            tilgangVisning = true,
+            tilgangEndring = true
+        )
+        assertOperasjoner(
+            jwt = jwt,
+            forventetResultatVisning = true,
+            forventetResultatEndring = true
+
+        )
+        tilgangsstyringGatewayKaltAkkurat(2)
+    }
+
+    @Test
+    fun `Azure person token uten tilgang`() {
+        val jwt = azurePersonToken()
+        mockTilgangsstyringGateway(
+            jwt = jwt,
+            tilgangVisning = false,
+            tilgangEndring = false
+        )
+        assertOperasjoner(
+            jwt = jwt,
+            forventetResultatVisning = false,
+            forventetResultatEndring = false
+        )
+        tilgangsstyringGatewayKaltAkkurat(2)
+    }
+
+    @Test
+    fun `Open AM system token med tilgang`() {
+        assertOperasjoner(
+            jwt = openAmSytemToken(medTilgang = true),
+            forventetResultatVisning = true,
+            forventetResultatEndring = true
+        )
+        tilgangsstyringGatewayKaltAkkurat(0)
+    }
+
+    @Test
+    fun `Open AM system token uten tilgang`() {
+        assertOperasjoner(
+            jwt = openAmSytemToken(medTilgang = false),
+            forventetResultatVisning = false,
+            forventetResultatEndring = false
+        )
+        tilgangsstyringGatewayKaltAkkurat(0)
+    }
+
+    @Test
+    fun `Open AM person token som kun kan lese`() {
+        val jwt = openAmPersonToken()
+        mockTilgangsstyringGateway(
+            jwt = jwt,
+            tilgangVisning = true,
+            tilgangEndring = false
+        )
+        assertOperasjoner(
+            jwt = jwt,
+            forventetResultatVisning = true,
+            forventetResultatEndring = false
+        )
+        tilgangsstyringGatewayKaltAkkurat(2)
+    }
+
+    @Test
+    fun `Open AM person token som kan lese og skrive`() {
+        val jwt = openAmPersonToken()
+        mockTilgangsstyringGateway(
+            jwt = jwt,
+            tilgangVisning = true,
+            tilgangEndring = true
+        )
+        assertOperasjoner(
+            jwt = jwt,
+            forventetResultatVisning = true,
+            forventetResultatEndring = true
+        )
+        tilgangsstyringGatewayKaltAkkurat(2)
+    }
+
+    @Test
+    fun `Open AM person token som uten tilgang`() {
+        val jwt = openAmPersonToken()
+        mockTilgangsstyringGateway(
+            jwt = jwt,
+            tilgangVisning = false,
+            tilgangEndring = false
+        )
+        assertOperasjoner(
+            jwt = jwt,
+            forventetResultatVisning = false,
+            forventetResultatEndring = false
+        )
+        tilgangsstyringGatewayKaltAkkurat(2)
+    }
+
+    private fun assertOperasjoner(
+        jwt: String?,
+        forventetResultatVisning: Boolean,
+        forventetResultatEndring: Boolean) {
+        val call = call(authorizationHeader = when (jwt) {
+            null -> null
+            else -> "Bearer $jwt"
+        })
+        assertEquals(forventetResultatVisning, VisningOperasjon.kanGjøreOperasjon(call))
+        assertEquals(forventetResultatEndring, EndringOperasjon.kanGjøreOperasjon(call))
+    }
+
+    private fun Operasjon.kanGjøreOperasjon(call: ApplicationCall) = this.let { operasjon -> runBlocking {
+        kotlin.runCatching { tilgangsstyring.verifiserTilgang(call = call, operasjon = operasjon) }.isSuccess
+    }}
+
+    private fun tilgangsstyringGatewayKaltAkkurat(n: Int) {
+        coVerify(exactly = n) { omsorgspengerTilgangsstyringGatewayMock.harTilgang(any(), any()) }
+    }
+
+    private fun mockTilgangsstyringGateway(
+        jwt: String,
+        tilgangVisning: Boolean,
+        tilgangEndring: Boolean) {
+        coEvery { omsorgspengerTilgangsstyringGatewayMock.harTilgang(
+            token = match { it.jwt == jwt },
+            operasjon = match { it.type == Operasjon.Type.Visning })
+        }.returns(tilgangVisning)
+        coEvery { omsorgspengerTilgangsstyringGatewayMock.harTilgang(
+            token = match { it.jwt == jwt },
+            operasjon = match { it.type == Operasjon.Type.Endring })
+        }.returns(tilgangEndring)
+    }
+
+    private companion object {
+        private val VisningOperasjon = Operasjon(
+            type = Operasjon.Type.Visning,
+            beskrivelse = "Tester tilgangsstyring",
+            identitetsnummer = setOf("123")
+        )
+
+        private val EndringOperasjon = Operasjon(
+            type = Operasjon.Type.Endring,
+            beskrivelse = "Tester tilgangsstyring",
+            identitetsnummer = setOf("123")
+        )
+
+        private fun azureSystemToken(medTilgang: Boolean) = Azure.V2_0.generateJwt(
+            clientId = "any",
+            audience = "sjekkes-ved-sjekk-på-signatur",
+            accessAsApplication = medTilgang
+        )
+        private fun azurePersonToken() = Azure.V2_0.generateJwt(
+            clientId = "any",
+            audience = "sjekkes-ved-sjekk-på-signatur",
+            accessAsApplication = false,
+            overridingClaims = mapOf(
+                "oid" to "something",
+                "preferred_username" to "user"
+            )
+        )
+        private fun openAmSytemToken(medTilgang: Boolean) = NaisSts.generateJwt(
+            application = "any",
+            overridingClaims = mapOf(
+                "azp" to when (medTilgang) {
+                    true -> "k9-sak"
+                    false -> "k9-noe-annet"
+                }
+            )
+        )
+
+        private fun openAmPersonToken() = NaisSts.generateJwt(
+            application = "any",
+            overridingClaims = mapOf(
+                "azp" to "any",
+                "tokenName" to "id_token"
+            )
+        )
+
+
+        private fun call(authorizationHeader: String?) = mockk<ApplicationCall>().also {
+            every { it.request.headers }.returns(when(authorizationHeader) {
+                null -> Headers.Empty
+                else -> Headers.build {
+                    this.append(HttpHeaders.Authorization, authorizationHeader)
+                }
+            })
+        }
+    }
+}
