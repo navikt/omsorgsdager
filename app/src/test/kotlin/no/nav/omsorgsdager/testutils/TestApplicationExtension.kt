@@ -50,21 +50,17 @@ internal class TestApplicationExtension : ParameterResolver {
                 "DATABASE_USERNAME" to "postgres",
                 "DATABASE_PASSWORD" to "postgres",
                 "PDL_BASE_URL" to wireMockServer.pdlApiBaseUrl(),
-                "STS_TOKEN_ENDPOINT" to wireMockServer.getNaisStsTokenUrl(),
                 "PROXY_SCOPES" to "/.default",
                 "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl(),
                 "KAFKA_BOOTSTRAP_SERVERS" to "test",
                 "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
                 "AZURE_V2_JWKS_URI" to (wireMockServer.getAzureV2JwksUrl()),
                 "AZURE_APP_CLIENT_ID" to "omsorgsdager",
+                "AZURE_APP_CLIENT_SECRET" to "secret",
+                "AZURE_APP_TOKEN_ENDPOINT" to (wireMockServer.getAzureV2TokenUrl()),
                 "OPEN_AM_ISSUER" to NaisSts.getIssuer(),
                 "OPEN_AM_JWKS_URI" to (wireMockServer.getNaisStsJwksUrl()),
                 "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak"
-            ),
-            accessTokenClient = ClientSecretAccessTokenClient( // TODO: Why?
-                clientId = "omsorgsdager",
-                clientSecret = "azureSecret",
-                tokenEndpoint = URI(wireMockServer.getAzureV2TokenUrl()),
             ),
             kafkaProducer = mockk()
         ).build()
