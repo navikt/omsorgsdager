@@ -31,8 +31,7 @@ internal class ApplicationContext(
     internal val tokenResolver: TokenResolver,
     internal val tilgangsstyring: Tilgangsstyring,
     internal val kafkaProducer: KafkaProducer<String, String>,
-    internal val utvidettRepository: UtvidettRepository,
-    internal val tilgangsstyringRestClient: TilgangsstyringRestClient) { // TODO: Fjern
+    internal val utvidettRepository: UtvidettRepository) {
 
     internal fun start() {
         dataSource.migrate()
@@ -100,11 +99,7 @@ internal class ApplicationContext(
                 utvidettRepository = benyttetUtvidettRepository,
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
                 tokenResolver = benyttetTokenResolver,
-                tilgangsstyring = benyttetTilgangsstyring,
-                tilgangsstyringRestClient = TilgangsstyringRestClient(
-                    httpClient = benyttetHttpClient,
-                    env = benyttetEnv
-                )
+                tilgangsstyring = benyttetTilgangsstyring
             )
         }
 

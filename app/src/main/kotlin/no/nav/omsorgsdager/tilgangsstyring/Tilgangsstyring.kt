@@ -11,6 +11,7 @@ internal class Tilgangsstyring(
     private val omsorgspengerTilgangsstyringGateway: OmsorgspengerTilgangsstyringGateway) {
 
     internal suspend fun verifiserTilgang(call: ApplicationCall, operasjon: Operasjon) {
+        require(operasjon.identitetsnummer.isNotEmpty()) { "Må settes minst et identitetsnummer." }
         val token = tokenResolver.resolve(call)
         val correlationId = call.correlationId()
         when (token.erPersonToken) {
