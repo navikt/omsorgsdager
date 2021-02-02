@@ -9,9 +9,10 @@ import java.time.ZonedDateTime
 
 internal interface KroniskSyktBarnRepository {
     fun nyttVedtak(vedtak: KroniskSyktBarnVedtak, uløsteAksjonspunkter: Set<UløstAksjonspunkt>)
-    fun fastsett(behandlingId: BehandlingId)
-    fun deaktiver(behandlingId: BehandlingId)
-    fun løsteAksjonspunkter(behandlingId: BehandlingId, løsteAksjonspunkter: Set<LøstAksjonpunkt>)
+    fun fastsett(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>
+    fun deaktiver(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>
+    fun løsteAksjonspunkter(behandlingId: BehandlingId, løsteAksjonspunkter: Set<LøstAksjonpunkt>) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>
+    fun hent(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>?
 }
 
 internal class InMemoryKroniskSyktBarnRespository : KroniskSyktBarnRepository {
@@ -25,32 +26,36 @@ internal class InMemoryKroniskSyktBarnRespository : KroniskSyktBarnRepository {
     }
 
 
-    override fun fastsett(behandlingId: BehandlingId) {
+    override fun fastsett(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter> {
         val (vedtak, aksjonspunkter) = map.getValue(behandlingId)
-        require(aksjonspunkter.løsteAksjonspunkter.isEmpty()) { "Må ha løst alle aksjonspunkter for å fastsette" }
+        require(aksjonspunkter.uløsteAksjonspunkter.isEmpty()) { "Må ha løst alle aksjonspunkter for å fastsette" }
+        require(vedtak.status == VedtakStatus.FORSLAG) { "Må være i status FORSLAG for å kunne sette til FASTSATT" }
         map[behandlingId] = vedtak.copy(
             status = VedtakStatus.FASTSATT,
             statusSistEndret = ZonedDateTime.now()
         ) to aksjonspunkter
+        return map.getValue(behandlingId)
     }
 
-    override fun deaktiver(behandlingId: BehandlingId) {
+    override fun deaktiver(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter> {
         val (vedtak, aksjonspunkter) = map.getValue(behandlingId)
+        require(vedtak.status == VedtakStatus.FORSLAG) { "Må være i status FORSLAG for å kunne sette til DEAKTIVERT" }
         map[behandlingId] = vedtak.copy(
             status = VedtakStatus.DEAKTIVERT,
             statusSistEndret = ZonedDateTime.now()
         ) to aksjonspunkter
+        return map.getValue(behandlingId)
     }
 
-    override fun løsteAksjonspunkter(behandlingId: BehandlingId, løsteAksjonspunkter: Set<LøstAksjonpunkt>) {
+    override fun løsteAksjonspunkter(behandlingId: BehandlingId, løsteAksjonspunkter: Set<LøstAksjonpunkt>) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter> {
         val (vedtak, aksjonspunkter) = map.getValue(behandlingId)
-        val nyeLøsninger = løsteAksjonspunkter.map { it.navn() }
+        val nyeLøsninger = løsteAksjonspunkter.map { it.navn }
 
         val oppdaterteLøsteAksjonspunkter = aksjonspunkter.løsteAksjonspunkter.filterNot {
-            it.navn() in nyeLøsninger
+            it.navn in nyeLøsninger
         }.plus(løsteAksjonspunkter).toSet()
 
-        val alleLøsninger = oppdaterteLøsteAksjonspunkter.map { it.navn() }
+        val alleLøsninger = oppdaterteLøsteAksjonspunkter.map { it.navn }
 
         val oppdaterteAksjonspunkter = Aksjonspunkter(
             løsteAksjonspunkter = oppdaterteLøsteAksjonspunkter,
@@ -58,8 +63,11 @@ internal class InMemoryKroniskSyktBarnRespository : KroniskSyktBarnRepository {
                 it.navn in alleLøsninger
             }.toSet()
         )
-
         map[behandlingId] = vedtak to oppdaterteAksjonspunkter
+        return map.getValue(behandlingId)
     }
+
+    override fun hent(behandlingId: BehandlingId): Pair<KroniskSyktBarnVedtak, Aksjonspunkter>? =
+        map[behandlingId]
 
 }

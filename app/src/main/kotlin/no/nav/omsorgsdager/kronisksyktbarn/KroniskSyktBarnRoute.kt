@@ -1,17 +1,20 @@
 package no.nav.omsorgsdager.kronisksyktbarn
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.util.*
 import io.ktor.util.pipeline.*
+import no.nav.omsorgsdager.SerDes.map
+import no.nav.omsorgsdager.SerDes.objectNode
 import no.nav.omsorgsdager.aksjonspunkt.UløstAksjonspunkt
+import no.nav.omsorgsdager.behandlingId
 import no.nav.omsorgsdager.tilgangsstyring.Operasjon
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
 import no.nav.omsorgsdager.kronisksyktbarn.dto.KronisktSyktBarnGrunnlag
+import no.nav.omsorgsdager.kronisksyktbarn.dto.LøsteAksjonspunkterRequest
 import no.nav.omsorgsdager.tid.Periode.Companion.utÅretBarnetFyller18
 import no.nav.omsorgsdager.vedtak.VedtakResponse
 import no.nav.omsorgsdager.vedtak.VedtakStatus
@@ -27,14 +30,8 @@ internal fun Route.KroniskSyktBarnRoute(
     route("/kroniskt-sykt-barn") {
 
         post {
-            val request = try {
-                call.receive<JsonNode>()
-            } catch (cause: Throwable) {
-                call.respond(HttpStatusCode.BadRequest)
-                return@post
-            }
-
-            val grunnlag = KronisktSyktBarnGrunnlag(request as ObjectNode)
+            val request = call.objectNode()
+            val grunnlag = KronisktSyktBarnGrunnlag(request)
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.NyBehandlingKroniskSyktBarn.copy(
                 identitetsnummer = setOf(
@@ -43,7 +40,7 @@ internal fun Route.KroniskSyktBarnRoute(
                 )
             ))
 
-            val uløsteAksjonspunkter = setOf(UløstAksjonspunkt(navn = "VURDERE_LEGEERKLÆRING"))
+            val uløsteAksjonspunkter = setOf(UløstAksjonspunkt(navn = "LEGEERKLÆRING"))
             kroniskSyktBarnRepository.nyttVedtak(
                 vedtak = KroniskSyktBarnVedtak(
                     saksnummer = grunnlag.saksnummer,
@@ -62,55 +59,73 @@ internal fun Route.KroniskSyktBarnRoute(
             )
 
             //utvidettRepository.lagre(request.behandlingId(), request.toString())
-            call.respond(HttpStatusCode.OK, response.toJson())
+            call.respond(HttpStatusCode.Created, response.toJson())
         }
 
         // Oppdatere i database
         put("/{behandlingId}/aksjonspunkt") {
-            val request = try {
-                call.receive<JsonNode>()
-            } catch (cause: Throwable) {
-                call.respond(HttpStatusCode.BadRequest)
+            val behandlingId = call.behandlingId()
+            val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
+            if (vedtakOgAksjonspunkter == null) {
+                call.respond(HttpStatusCode.NotFound)
+                return@put
+            }
+            if (vedtakOgAksjonspunkter.first.status != VedtakStatus.FORSLAG) {
+                call.respond(HttpStatusCode.Conflict)
                 return@put
             }
 
-            val behandlingId = call.parameters["behandlingId"]
+            val request = call.objectNode()
+            val løsteAksjonspunkter = request.map<LøsteAksjonspunkterRequest>()
 
             // TODO: Hent behandling + identer
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.LøseAksjonspunktKroniskSyktBarn.copy(
-                identitetsnummer = setOf("123") // TODO
+                identitetsnummer = vedtakOgAksjonspunkter.first.involverteIdentitetsnummer
             ))
 
-            // TODO: status=FASTSATT throws HttpStatusCode.Conflict
+            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.løsteAksjonspunkter(
+                behandlingId = behandlingId,
+                løsteAksjonspunkter = løsteAksjonspunkter.løsteAksjonspunkter
+            )
+
             val response = VedtakResponse(
-                status = VedtakStatus.FORSLAG,
-                uløsteAksjonspunkter = setOf(UløstAksjonspunkt(navn="MEDLEMSKAP"))
+                status = vedtak.status,
+                uløsteAksjonspunkter = aksjonspunkter.uløsteAksjonspunkter
             )
 
             call.respond(HttpStatusCode.OK, response.toJson())
         }
 
         put("/{behandlingId}/fastsett") {
-
-            val behandlingId = call.parameters["behandlingId"]
-
-            // TODO: Hent behandlingId + identer + aksjonspunkter
-            val aksjonspunkter = setOf(UløstAksjonspunkt(navn = "VURDERE_LEGEERKLÆRING"))
-
-            tilgangsstyring.verifiserTilgang(call, Operasjoner.FastsetteKroniskSyktBarn.copy(
-                identitetsnummer = setOf("123","456") // TODO
-            ))
-
-            // se efter uløste Aksjonspunkter
-            val uløsteAksjonspunkter = 0
-            if(uløsteAksjonspunkter>0) {
-                call.respond(HttpStatusCode.Conflict, uløsteAksjonspunkter)
+            val behandlingId = call.behandlingId()
+            val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
+            if (vedtakOgAksjonspunkter == null) {
+                call.respond(HttpStatusCode.NotFound)
+                return@put
+            }
+            if (vedtakOgAksjonspunkter.first.status != VedtakStatus.FORSLAG) {
+                call.respond(HttpStatusCode.Conflict)
+                return@put
+            }
+            if (vedtakOgAksjonspunkter.second.uløsteAksjonspunkter.isNotEmpty()) {
+                call.respond(HttpStatusCode.Conflict)
+                return@put
             }
 
+            // TODO: Løst alt men ikke kan fastsettes...
+
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.FastsetteKroniskSyktBarn.copy(
+                identitetsnummer = vedtakOgAksjonspunkter.first.involverteIdentitetsnummer
+            ))
+
+            val (fastsattVedtak, fastsattAksjonspunkter) = kroniskSyktBarnRepository.fastsett(
+                behandlingId = behandlingId
+            )
+
             val response = VedtakResponse(
-                status = VedtakStatus.FASTSATT,
-                uløsteAksjonspunkter = emptySet()
+                status = fastsattVedtak.status,
+                uløsteAksjonspunkter = fastsattAksjonspunkter.uløsteAksjonspunkter
             )
 
 
@@ -123,18 +138,30 @@ internal fun Route.KroniskSyktBarnRoute(
         }
 
         put("/{behandlingId}/deaktiver") {
-
-            val behandlingId = call.parameters["behandlingId"]
+            val behandlingId = call.behandlingId()
+            val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
+            if (vedtakOgAksjonspunkter == null) {
+                call.respond(HttpStatusCode.NotFound)
+                return@put
+            }
+            if (vedtakOgAksjonspunkter.first.status != VedtakStatus.FORSLAG) {
+                call.respond(HttpStatusCode.Conflict)
+                return@put
+            }
 
             // TODO: Hent behandlingId + identer
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.DeaktivereKroniskSyktBarn.copy(
-                identitetsnummer = setOf("123", "456") // TODO
+                identitetsnummer = vedtakOgAksjonspunkter.first.involverteIdentitetsnummer
             ))
 
+            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.deaktiver(
+                behandlingId = behandlingId
+            )
+
             val response = VedtakResponse(
-                status = VedtakStatus.DEAKTIVERT,
-                uløsteAksjonspunkter = emptySet()
+                status = vedtak.status,
+                uløsteAksjonspunkter = aksjonspunkter.uløsteAksjonspunkter
             )
 
 
@@ -146,13 +173,15 @@ internal fun Route.KroniskSyktBarnRoute(
 
         get("/{behandlingId}") {
 
-            val behandlingId = call.parameters["behandlingId"]
+            val behandlingId = call.parameters.getOrFail("behandlingId")
 
             // TODO: Hent behandling + identer
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.HenteKroniskSyktBarnBehandling.copy(
                 identitetsnummer = setOf("123", "456")
             ))
+
+            val vedtak = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
 
             val behandling = """
                 {

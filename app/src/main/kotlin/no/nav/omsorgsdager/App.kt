@@ -16,6 +16,7 @@ import no.nav.helse.dusseldorf.ktor.core.DefaultProbeRoutes
 import no.nav.helse.dusseldorf.ktor.core.DefaultStatusPages
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
+import no.nav.omsorgsdager.SerDes.configured
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnRoute
 import java.net.URI
@@ -34,7 +35,7 @@ internal fun Application.app(
     */
     install(ContentNegotiation) {
         jackson {
-            disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            configured()
         }
     }
 

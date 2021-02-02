@@ -1,7 +1,9 @@
 package no.nav.omsorgsdager
 
+import com.fasterxml.jackson.databind.node.ObjectNode
 import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.util.*
 import org.json.JSONObject
 import java.util.*
 
@@ -12,13 +14,15 @@ internal fun ApplicationCall.correlationId() = when {
     else -> "omsorgsdager-${UUID.randomUUID()}"
 }
 
-typealias Saksnummer = String
-typealias BehandlingId = String
-typealias Identitetsnummer = String
+internal typealias Saksnummer = String
+internal typealias BehandlingId = String
+internal fun ApplicationCall.behandlingId() : BehandlingId = parameters.getOrFail("behandlingId")
+internal typealias Identitetsnummer = String
 
-internal data class Json (
-    internal val rawJson: String) {
-    init {
-        JSONObject(rawJson)
+internal class Json private constructor(json: String) {
+    internal val raw = JSONObject(json).toString()
+    internal companion object {
+        internal fun String.somJson() = Json(json = this)
+        internal fun ObjectNode.somJson() = Json(json = toString())
     }
 }

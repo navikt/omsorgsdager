@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager.kronisksyktbarn
 
 import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.kronisksyktbarn.dto.Barn
 import no.nav.omsorgsdager.tid.Periode
@@ -18,4 +19,6 @@ internal data class KroniskSyktBarnVedtak(
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
         periode = nyPeriode
     )
+    // TODO: Søker..
+    internal val involverteIdentitetsnummer : Set<Identitetsnummer> = setOf(barn.identitetsnummer)
 }
