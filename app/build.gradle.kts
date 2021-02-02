@@ -7,6 +7,7 @@ val jsonassertVersion = "1.5.0"
 val kafkaVersion = "2.4.0"
 val mockkVersion = "1.10.5"
 val assertjVersion = "3.19.0"
+val jacksonDateTime = "2.12.1"
 
 // Database
 val flywayVersion = "7.5.2"
@@ -38,6 +39,7 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonDateTime")
 
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")

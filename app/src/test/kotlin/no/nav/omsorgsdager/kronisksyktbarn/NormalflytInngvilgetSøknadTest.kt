@@ -3,6 +3,8 @@ package no.nav.omsorgsdager.kronisksyktbarn
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.omsorgsdager.testutils.TestApplicationExtension
+import no.nav.omsorgsdager.vedtak.Vedtak
+import no.nav.omsorgsdager.vedtak.VedtakStatus
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,15 +25,15 @@ internal class NormalflytInngvilgetSøknadTest(
             {
                 "saksnummer": "123",
                 "behandlingId": "$behandlingId",
-                "mottatt": "${ZonedDateTime.now()}",
+                "mottatt": "2021-01-01T08:00:00.000Z",
                 "søker": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "${LocalDate.now().minusYears(30)}",
+                    "fødselsdato": "1990-01-01",
                     "jobberINorge": true
                 },
                 "barn": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "${LocalDate.now().minusYears(1)}"
+                    "fødselsdato": "2020-01-01"
                 }
             }
         """.trimIndent()
@@ -108,6 +110,33 @@ internal class NormalflytInngvilgetSøknadTest(
                 behandlingId = behandlingId,
                 requestBody = løseAksjonspunktForLegeerklæringRequest,
                 forventetStatusCode = HttpStatusCode.Conflict
+            )
+        }
+    }
+
+    @Test
+    @Order(5)
+    fun `Hent behandlingId`() {
+        val forventetResponse = """
+            {
+              "barn": {
+                "identitetsnummer": "123",
+                "fødselsdato": "2020-01-01"
+              },
+              "behandlingId": "$behandlingId",
+              "gyldigFraOgMed": "2021-01-01",
+              "gyldigTilOgMed": "2038-12-31",
+              "status": "${VedtakStatus.FASTSATT}",
+              "uløsteAksjonspunkter": {},
+              "løsteAksjonspunkter": {
+                "LEGEERKLÆRING": {}
+              }
+            }
+        """.trimIndent()
+        with(testApplicationEngine) {
+            hent(
+                behandlingId = behandlingId,
+                forventetResponse = forventetResponse
             )
         }
     }

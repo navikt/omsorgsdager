@@ -23,10 +23,8 @@ internal data class Periode(
     override fun toString() = "$fom/$tom"
 
     internal companion object {
-        internal fun LocalDate.utÅretBarnetFyller18() = Periode(
-            fom = this,
-            tom = plusYears(18).withMonth(12).withDayOfMonth(31)
-        )
+        internal fun LocalDate.utÅretBarnetFyller18() =
+            plusYears(18).withMonth(12).withDayOfMonth(31)
         internal fun LocalDate.erFørEllerLik(annen: LocalDate) = isBefore(annen) || isEqual(annen)
         internal fun LocalDate.erEtterEllerLik(annen: LocalDate) = isAfter(annen) || isEqual(annen)
         internal fun LocalDate.nesteDag() = plusDays(1)

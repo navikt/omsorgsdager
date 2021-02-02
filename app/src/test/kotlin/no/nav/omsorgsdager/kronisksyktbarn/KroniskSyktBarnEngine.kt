@@ -13,7 +13,7 @@ private fun TestApplicationCall.assertForventetResponse(forventetResponse: Strin
     if (forventetResponse == null) {
         assertEquals(forventetResponse, response.content)
     } else {
-        JSONAssert.assertEquals(forventetResponse, forventetResponse, true)
+        JSONAssert.assertEquals(forventetResponse, response.content, true)
     }
 }
 
@@ -64,6 +64,19 @@ internal fun TestApplicationEngine.deaktiver(
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
     handleRequest(HttpMethod.Put, "/api/kroniskt-sykt-barn/$behandlingId/deaktiver") {
+        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+    }.apply {
+        assertEquals(forventetStatusCode, response.status())
+        assertForventetResponse(forventetResponse)
+    }
+}
+
+internal fun TestApplicationEngine.hent(
+    behandlingId: BehandlingId,
+    forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
+    forventetResponse: String? = null) {
+    handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn/$behandlingId") {
         addHeader(HttpHeaders.Authorization, authorizationHeader)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {

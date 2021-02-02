@@ -20,6 +20,7 @@ internal fun ApplicationCall.behandlingId() : BehandlingId = parameters.getOrFai
 internal typealias Identitetsnummer = String
 
 internal class Json private constructor(json: String) {
+    internal val map = JSONObject(json).toMap()
     internal val raw = JSONObject(json).toString()
     internal companion object {
         internal fun String.somJson() = Json(json = this)
