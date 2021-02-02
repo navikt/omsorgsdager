@@ -100,6 +100,10 @@ internal class NormalflytInngvilgetSøknadTest(
                 behandlingId = behandlingId,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
+            fastsett(
+                behandlingId = behandlingId,
+                forventetStatusCode = HttpStatusCode.Conflict
+            )
             aksjonspunkter(
                 behandlingId = behandlingId,
                 requestBody = løseAksjonspunktForLegeerklæringRequest,
