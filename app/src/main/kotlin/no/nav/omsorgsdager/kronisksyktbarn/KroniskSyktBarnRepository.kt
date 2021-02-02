@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager.kronisksyktbarn
 
 import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.aksjonspunkt.Aksjonspunkter
 import no.nav.omsorgsdager.aksjonspunkt.LøstAksjonpunkt
 import no.nav.omsorgsdager.aksjonspunkt.UløstAksjonspunkt
@@ -13,6 +14,7 @@ internal interface KroniskSyktBarnRepository {
     fun deaktiver(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>
     fun løsteAksjonspunkter(behandlingId: BehandlingId, løsteAksjonspunkter: Set<LøstAksjonpunkt>) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>
     fun hent(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>?
+    fun hentAlle(saksnummer: Saksnummer) : List<Pair<KroniskSyktBarnVedtak, Aksjonspunkter>>
 }
 
 internal class InMemoryKroniskSyktBarnRespository : KroniskSyktBarnRepository {
@@ -70,4 +72,7 @@ internal class InMemoryKroniskSyktBarnRespository : KroniskSyktBarnRepository {
     override fun hent(behandlingId: BehandlingId): Pair<KroniskSyktBarnVedtak, Aksjonspunkter>? =
         map[behandlingId]
 
+    override fun hentAlle(saksnummer: Saksnummer): List<Pair<KroniskSyktBarnVedtak, Aksjonspunkter>> {
+        return map.filterValues { it.first.saksnummer == saksnummer }.values.toList()
+    }
 }

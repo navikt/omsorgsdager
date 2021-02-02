@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager.utvidetrett
+package no.nav.omsorgsdager.kronisksyktbarn
 
 import io.ktor.http.*
 import io.ktor.server.testing.*
