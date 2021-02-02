@@ -15,12 +15,17 @@ internal fun ApplicationCall.correlationId() = when {
 }
 
 internal typealias Saksnummer = String
+internal fun ApplicationCall.saksnummer() : Saksnummer = parameters.getOrFail("saksnummer")
 internal typealias BehandlingId = String
 internal fun ApplicationCall.behandlingId() : BehandlingId = parameters.getOrFail("behandlingId")
 internal typealias Identitetsnummer = String
 
 internal class Json private constructor(json: String) {
-    internal val raw = JSONObject(json).toString()
+    private val jsonObject = JSONObject(json)
+    internal val map = jsonObject.toMap()
+    internal val raw = requireNotNull(jsonObject.toString()) {
+        "Ugyldig JSON $json"
+    }
     internal companion object {
         internal fun String.somJson() = Json(json = this)
         internal fun ObjectNode.somJson() = Json(json = toString())

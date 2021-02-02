@@ -27,7 +27,6 @@ internal class InMemoryKroniskSyktBarnRespository : KroniskSyktBarnRepository {
         )
     }
 
-
     override fun fastsett(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter> {
         val (vedtak, aksjonspunkter) = map.getValue(behandlingId)
         require(aksjonspunkter.uløsteAksjonspunkter.isEmpty()) { "Må ha løst alle aksjonspunkter for å fastsette" }

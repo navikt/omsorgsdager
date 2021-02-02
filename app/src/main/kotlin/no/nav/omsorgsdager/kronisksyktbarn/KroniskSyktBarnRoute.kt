@@ -7,25 +7,31 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
+import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.SerDes.map
 import no.nav.omsorgsdager.SerDes.objectNode
 import no.nav.omsorgsdager.aksjonspunkt.UløstAksjonspunkt
 import no.nav.omsorgsdager.behandlingId
+import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSkytBarnListeResponse
+import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSyktBarnRequest.Companion.hentKroniskSyktBarnRequest
+import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSyktBarnResponse
 import no.nav.omsorgsdager.tilgangsstyring.Operasjon
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
 import no.nav.omsorgsdager.kronisksyktbarn.dto.KronisktSyktBarnGrunnlag
 import no.nav.omsorgsdager.kronisksyktbarn.dto.LøsteAksjonspunkterRequest
-import no.nav.omsorgsdager.tid.Periode.Companion.utÅretBarnetFyller18
+import no.nav.omsorgsdager.saksnummer
+import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm18År
+import no.nav.omsorgsdager.tid.Periode.Companion.toLocalDateOslo
+import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
 import no.nav.omsorgsdager.vedtak.VedtakResponse
 import no.nav.omsorgsdager.vedtak.VedtakStatus
-import org.slf4j.LoggerFactory
 import java.time.ZonedDateTime
 
 internal fun Route.KroniskSyktBarnRoute(
     tilgangsstyring: Tilgangsstyring,
     kroniskSyktBarnRepository: KroniskSyktBarnRepository) {
-
-    val logger = LoggerFactory.getLogger("no.nav.omsorgsdager.KronisktSyktBarnRoute")
 
     route("/kroniskt-sykt-barn") {
 
@@ -48,7 +54,10 @@ internal fun Route.KroniskSyktBarnRoute(
                     status = VedtakStatus.FORSLAG,
                     statusSistEndret = ZonedDateTime.now(),
                     barn = grunnlag.barn,
-                    periode = grunnlag.barn.fødselsdato.utÅretBarnetFyller18()
+                    periode = Periode(
+                        fom = grunnlag.mottatt.toLocalDateOslo(),
+                        tom = grunnlag.barn.fødselsdato.sisteDagIÅretOm18År()
+                    )
                 ),
                 uløsteAksjonspunkter = uløsteAksjonspunkter
             )
@@ -58,11 +67,9 @@ internal fun Route.KroniskSyktBarnRoute(
                 uløsteAksjonspunkter = uløsteAksjonspunkter
             )
 
-            //utvidettRepository.lagre(request.behandlingId(), request.toString())
             call.respond(HttpStatusCode.Created, response.toJson())
         }
 
-        // Oppdatere i database
         put("/{behandlingId}/aksjonspunkt") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
@@ -129,10 +136,7 @@ internal fun Route.KroniskSyktBarnRoute(
             )
 
 
-            // TODO: Oppdater db
-            //utvidettRepository.fastsett(behandlingId)
-
-            // TODO: Send till k9-vaktmester
+            // TODO: Oppdater db & send till k9-vaktmester
 
             call.respond(HttpStatusCode.OK, response.toJson())
         }
@@ -149,8 +153,6 @@ internal fun Route.KroniskSyktBarnRoute(
                 return@put
             }
 
-            // TODO: Hent behandlingId + identer
-
             tilgangsstyring.verifiserTilgang(call, Operasjoner.DeaktivereKroniskSyktBarn.copy(
                 identitetsnummer = vedtakOgAksjonspunkter.first.involverteIdentitetsnummer
             ))
@@ -164,86 +166,56 @@ internal fun Route.KroniskSyktBarnRoute(
                 uløsteAksjonspunkter = aksjonspunkter.uløsteAksjonspunkter
             )
 
-
-            // TODO: Oppdater db
-            //utvidettRepository.fastsett(behandlingId)
-
             call.respond(HttpStatusCode.OK, response.toJson())
         }
 
-        get("/{behandlingId}") {
+        suspend fun ApplicationCall.hentForBehandlingId(behandlingId: BehandlingId) : HentKroniskSyktBarnResponse? {
+            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)?:return null
 
-            val behandlingId = call.parameters.getOrFail("behandlingId")
-
-            // TODO: Hent behandling + identer
-
-            tilgangsstyring.verifiserTilgang(call, Operasjoner.HenteKroniskSyktBarnBehandling.copy(
-                identitetsnummer = setOf("123", "456")
+            tilgangsstyring.verifiserTilgang(this, Operasjoner.HenteKroniskSyktBarnBehandling.copy(
+                identitetsnummer = vedtak.involverteIdentitetsnummer
             ))
 
-            val vedtak = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
-
-            val behandling = """
-                {
-                      "barn": {
-                        "identitetsnummer": "$behandlingId",
-                        "fødselsdato": "2021-01-29"
-                      },
-                      "behandlingId": "UUID-123-123",
-                      "gyldigFraOgMed": "2021-01-29",
-                      "gyldigTilOgMed": "2021-01-29",
-                      "status": "FORSLAG",
-                      "uløsteAksjonspunkter": {
-                        "LEGEERKLÆRING": {}
-                      },
-                      "løsteAksjonspunkter": {
-                        "MEDLEMSKAP": {},
-                        "YRKESAKTIVITET": {}
-                      },
-                      "lovhenvisnigner": {
-                        "FTL 9-5 3.ledd": "søkeren bor ikke i norge",
-                        "FTL 9-5 2.ledd": "ikke omsorgen for barnet"
-                      }
-                }
-            """.trimIndent()
-
-            call.respond(HttpStatusCode.OK, behandling)
+            return HentKroniskSyktBarnResponse(
+                vedtak = vedtak,
+                aksjonspunkter = aksjonspunkter
+            )
         }
 
-        get("{saksnummer}") {
-            val behandlingId = call.parameters["behandlingId"]
+        suspend fun ApplicationCall.hentForSaksnummer(saksnummer: Saksnummer) : HentKroniskSkytBarnListeResponse {
+            val alle = kroniskSyktBarnRepository.hentAlle(saksnummer = saksnummer)
+            val gjeldendeVedtak = alle.map { it.first }.gjeldendeVedtak()
+            val identitetsnummer = gjeldendeVedtak.map { it.involverteIdentitetsnummer }.flatten().toSet()
 
-            // TODO: Hent behandling + identer
-
-            tilgangsstyring.verifiserTilgang(call, Operasjoner.HenteKroniskSyktBarnSak.copy(
-                identitetsnummer = setOf("123", "456")
+            tilgangsstyring.verifiserTilgang(this, Operasjoner.HenteKroniskSyktBarnSak.copy(
+                identitetsnummer = identitetsnummer
             ))
 
-            val behandling = """
-                {
-                      "barn": {
-                        "identitetsnummer": "$behandlingId",
-                        "fødselsdato": "2021-01-29"
-                      },
-                      "behandlingId": "UUID-123-123",
-                      "gyldigFraOgMed": "2021-01-29",
-                      "gyldigTilOgMed": "2021-01-29",
-                      "status": "FORSLAG",
-                      "uløsteAksjonspunkter": {
-                        "LEGEERKLÆRING": {}
-                      },
-                      "løsteAksjonspunkter": {
-                        "MEDLEMSKAP": {},
-                        "YRKESAKTIVITET": {}
-                      },
-                      "lovhenvisnigner": {
-                        "FTL 9-5 3.ledd": "søkeren bor ikke i norge",
-                        "FTL 9-5 2.ledd": "ikke omsorgen for barnet"
-                      }
-                }
-            """.trimIndent()
+            val vedtak =  gjeldendeVedtak.map { gjeldendeVedtak -> HentKroniskSyktBarnResponse(
+                vedtak = gjeldendeVedtak,
+                aksjonspunkter = alle.first { it.first.behandlingId == gjeldendeVedtak.behandlingId }.second
+            )}
+            return HentKroniskSkytBarnListeResponse(vedtak)
+        }
 
-            call.respond(HttpStatusCode.OK, behandling)
+        get {
+            val request = call.hentKroniskSyktBarnRequest()
+            when (request.hentForBehandlingId) {
+                true -> {
+                    val response = call.hentForBehandlingId(
+                        behandlingId = request.behandlingId!!
+                    )
+                    when (response) {
+                        null -> call.respond(HttpStatusCode.NotFound)
+                        else -> call.respond(HttpStatusCode.OK, response)
+                    }
+                }
+                false -> {
+                    call.respond(HttpStatusCode.OK, call.hentForSaksnummer(
+                        saksnummer = request.saksnummer!!
+                    ))
+                }
+            }
         }
     }
 }

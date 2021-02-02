@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Saksnummer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.skyscreamer.jsonassert.JSONAssert
 
@@ -13,7 +14,7 @@ private fun TestApplicationCall.assertForventetResponse(forventetResponse: Strin
     if (forventetResponse == null) {
         assertEquals(forventetResponse, response.content)
     } else {
-        JSONAssert.assertEquals(forventetResponse, forventetResponse, true)
+        JSONAssert.assertEquals(forventetResponse, response.content, true)
     }
 }
 
@@ -64,6 +65,32 @@ internal fun TestApplicationEngine.deaktiver(
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
     handleRequest(HttpMethod.Put, "/api/kroniskt-sykt-barn/$behandlingId/deaktiver") {
+        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+    }.apply {
+        assertEquals(forventetStatusCode, response.status())
+        assertForventetResponse(forventetResponse)
+    }
+}
+
+internal fun TestApplicationEngine.hentBehandling(
+    behandlingId: BehandlingId,
+    forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
+    forventetResponse: String? = null) {
+    handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn?behandlingId=$behandlingId") {
+        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+    }.apply {
+        assertEquals(forventetStatusCode, response.status())
+        assertForventetResponse(forventetResponse)
+    }
+}
+
+internal fun TestApplicationEngine.hentSak(
+    saksnummer: Saksnummer,
+    forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
+    forventetResponse: String? = null) {
+    handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn?saksnummer=$saksnummer") {
         addHeader(HttpHeaders.Authorization, authorizationHeader)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {

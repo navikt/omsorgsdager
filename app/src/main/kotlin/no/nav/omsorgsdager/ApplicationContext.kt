@@ -20,7 +20,6 @@ import no.nav.omsorgsdager.pdl.PdlClient
 import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver
-import no.nav.omsorgsdager.kronisksyktbarn.UtvidettRepository
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource
@@ -33,7 +32,6 @@ internal class ApplicationContext(
     internal val tokenResolver: TokenResolver,
     internal val tilgangsstyring: Tilgangsstyring,
     internal val kafkaProducer: KafkaProducer<String, String>,
-    internal val utvidettRepository: UtvidettRepository,
     internal val kroniskSyktBarnRepository: KroniskSyktBarnRepository) {
 
     internal fun start() {
@@ -52,7 +50,6 @@ internal class ApplicationContext(
         var tokenResolver: TokenResolver? = null,
         var tilgangsstyring: Tilgangsstyring? = null,
         var kafkaProducer: KafkaProducer<String, String>? = null,
-        var utvidettRepository: UtvidettRepository? = null,
         var kroniskSyktBarnRepository: KroniskSyktBarnRepository? = null) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
@@ -88,7 +85,6 @@ internal class ApplicationContext(
             )
 
             val benyttetKafkaProducer = kafkaProducer ?: benyttetEnv.kafkaProducer()
-            val benyttetUtvidettRepository = utvidettRepository ?: UtvidettRepository(benyttetDataSource)
 
             return ApplicationContext(
                 env = benyttetEnv,
@@ -100,7 +96,6 @@ internal class ApplicationContext(
                     )
                 ),
                 kafkaProducer = benyttetKafkaProducer,
-                utvidettRepository = benyttetUtvidettRepository,
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
                 tokenResolver = benyttetTokenResolver,
                 tilgangsstyring = benyttetTilgangsstyring,

@@ -4,10 +4,10 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.omsorgsdager.testutils.TestApplicationExtension
 import org.intellij.lang.annotations.Language
+import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
-import java.time.LocalDate
-import java.time.ZonedDateTime
 
 @ExtendWith(TestApplicationExtension::class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -21,17 +21,17 @@ internal class NormalflytInngvilgetSøknadTest(
         @Language("JSON")
         val request = """
             {
-                "saksnummer": "123",
+                "saksnummer": "$saksnummer",
                 "behandlingId": "$behandlingId",
-                "mottatt": "${ZonedDateTime.now()}",
+                "mottatt": "2020-12-31T23:59:59.000Z",
                 "søker": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "${LocalDate.now().minusYears(30)}",
+                    "fødselsdato": "1990-01-01",
                     "jobberINorge": true
                 },
                 "barn": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "${LocalDate.now().minusYears(1)}"
+                    "fødselsdato": "2020-01-01"
                 }
             }
         """.trimIndent()
@@ -73,7 +73,6 @@ internal class NormalflytInngvilgetSøknadTest(
         }
     }
 
-
     @Test
     @Order(3)
     fun `Fastsette vedtaket`() {
@@ -112,7 +111,35 @@ internal class NormalflytInngvilgetSøknadTest(
         }
     }
 
+    @Test
+    @Order(5)
+    fun `Hente behandlingen`() {
+        with(testApplicationEngine) {
+            hentBehandling(
+                behandlingId = behandlingId,
+                forventetResponse = forventetResponseHentBehandling
+            )
+        }
+    }
+
+    @Test
+    @Order(6)
+    fun `Hente saken`() {
+        val vedtak = JSONArray().also { it.put(JSONObject(
+            forventetResponseHentBehandling
+        ))}
+        with(testApplicationEngine) {
+            hentSak(
+                saksnummer = saksnummer,
+                forventetResponse = JSONObject().also {
+                    it.put("vedtak", vedtak)
+                }.toString()
+            )
+        }
+    }
+
     private companion object {
+        private const val saksnummer = "123"
         private const val behandlingId = "456"
         @Language("JSON")
         private val løseAksjonspunktForLegeerklæringRequest = """
@@ -124,5 +151,27 @@ internal class NormalflytInngvilgetSøknadTest(
                 }
             }
             """.trimIndent()
+
+        @Language("JSON")
+        val forventetResponseHentBehandling = """
+            {
+              "barn": {
+                "identitetsnummer": "123",
+                "fødselsdato": "2020-01-01"
+              },
+              "behandlingId": "$behandlingId",
+              "gyldigFraOgMed": "2021-01-01",
+              "gyldigTilOgMed": "2038-12-31",
+              "status": "FASTSATT",
+              "uløsteAksjonspunkter": {},
+              "løsteAksjonspunkter": {
+                "LEGEERKLÆRING": {
+                    "begrunnelse": "foo bar",
+                    "barnetErKroniskSykt": true,
+                    "barnetErFunksjonshemmet": false
+                }
+              }
+            }
+        """.trimIndent()
     }
 }
