@@ -16,12 +16,13 @@ internal interface Vedtak {
     fun kopiMedNyPeriode(nyPeriode: Periode) : Vedtak
 
     companion object {
-        internal fun List<Vedtak>.gjeldendeVedtak() = asSequence()
+        internal fun<V:Vedtak> List<V>.gjeldendeVedtak() = asSequence()
             .filterNot { it.status == VedtakStatus.FORSLAG }
             .sortedByDescending { it.statusSistEndret }
             .groupBy { it.barn }
             .map { it.value.gjeldendeVedtakPerBarn() }
             .flatten()
+            .map{ it as V }
             .toList()
 
         private fun List<Vedtak>.gjeldendeVedtakPerBarn() : List<Vedtak> {

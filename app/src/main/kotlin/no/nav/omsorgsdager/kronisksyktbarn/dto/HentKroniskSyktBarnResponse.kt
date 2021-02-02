@@ -6,6 +6,10 @@ import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import java.time.LocalDate
 
+internal data class HentKroniskSkytBarnListeResponse(
+    val vedtak: List<HentKroniskSyktBarnResponse>
+)
+
 internal data class HentKroniskSyktBarnResponse(
     val barn: Barn,
     val behandlingId: BehandlingId,

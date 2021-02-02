@@ -3,13 +3,11 @@ package no.nav.omsorgsdager.kronisksyktbarn
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.omsorgsdager.testutils.TestApplicationExtension
-import no.nav.omsorgsdager.vedtak.Vedtak
-import no.nav.omsorgsdager.vedtak.VedtakStatus
 import org.intellij.lang.annotations.Language
+import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
-import java.time.LocalDate
-import java.time.ZonedDateTime
 
 @ExtendWith(TestApplicationExtension::class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -23,7 +21,7 @@ internal class NormalflytInngvilgetSøknadTest(
         @Language("JSON")
         val request = """
             {
-                "saksnummer": "123",
+                "saksnummer": "$saksnummer",
                 "behandlingId": "$behandlingId",
                 "mottatt": "2020-12-31T23:59:59.000Z",
                 "søker": {
@@ -75,7 +73,6 @@ internal class NormalflytInngvilgetSøknadTest(
         }
     }
 
-
     @Test
     @Order(3)
     fun `Fastsette vedtaket`() {
@@ -117,7 +114,46 @@ internal class NormalflytInngvilgetSøknadTest(
     @Test
     @Order(5)
     fun `Hente behandlingen`() {
-        val forventetResponse = """
+        with(testApplicationEngine) {
+            hentBehandling(
+                behandlingId = behandlingId,
+                forventetResponse = forventetResponseHentBehandling
+            )
+        }
+    }
+
+    @Test
+    @Order(6)
+    fun `Hente saken`() {
+        val vedtak = JSONArray().also { it.put(JSONObject(
+            forventetResponseHentBehandling
+        ))}
+        with(testApplicationEngine) {
+            hentSak(
+                saksnummer = saksnummer,
+                forventetResponse = JSONObject().also {
+                    it.put("vedtak", vedtak)
+                }.toString()
+            )
+        }
+    }
+
+    private companion object {
+        private const val saksnummer = "123"
+        private const val behandlingId = "456"
+        @Language("JSON")
+        private val løseAksjonspunktForLegeerklæringRequest = """
+            {
+              "LEGEERKLÆRING": {
+                    "begrunnelse": "foo bar",
+                    "barnetErKroniskSykt": true,
+                    "barnetErFunksjonshemmet": false
+                }
+            }
+            """.trimIndent()
+
+        @Language("JSON")
+        val forventetResponseHentBehandling = """
             {
               "barn": {
                 "identitetsnummer": "123",
@@ -137,25 +173,5 @@ internal class NormalflytInngvilgetSøknadTest(
               }
             }
         """.trimIndent()
-        with(testApplicationEngine) {
-            hent(
-                behandlingId = behandlingId,
-                forventetResponse = forventetResponse
-            )
-        }
-    }
-
-    private companion object {
-        private const val behandlingId = "456"
-        @Language("JSON")
-        private val løseAksjonspunktForLegeerklæringRequest = """
-            {
-              "LEGEERKLÆRING": {
-                    "begrunnelse": "foo bar",
-                    "barnetErKroniskSykt": true,
-                    "barnetErFunksjonshemmet": false
-                }
-            }
-            """.trimIndent()
     }
 }

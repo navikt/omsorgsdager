@@ -15,6 +15,7 @@ internal fun ApplicationCall.correlationId() = when {
 }
 
 internal typealias Saksnummer = String
+internal fun ApplicationCall.saksnummer() : Saksnummer = parameters.getOrFail("saksnummer")
 internal typealias BehandlingId = String
 internal fun ApplicationCall.behandlingId() : BehandlingId = parameters.getOrFail("behandlingId")
 internal typealias Identitetsnummer = String

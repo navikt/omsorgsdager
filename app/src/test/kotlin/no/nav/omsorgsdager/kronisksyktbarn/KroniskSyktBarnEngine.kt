@@ -4,6 +4,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Saksnummer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.skyscreamer.jsonassert.JSONAssert
 
@@ -72,11 +73,24 @@ internal fun TestApplicationEngine.deaktiver(
     }
 }
 
-internal fun TestApplicationEngine.hent(
+internal fun TestApplicationEngine.hentBehandling(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn/$behandlingId") {
+    handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn?behandlingId=$behandlingId") {
+        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+    }.apply {
+        assertEquals(forventetStatusCode, response.status())
+        assertForventetResponse(forventetResponse)
+    }
+}
+
+internal fun TestApplicationEngine.hentSak(
+    saksnummer: Saksnummer,
+    forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
+    forventetResponse: String? = null) {
+    handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn?saksnummer=$saksnummer") {
         addHeader(HttpHeaders.Authorization, authorizationHeader)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
