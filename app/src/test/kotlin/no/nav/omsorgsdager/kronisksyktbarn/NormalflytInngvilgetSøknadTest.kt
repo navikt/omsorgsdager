@@ -25,7 +25,7 @@ internal class NormalflytInngvilgetSøknadTest(
             {
                 "saksnummer": "123",
                 "behandlingId": "$behandlingId",
-                "mottatt": "2021-01-01T08:00:00.000Z",
+                "mottatt": "2020-12-31T23:59:59.000Z",
                 "søker": {
                     "identitetsnummer": "123",
                     "fødselsdato": "1990-01-01",
@@ -116,7 +116,7 @@ internal class NormalflytInngvilgetSøknadTest(
 
     @Test
     @Order(5)
-    fun `Hent behandlingId`() {
+    fun `Hente behandlingen`() {
         val forventetResponse = """
             {
               "barn": {

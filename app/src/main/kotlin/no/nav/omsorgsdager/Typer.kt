@@ -20,8 +20,11 @@ internal fun ApplicationCall.behandlingId() : BehandlingId = parameters.getOrFai
 internal typealias Identitetsnummer = String
 
 internal class Json private constructor(json: String) {
-    internal val map = JSONObject(json).toMap()
-    internal val raw = JSONObject(json).toString()
+    private val jsonObject = JSONObject(json)
+    internal val map = jsonObject.toMap()
+    internal val raw = requireNotNull(jsonObject.toString()) {
+        "Ugyldig JSON $json"
+    }
     internal companion object {
         internal fun String.somJson() = Json(json = this)
         internal fun ObjectNode.somJson() = Json(json = toString())

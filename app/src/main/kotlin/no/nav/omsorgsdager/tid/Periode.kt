@@ -1,6 +1,8 @@
 package no.nav.omsorgsdager.tid
 
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 internal data class Periode(
     internal val fom : LocalDate,
@@ -23,7 +25,9 @@ internal data class Periode(
     override fun toString() = "$fom/$tom"
 
     internal companion object {
-        internal fun LocalDate.utÅretBarnetFyller18() =
+        private val Oslo = ZoneId.of("Europe/Oslo")
+        internal fun ZonedDateTime.toLocalDateOslo() = withZoneSameInstant(Oslo).toLocalDate()
+        internal fun LocalDate.sisteDagIÅretOm18År() =
             plusYears(18).withMonth(12).withDayOfMonth(31)
         internal fun LocalDate.erFørEllerLik(annen: LocalDate) = isBefore(annen) || isEqual(annen)
         internal fun LocalDate.erEtterEllerLik(annen: LocalDate) = isAfter(annen) || isEqual(annen)

@@ -17,7 +17,8 @@ import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
 import no.nav.omsorgsdager.kronisksyktbarn.dto.KronisktSyktBarnGrunnlag
 import no.nav.omsorgsdager.kronisksyktbarn.dto.LøsteAksjonspunkterRequest
 import no.nav.omsorgsdager.tid.Periode
-import no.nav.omsorgsdager.tid.Periode.Companion.utÅretBarnetFyller18
+import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm18År
+import no.nav.omsorgsdager.tid.Periode.Companion.toLocalDateOslo
 import no.nav.omsorgsdager.vedtak.VedtakResponse
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import org.slf4j.LoggerFactory
@@ -49,8 +50,8 @@ internal fun Route.KroniskSyktBarnRoute(
                     statusSistEndret = ZonedDateTime.now(),
                     barn = grunnlag.barn,
                     periode = Periode(
-                        fom = grunnlag.mottatt.toLocalDate(),
-                        tom = grunnlag.barn.fødselsdato.utÅretBarnetFyller18()
+                        fom = grunnlag.mottatt.toLocalDateOslo(),
+                        tom = grunnlag.barn.fødselsdato.sisteDagIÅretOm18År()
                     )
                 ),
                 uløsteAksjonspunkter = uløsteAksjonspunkter
