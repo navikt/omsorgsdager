@@ -126,10 +126,14 @@ internal class NormalflytInngvilgetSøknadTest(
               "behandlingId": "$behandlingId",
               "gyldigFraOgMed": "2021-01-01",
               "gyldigTilOgMed": "2038-12-31",
-              "status": "${VedtakStatus.FASTSATT}",
+              "status": "FASTSATT",
               "uløsteAksjonspunkter": {},
               "løsteAksjonspunkter": {
-                "LEGEERKLÆRING": {}
+                "LEGEERKLÆRING": {
+                    "begrunnelse": "foo bar",
+                    "barnetErKroniskSykt": true,
+                    "barnetErFunksjonshemmet": false
+                }
               }
             }
         """.trimIndent()

@@ -15,7 +15,7 @@ internal data class HentKroniskSyktBarnResponse(
     val gyldigTilOgMed: LocalDate,
     val status: VedtakStatus,
     val uløsteAksjonspunkter: Map<String, Any>,
-    val løsteAksjonpunkter: Map<String, Any>
+    val løsteAksjonspunkter: Map<String, Any>
 ) {
     constructor(vedtak: KroniskSyktBarnVedtak, aksjonspunkter: Aksjonspunkter) : this(
         barn = vedtak.barn,
@@ -26,7 +26,7 @@ internal data class HentKroniskSyktBarnResponse(
         uløsteAksjonspunkter = aksjonspunkter.uløsteAksjonspunkter
             .associateBy { it.navn }
             .mapValues { Any() },
-        løsteAksjonpunkter = aksjonspunkter.løsteAksjonspunkter
+        løsteAksjonspunkter = aksjonspunkter.løsteAksjonspunkter
             .associateBy { it.navn }
             .mapValues { it.value.løsning.map }
     )
