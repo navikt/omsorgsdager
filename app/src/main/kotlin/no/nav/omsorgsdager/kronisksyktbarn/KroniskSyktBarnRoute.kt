@@ -43,10 +43,11 @@ internal fun Route.KroniskSyktBarnRoute(
                 )
             ))
 
-            val tilOgMed = when(grunnlag.søker.erOver70EtterDato(grunnlag.barn.fødselsdato.sisteDagIÅretOm18År())) {
-                true -> grunnlag.søker.fødselsdato.plusYears(70)
-                false -> grunnlag.barn.fødselsdato.sisteDagIÅretOm18År()
-            }
+            val sisteDagIÅretBarnetFyller18 = grunnlag.barn.fødselsdato.sisteDagIÅretOm18År()
+            val tilOgMed = minOf(
+                sisteDagIÅretBarnetFyller18,
+                grunnlag.søker.sisteDagSøkerHarRettTilOmsorgsdager
+            )
 
             val uløsteAksjonspunkter = setOf(UløstAksjonspunkt(navn = "LEGEERKLÆRING"))
             kroniskSyktBarnRepository.nyttVedtak(

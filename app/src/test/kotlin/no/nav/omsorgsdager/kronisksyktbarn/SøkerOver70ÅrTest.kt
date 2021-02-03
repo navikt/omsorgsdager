@@ -75,7 +75,7 @@ internal class SøkerOver70ÅrTest(
                   },
                   "behandlingId": "$behandlingId",
                   "gyldigFraOgMed": "2021-01-01",
-                  "gyldigTilOgMed": "2025-01-01",
+                  "gyldigTilOgMed": "2024-12-31",
                   "status": "FORSLAG",
                   "uløsteAksjonspunkter": {
                     "LEGEERKLÆRING": {}
