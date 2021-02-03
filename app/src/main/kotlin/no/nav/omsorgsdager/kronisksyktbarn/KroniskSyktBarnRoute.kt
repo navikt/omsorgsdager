@@ -68,16 +68,16 @@ internal fun Route.KroniskSyktBarnRoute(
             call.respond(HttpStatusCode.Created, response.toJson())
         }
 
-        put("/{behandlingId}/aksjonspunkt") {
+        patch("/{behandlingId}/aksjonspunkt") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
                 call.respond(HttpStatusCode.NotFound)
-                return@put
+                return@patch
             }
             if (vedtakOgAksjonspunkter.first.status != VedtakStatus.FORSLAG) {
                 call.respond(HttpStatusCode.Conflict)
-                return@put
+                return@patch
             }
 
             val request = call.objectNode()
@@ -102,20 +102,20 @@ internal fun Route.KroniskSyktBarnRoute(
             call.respond(HttpStatusCode.OK, response.toJson())
         }
 
-        put("/{behandlingId}/fastsett") {
+        patch("/{behandlingId}/fastsett") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
                 call.respond(HttpStatusCode.NotFound)
-                return@put
+                return@patch
             }
             if (vedtakOgAksjonspunkter.first.status != VedtakStatus.FORSLAG) {
                 call.respond(HttpStatusCode.Conflict)
-                return@put
+                return@patch
             }
             if (vedtakOgAksjonspunkter.second.uløsteAksjonspunkter.isNotEmpty()) {
                 call.respond(HttpStatusCode.Conflict)
-                return@put
+                return@patch
             }
 
             // TODO: Løst alt men ikke kan fastsettes...
@@ -139,16 +139,16 @@ internal fun Route.KroniskSyktBarnRoute(
             call.respond(HttpStatusCode.OK, response.toJson())
         }
 
-        put("/{behandlingId}/deaktiver") {
+        patch("/{behandlingId}/deaktiver") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
                 call.respond(HttpStatusCode.NotFound)
-                return@put
+                return@patch
             }
             if (vedtakOgAksjonspunkter.first.status != VedtakStatus.FORSLAG) {
                 call.respond(HttpStatusCode.Conflict)
-                return@put
+                return@patch
             }
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.DeaktivereKroniskSyktBarn.copy(
