@@ -4,7 +4,6 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.omsorgsdager.testutils.TestApplicationExtension
 import org.intellij.lang.annotations.Language
-import org.json.JSONObject
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 
