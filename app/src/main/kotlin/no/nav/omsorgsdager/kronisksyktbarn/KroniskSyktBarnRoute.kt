@@ -50,6 +50,7 @@ internal fun Route.KroniskSyktBarnRoute(
                     behandlingId = grunnlag.behandlingId,
                     status = VedtakStatus.FORSLAG,
                     statusSistEndret = ZonedDateTime.now(),
+                    søker = grunnlag.søker,
                     barn = grunnlag.barn,
                     periode = Periode(
                         fom = grunnlag.mottatt.toLocalDateOslo(),
