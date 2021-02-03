@@ -200,9 +200,9 @@ internal fun Route.KroniskSyktBarnRoute(
             val vedtak = gjeldendeVedtak.filtrerPåDatoer(
                 fom = request.gyldigFraOgMed,
                 tom = request.gyldigTilOgMed
-            ).map { gjeldendeVedtak -> HentKroniskSyktBarn.Vedtak(
-                vedtak = gjeldendeVedtak,
-                aksjonspunkter = alle.first { it.first.behandlingId == gjeldendeVedtak.behandlingId }.second
+            ).map { gv -> HentKroniskSyktBarn.Vedtak(
+                vedtak = gv,
+                aksjonspunkter = alle.first { it.first.behandlingId == gv.behandlingId }.second
             )}
 
             return HentKroniskSyktBarn.Response(vedtak)
@@ -211,12 +211,7 @@ internal fun Route.KroniskSyktBarnRoute(
         get {
             val request = call.hentKroniskSyktBarnRequest()
             when (request.hentForBehandling) {
-                true -> {
-                    when (val response = call.hentForBehandling(request)) {
-                        null -> call.respond(HttpStatusCode.NotFound)
-                        else -> call.respond(HttpStatusCode.OK, response)
-                    }
-                }
+                true -> call.respond(HttpStatusCode.OK, call.hentForBehandling(request))
                 false -> call.respond(HttpStatusCode.OK, call.hentForSak(request))
             }
         }
