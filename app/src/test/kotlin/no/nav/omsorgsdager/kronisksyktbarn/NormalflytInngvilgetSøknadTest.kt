@@ -133,14 +133,15 @@ internal class NormalflytInngvilgetSøknadTest(
     private companion object {
         private const val saksnummer = "123"
         private const val behandlingId = "456"
+
         @Language("JSON")
         private val løseAksjonspunktForLegeerklæringRequest = """
             {
               "LEGEERKLÆRING": {
-                    "begrunnelse": "foo bar",
-                    "barnetErKroniskSykt": true,
-                    "barnetErFunksjonshemmet": false
-                }
+                "vurdering": "foo bar",
+                "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
+              }
             }
             """.trimIndent()
 
@@ -159,12 +160,12 @@ internal class NormalflytInngvilgetSøknadTest(
                   "uløsteAksjonspunkter": {},
                   "løsteAksjonspunkter": {
                     "LEGEERKLÆRING": {
-                        "begrunnelse": "foo bar",
-                        "barnetErKroniskSykt": true,
-                        "barnetErFunksjonshemmet": false
+                        "vurdering": "foo bar",
+                        "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                        "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
                     }
                   }
-                }]
+              }]
             }
         """.trimIndent()
     }
