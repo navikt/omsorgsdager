@@ -1,6 +1,5 @@
 package no.nav.omsorgsdager
 
-import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*

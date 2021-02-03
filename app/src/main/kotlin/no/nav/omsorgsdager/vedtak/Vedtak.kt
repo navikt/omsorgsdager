@@ -4,6 +4,7 @@ import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.tid.Tidslinje
+import java.time.LocalDate
 import java.time.ZonedDateTime
 
 internal interface Vedtak {
@@ -24,6 +25,19 @@ internal interface Vedtak {
             .flatten()
             .map{ it as V }
             .toList()
+
+        internal fun<V:Vedtak> List<V>.filtrerPåDatoer(
+            fom: LocalDate?,
+            tom: LocalDate?
+        ) = filter { it.erInnenforDatoer(fom,tom) }
+
+        internal fun Vedtak.erInnenforDatoer(
+            fom: LocalDate?,
+            tom: LocalDate?) = when {
+                fom == null && tom == null -> true
+                fom != null && tom != null -> Periode(fom = fom, tom = tom).overlapperMedMinstEnDag(periode)
+                else -> periode.inneholder(fom?:tom!!)
+            }
 
         private fun List<Vedtak>.gjeldendeVedtakPerBarn() : List<Vedtak> {
             if (isEmpty()) return emptyList()
