@@ -10,6 +10,7 @@ import io.ktor.util.pipeline.*
 import no.nav.omsorgsdager.SerDes.map
 import no.nav.omsorgsdager.SerDes.objectNode
 import no.nav.omsorgsdager.aksjonspunkt.UløstAksjonspunkt
+import no.nav.omsorgsdager.aksjonspunkt.kanFastsettes
 import no.nav.omsorgsdager.behandlingId
 import no.nav.omsorgsdager.kronisksyktbarn.dto.*
 import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSyktBarn
@@ -22,8 +23,8 @@ import no.nav.omsorgsdager.tid.Periode.Companion.toLocalDateOslo
 import no.nav.omsorgsdager.vedtak.Vedtak.Companion.erInnenforDatoer
 import no.nav.omsorgsdager.vedtak.Vedtak.Companion.filtrerPåDatoer
 import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
-import no.nav.omsorgsdager.vedtak.VedtakResponse
 import no.nav.omsorgsdager.vedtak.VedtakStatus
+import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon
 import java.time.ZonedDateTime
 
 internal fun Route.KroniskSyktBarnRoute(
@@ -44,7 +45,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
 
             val uløsteAksjonspunkter = setOf(UløstAksjonspunkt(navn = "LEGEERKLÆRING"))
-            kroniskSyktBarnRepository.nyttVedtak(
+            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.nyttVedtak(
                 vedtak = KroniskSyktBarnVedtak(
                     saksnummer = grunnlag.saksnummer,
                     behandlingId = grunnlag.behandlingId,
@@ -60,12 +61,10 @@ internal fun Route.KroniskSyktBarnRoute(
                 uløsteAksjonspunkter = uløsteAksjonspunkter
             )
 
-            val response = VedtakResponse(
-                status = VedtakStatus.FORSLAG,
-                uløsteAksjonspunkter = uløsteAksjonspunkter
-            )
-
-            call.respond(HttpStatusCode.Created, response.toJson())
+            call.respond(HttpStatusCode.Created, VedtakNøkkelinformasjon.Response(
+                vedtak = vedtak,
+                aksjonspunkter = aksjonspunkter
+            ))
         }
 
         patch("/{behandlingId}/aksjonspunkt") {
@@ -94,12 +93,10 @@ internal fun Route.KroniskSyktBarnRoute(
                 løsteAksjonspunkter = løsteAksjonspunkter.løsteAksjonspunkter
             )
 
-            val response = VedtakResponse(
-                status = vedtak.status,
-                uløsteAksjonspunkter = aksjonspunkter.uløsteAksjonspunkter
-            )
-
-            call.respond(HttpStatusCode.OK, response.toJson())
+            call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
+                vedtak = vedtak,
+                aksjonspunkter = aksjonspunkter
+            ))
         }
 
         patch("/{behandlingId}/fastsett") {
@@ -117,6 +114,10 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.Conflict)
                 return@patch
             }
+            if (!vedtakOgAksjonspunkter.second.løsteAksjonspunkter.kanFastsettes()) {
+                call.respond(HttpStatusCode.Conflict)
+                return@patch
+            }
 
             // TODO: Løst alt men ikke kan fastsettes...
 
@@ -128,15 +129,12 @@ internal fun Route.KroniskSyktBarnRoute(
                 behandlingId = behandlingId
             )
 
-            val response = VedtakResponse(
-                status = fastsattVedtak.status,
-                uløsteAksjonspunkter = fastsattAksjonspunkter.uløsteAksjonspunkter
-            )
-
-
             // TODO: Oppdater db & send till k9-vaktmester
 
-            call.respond(HttpStatusCode.OK, response.toJson())
+            call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
+                vedtak = fastsattVedtak,
+                aksjonspunkter = fastsattAksjonspunkter
+            ))
         }
 
         patch("/{behandlingId}/deaktiver") {
@@ -159,12 +157,10 @@ internal fun Route.KroniskSyktBarnRoute(
                 behandlingId = behandlingId
             )
 
-            val response = VedtakResponse(
-                status = vedtak.status,
-                uløsteAksjonspunkter = aksjonspunkter.uløsteAksjonspunkter
-            )
-
-            call.respond(HttpStatusCode.OK, response.toJson())
+            call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
+                vedtak = vedtak,
+                aksjonspunkter = aksjonspunkter
+            ))
         }
 
         suspend fun ApplicationCall.hentForBehandling(

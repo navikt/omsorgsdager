@@ -17,7 +17,7 @@ internal object LøsKroniskSyktBarnAksjonspunkt {
     ) : LøstAksjonpunkt {
         override val navn = "LEGEERKLÆRING"
         override val versjon = "0.0.1"
-        override val kanFastsettes = barnetErKroniskSyktEllerHarEnFunksjonshemning || erSammenhengMedSøkersRisikoForFraværeFraArbeid
+        override val kanFastsettes = barnetErKroniskSyktEllerHarEnFunksjonshemning && erSammenhengMedSøkersRisikoForFraværeFraArbeid
         override val løsning = """
         {
             "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,

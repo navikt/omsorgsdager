@@ -37,6 +37,7 @@ internal class NormalflytInngvilgetSøknadTest(
         val forventetResponse = """
         {
             "status": "FORSLAG",
+            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
@@ -57,6 +58,7 @@ internal class NormalflytInngvilgetSøknadTest(
         val forventetResponse = """
             {
                 "status": "FORSLAG",
+                "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
                 "uløsteAksjonspunkter": {}
             }
           """.trimIndent()
@@ -77,6 +79,7 @@ internal class NormalflytInngvilgetSøknadTest(
         val forventetResponse = """
             {
                 "status": "FASTSATT",
+                "potensielleStatuser": [],
                 "uløsteAksjonspunkter": {}
             }
             """.trimIndent()

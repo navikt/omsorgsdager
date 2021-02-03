@@ -21,6 +21,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
         {
             "status": "FORSLAG",
+            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
@@ -41,6 +42,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "DEAKTIVERT",
+                "potensielleStatuser": [],
                 "uløsteAksjonspunkter": {
                   "LEGEERKLÆRING": {}
                 }
@@ -61,6 +63,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
         {
             "status": "FORSLAG",
+            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
@@ -81,6 +84,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "FORSLAG",
+                "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
                 "uløsteAksjonspunkter": {}
             }
           """.trimIndent()
@@ -104,6 +108,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "FASTSATT",
+                "potensielleStatuser": [],
                 "uløsteAksjonspunkter": {}
             }
             """.trimIndent()
@@ -122,6 +127,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
         {
             "status": "FORSLAG",
+            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
@@ -145,6 +151,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "FORSLAG",
+                "potensielleStatuser": ["DEAKTIVERT"],
                 "uløsteAksjonspunkter": {}
             }
           """.trimIndent()
@@ -168,6 +175,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "DEAKTIVERT",
+                "potensielleStatuser": [],
                 "uløsteAksjonspunkter": {}
             }
             """.trimIndent()

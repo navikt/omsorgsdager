@@ -8,3 +8,5 @@ internal interface LøstAksjonpunkt {
     val kanFastsettes : Boolean
     val løsning: Json
 }
+
+internal fun Collection<LøstAksjonpunkt>.kanFastsettes() = all { it.kanFastsettes }
