@@ -2,12 +2,13 @@ package no.nav.omsorgsdager.kronisksyktbarn.dto
 
 import com.fasterxml.jackson.databind.node.ObjectNode
 import no.nav.omsorgsdager.tid.Periode.Companion.erFørEllerLik
+import no.nav.omsorgsdager.Identitetsnummer
 import java.time.LocalDate
 
-data class Søker(
-    val identitetsnummer: String,
+internal data class Søker private constructor(
+    val identitetsnummer: Identitetsnummer,
     val fødselsdato: LocalDate) {
-    constructor(node: ObjectNode) : this(
+    internal constructor(node: ObjectNode) : this(
         identitetsnummer = node["identitetsnummer"].asText(),
         fødselsdato = node["fødselsdato"].asText().let { LocalDate.parse(it) }
     )

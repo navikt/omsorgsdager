@@ -4,12 +4,14 @@ import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.kronisksyktbarn.dto.Barn
+import no.nav.omsorgsdager.kronisksyktbarn.dto.Søker
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.Vedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import java.time.ZonedDateTime
 
 internal data class KroniskSyktBarnVedtak(
+    internal val søker: Søker,
     override val saksnummer: Saksnummer,
     override val behandlingId: BehandlingId,
     override val status: VedtakStatus,
@@ -19,6 +21,6 @@ internal data class KroniskSyktBarnVedtak(
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
         periode = nyPeriode
     )
-    // TODO: Søker..
-    internal val involverteIdentitetsnummer : Set<Identitetsnummer> = setOf(barn.identitetsnummer)
+    override val søkersIdentitetsnummer = søker.identitetsnummer
+    internal val involverteIdentitetsnummer : Set<Identitetsnummer> = setOf(søker.identitetsnummer, barn.identitetsnummer)
 }
