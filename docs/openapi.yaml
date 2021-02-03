@@ -57,6 +57,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+        409:
+          description: Om det allerede er sendt inn et vedtak med samme behandlingId
     get:
       tags:
         - Kronisk sykt barn - les
@@ -246,7 +248,16 @@ components:
       properties:
         LEGEERKLÆRING:
           type: object
-          properties: {}
+          properties:
+            vurdering:
+              type: string
+              example: Dette er saksbehandlers vurdering
+            barnetErKroniskSyktEllerHarEnFunksjonshemning:
+              type: boolean
+              example: true
+            erSammenhengMedSøkersRisikoForFraværeFraArbeid:
+              type: boolean
+              example: true
         OMSORGEN_FOR:
           type: object
           properties: {}
@@ -275,18 +286,24 @@ components:
         uløsteAksjonspunkter:
           type: object
           properties:
-            LEGEERKLÆRING:
+            OMSORGEN_FOR:
               type: object
               properties: {}
         løsteAksjonspunkter:
           type: object
           properties:
-            MEDLEMSKAP:
+            LEGEERKLÆRING:
               type: object
-              properties: {}
-            YRKESAKTIVITET:
-              type: object
-              properties: {}
+              properties:
+                vurdering:
+                  type: string
+                  example: Dette er saksbehandlers vurdering
+                barnetErKroniskSyktEllerHarEnFunksjonshemning:
+                  type: boolean
+                  example: true
+                erSammenhengMedSøkersRisikoForFraværeFraArbeid:
+                  type: boolean
+                  example: true
         lovhenvisnigner:
           type: object
           properties:

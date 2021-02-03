@@ -6,21 +6,25 @@ import no.nav.omsorgsdager.aksjonspunkt.LøstAksjonpunkt
 
 internal object LøsKroniskSyktBarnAksjonspunkt {
 
+    /*
+        - Er det dokumentert at barnets sykdom er kronisk eller at barnet har en funksjonshemming? Ja/nei
+        - Er det en sammenheng mellom barnets kroniske sykdom eller funksjonshemming og søkers risiko for fravær fra arbeid? Ja/nei
+     */
     internal data class Legeerklæring(
-        val barnetErKroniskSykt: Boolean,
-        val barnetErFunksjonshemmet: Boolean,
-        val begrunnelse: String
+        val barnetErKroniskSyktEllerHarEnFunksjonshemning: Boolean,
+        val erSammenhengMedSøkersRisikoForFraværeFraArbeid: Boolean,
+        val vurdering: String
     ) : LøstAksjonpunkt {
         override val navn = "LEGEERKLÆRING"
         override val versjon = "0.0.1"
-        override val kanFastsettes = barnetErKroniskSykt || barnetErFunksjonshemmet
+        override val kanFastsettes = barnetErKroniskSyktEllerHarEnFunksjonshemning && erSammenhengMedSøkersRisikoForFraværeFraArbeid
         override val løsning = """
         {
-            "barnetErKroniskSykt": $barnetErKroniskSykt,
-            "barnetErFunksjonshemmet": $barnetErFunksjonshemmet,
-            "begrunnelse": "$begrunnelse"
+            "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,
+            "erSammenhengMedSøkersRisikoForFraværeFraArbeid": $erSammenhengMedSøkersRisikoForFraværeFraArbeid,
+            "vurdering": "$vurdering"
         }
-    """.trimIndent().somJson()
+        """.trimIndent().somJson()
     }
 
     internal data class Request(

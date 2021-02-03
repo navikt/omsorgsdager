@@ -1,6 +1,5 @@
 package no.nav.omsorgsdager.kronisksyktbarn
 
-import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.omsorgsdager.testutils.TestApplicationExtension
 import org.intellij.lang.annotations.Language
@@ -37,6 +36,7 @@ internal class SøkerOver70ÅrTest(
         val forventetResponse = """
         {
             "status": "FORSLAG",
+            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
@@ -62,8 +62,8 @@ internal class SøkerOver70ÅrTest(
     }
 
     private companion object {
-        private const val saksnummer = "123"
-        private const val behandlingId = "456"
+        private const val saksnummer = "123456"
+        private const val behandlingId = "456789"
 
         @Language("JSON")
         val forventetResponseHentVedtak = """

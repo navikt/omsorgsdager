@@ -21,6 +21,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
         {
             "status": "FORSLAG",
+            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
@@ -41,6 +42,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "DEAKTIVERT",
+                "potensielleStatuser": [],
                 "uløsteAksjonspunkter": {
                   "LEGEERKLÆRING": {}
                 }
@@ -61,6 +63,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
         {
             "status": "FORSLAG",
+            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
@@ -81,6 +84,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "FORSLAG",
+                "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
                 "uløsteAksjonspunkter": {}
             }
           """.trimIndent()
@@ -89,8 +93,8 @@ internal class RevurderingflytTest(
             aksjonspunkter(
                 behandlingId = behandlingId2,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
-                    barnetErKroniskSykt = true,
-                    barnetErFunksjonshemmet = false
+                    barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
+                    erSammenhengMedSøkersRisikoForFraværeFraArbeid = true
                 ),
                 forventetResponse = forventetResponse
             )
@@ -104,6 +108,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "FASTSATT",
+                "potensielleStatuser": [],
                 "uløsteAksjonspunkter": {}
             }
             """.trimIndent()
@@ -122,6 +127,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
         {
             "status": "FORSLAG",
+            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
@@ -145,6 +151,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "FORSLAG",
+                "potensielleStatuser": ["DEAKTIVERT"],
                 "uløsteAksjonspunkter": {}
             }
           """.trimIndent()
@@ -153,8 +160,8 @@ internal class RevurderingflytTest(
             aksjonspunkter(
                 behandlingId = behandlingId3,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
-                    barnetErKroniskSykt = false,
-                    barnetErFunksjonshemmet = false
+                    barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
+                    erSammenhengMedSøkersRisikoForFraværeFraArbeid = false
                 ),
                 forventetResponse = forventetResponse
             )
@@ -168,6 +175,7 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "DEAKTIVERT",
+                "potensielleStatuser": [],
                 "uløsteAksjonspunkter": {}
             }
             """.trimIndent()
@@ -220,9 +228,9 @@ internal class RevurderingflytTest(
                         "uløsteAksjonspunkter": {},
                         "løsteAksjonspunkter": {
                             "LEGEERKLÆRING": {
-                                "begrunnelse": "foo bar",
-                                "barnetErFunksjonshemmet": false,
-                                "barnetErKroniskSykt": true
+                                "vurdering": "foo bar",
+                                "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
                             }
                         }
                     }]
@@ -245,9 +253,9 @@ internal class RevurderingflytTest(
                         "uløsteAksjonspunkter": {},
                         "løsteAksjonspunkter": {
                             "LEGEERKLÆRING": {
-                                "begrunnelse": "foo bar",
-                                "barnetErFunksjonshemmet": false,
-                                "barnetErKroniskSykt": false
+                                "vurdering": "foo bar",
+                                "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": false
                             }
                         }
                     }]
@@ -276,9 +284,9 @@ internal class RevurderingflytTest(
                 "uløsteAksjonspunkter": {},
                 "løsteAksjonspunkter": {
                     "LEGEERKLÆRING": {
-                        "begrunnelse": "foo bar",
-                        "barnetErFunksjonshemmet": false,
-                        "barnetErKroniskSykt": false
+                        "vurdering": "foo bar",
+                        "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                        "erSammenhengMedSøkersRisikoForFraværeFraArbeid": false
                     }
                 }
             }, {
@@ -293,9 +301,9 @@ internal class RevurderingflytTest(
                 "uløsteAksjonspunkter": {},
                 "løsteAksjonspunkter": {
                     "LEGEERKLÆRING": {
-                        "begrunnelse": "foo bar",
-                        "barnetErFunksjonshemmet": false,
-                        "barnetErKroniskSykt": true
+                        "vurdering": "foo bar",
+                        "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                        "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
                     }
                 }
             }]
@@ -336,15 +344,15 @@ internal class RevurderingflytTest(
 
         @Language("JSON")
         private fun løseAksjonspunktForLegeerklæringRequest(
-            barnetErKroniskSykt: Boolean,
-            barnetErFunksjonshemmet: Boolean
+            barnetErKroniskSyktEllerHarEnFunksjonshemning: Boolean,
+            erSammenhengMedSøkersRisikoForFraværeFraArbeid: Boolean
         ) = """
             {
               "LEGEERKLÆRING": {
-                    "begrunnelse": "foo bar",
-                    "barnetErKroniskSykt": $barnetErKroniskSykt,
-                    "barnetErFunksjonshemmet": $barnetErFunksjonshemmet
-                }
+                "vurdering": "foo bar",
+                "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,
+                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": $erSammenhengMedSøkersRisikoForFraværeFraArbeid
+              }
             }
             """.trimIndent()
     }

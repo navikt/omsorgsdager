@@ -9,7 +9,7 @@ import no.nav.omsorgsdager.vedtak.VedtakStatus
 import java.time.ZonedDateTime
 
 internal interface KroniskSyktBarnRepository {
-    fun nyttVedtak(vedtak: KroniskSyktBarnVedtak, uløsteAksjonspunkter: Set<UløstAksjonspunkt>)
+    fun nyttVedtak(vedtak: KroniskSyktBarnVedtak, uløsteAksjonspunkter: Set<UløstAksjonspunkt>) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>
     fun fastsett(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>
     fun deaktiver(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>
     fun løsteAksjonspunkter(behandlingId: BehandlingId, løsteAksjonspunkter: Set<LøstAksjonpunkt>) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>
@@ -20,11 +20,12 @@ internal interface KroniskSyktBarnRepository {
 internal class InMemoryKroniskSyktBarnRespository : KroniskSyktBarnRepository {
     private val map = mutableMapOf<BehandlingId, Pair<KroniskSyktBarnVedtak, Aksjonspunkter>>()
 
-    override fun nyttVedtak(vedtak: KroniskSyktBarnVedtak, uløsteAksjonspunkter: Set<UløstAksjonspunkt>) {
+    override fun nyttVedtak(vedtak: KroniskSyktBarnVedtak, uløsteAksjonspunkter: Set<UløstAksjonspunkt>) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter>{
         map[vedtak.behandlingId] = vedtak to Aksjonspunkter(
             uløsteAksjonspunkter = uløsteAksjonspunkter,
             løsteAksjonspunkter = emptySet()
         )
+        return map.getValue(vedtak.behandlingId)
     }
 
     override fun fastsett(behandlingId: BehandlingId) : Pair<KroniskSyktBarnVedtak, Aksjonspunkter> {
