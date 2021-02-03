@@ -5,12 +5,9 @@ import java.time.LocalDate
 
 data class Søker(
     val identitetsnummer: String,
-    val fødselsdato: LocalDate,
-    val jobberINorge: Boolean
-) {
+    val fødselsdato: LocalDate) {
     constructor(node: ObjectNode) : this(
         identitetsnummer = node["identitetsnummer"].asText(),
-        fødselsdato = node["fødselsdato"].asText().let { LocalDate.parse(it) },
-        jobberINorge = node["jobberINorge"].asBoolean()
+        fødselsdato = node["fødselsdato"].asText().let { LocalDate.parse(it) }
     )
 }

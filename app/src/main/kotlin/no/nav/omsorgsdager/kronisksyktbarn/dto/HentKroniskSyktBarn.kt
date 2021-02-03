@@ -32,7 +32,7 @@ internal object HentKroniskSyktBarn {
         }
     }
 
-    internal data class BehandlingResponse private constructor(
+    internal data class Vedtak private constructor(
         val barn: Barn,
         val behandlingId: BehandlingId,
         val gyldigFraOgMed: LocalDate,
@@ -55,7 +55,7 @@ internal object HentKroniskSyktBarn {
         )
     }
 
-    internal data class SakResponse(
-        val vedtak: List<BehandlingResponse>
+    internal data class Response(
+        val vedtak: List<Vedtak> = emptyList()
     )
 }

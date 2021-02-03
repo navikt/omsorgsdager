@@ -51,12 +51,61 @@ paths:
           description: >
             - Opprettet et vedtak. Ved opprettelse vil det alltid ha `status=FORSLAG`
             ettersom det minst vil være ett aksjonspunkt i `uløsteAksjonspunkter`
+
+            - `potensielleStatuser` inneholder liste om potensielle statuser vedtaket kan havne i.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+    get:
+      tags:
+        - Kronisk sykt barn - les
+      description: >
+        - Henter vedtak om kronisk sykt barn<br/>
+        Enten for en behandling id eller aggregert for et saksnummer.</br>
+
+        - For `saksnummer+barn+periode` man kun ha ett vedtak, så vil kun være det siste som blir aggregert på saksnummer.</br>
+
+        - Må sette enten saksnummer eller behandlingId. Ikke begge.<br/>
+
+        - `gyldigFraOgMed` & `gyldigTilogMed` er optional.
+      parameters:
+        - name: saksnummer
+          in: query
+          required: false
+          schema:
+            type: string
+            example: ABC123
+        - name: behandlingId
+          in: query
+          required: false
+          schema:
+            type: string
+            example: UUID-123
+        - name: gyldigFraOgMed
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2020-01-01"
+        - name: gyldigTilOgMed
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            example: "2020-02-01"
+      summary: Hente vedtak
+      responses:
+        200:
+          description: Henter alle vedtak for et saksnummer med filtrering
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HentGjeldendeKroniskSyktBarnResponse'
   /kronisk-sykt-barn/{behandlingId}/aksjonspunkt:
-    put:
+    patch:
       tags:
         - Kronisk sykt barn - skriv
       parameters:
@@ -86,12 +135,8 @@ paths:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
           description: Om vedtaket allerede har `status=FASTSATT`
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
   /kronisk-sykt-barn/{behandlingId}/fastsett:
-    put:
+    patch:
       tags:
         - Kronisk sykt barn - skriv
       summary: Fastsette vedtaket
@@ -112,12 +157,8 @@ paths:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
           description: Om det er uløste aksjonspunkter på vedtaket.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
   /kronisk-sykt-barn/{behandlingId}/deaktiver:
-    put:
+    patch:
       tags:
         - Kronisk sykt barn - skriv
       summary: Deaktiver vedtaket
@@ -136,73 +177,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
-  /kronisk-sykt-barn/{behandlingId}:
-    get:
-      tags:
-        - Kronisk sykt barn - les
-      parameters:
-        - name: behandlingId
-          in: path
-          description: Behandling ID
-          required: true
-          schema:
-            type: string
-      summary: Hente et vedtak
-      responses:
-        200:
-          description: Henter vedtaket slik det ser ut nå
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HentKroniskSyktBarnResponse'
-  /kronisk-sykt-barn/{saksnummer}:
-    get:
-      tags:
-        - Kronisk sykt barn - les
-      description: >
-        - Henter vedtak om kronisk sykt barn aggregert for et saksnummer.</br>
-
-        - For `saksnummer+barn+periode` man kun ha ett vedtak, så vil kun være det siste med `status=FASTSATT` som blir aggregert på saksnummer.
-      parameters:
-        - name: saksnummer
-          in: path
-          required: true
-          schema:
-            type: string
-            example: ABC123
-        - name: status
-          in: query
-          description: Status
-          required: false
-          schema:
-            type: string
-            description: Filtrering på status
-            enum:
-              - FORSLAG
-              - FASTSATT
-              - DEAKTIVERT
-        - name: gyldigFraOgMed
-          in: query
-          required: false
-          schema:
-            type: string
-            format: date
-            example: "2020-01-01"
-        - name: gyldigTilOgMed
-          in: query
-          required: false
-          schema:
-            type: string
-            format: date
-            example: "2020-02-01"
-      summary: Hente alle vedtak på saksnummer med filtrering
-      responses:
-        200:
-          description: Henter alle vedtak for et saksnummer med filtrering
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HentGjeldendeKroniskSyktBarnResponse'
 components:
   schemas:
     KroniskSyktBarnSoknadRequest:
@@ -211,11 +185,11 @@ components:
         saksnummer:
           type: string
           format: string
-          example: '"OBC123"'
+          example: 'OBC123'
         behandlingId:
           type: string
           format: string
-          example: '"UUID-123-123"'
+          example: 'UUID-123-123'
         mottatt:
           type: string
           format: date-time
@@ -229,19 +203,17 @@ components:
         identitetsnummer:
           type: string
           format: string
-          example: '"29099011112"'
+          example: '29099011112'
         fødselsdato:
           type: string
           format: date
-        jobberINorge:
-          type: boolean
     Barn:
       type: object
       properties:
         identitetsnummer:
           type: string
           format: string
-          example: '"29099011111"'
+          example: '29099011111'
         fødselsdato:
           type: string
           format: date
@@ -255,16 +227,18 @@ components:
             - FORSLAG
             - FASTSATT
             - DEAKTIVERT
+        potensielleStatuser:
+          type: array
+          items:
+            type: string
+            example: 'DEAKTIVERT'
         uløsteAksjonspunkter:
           type: object
           properties:
             LEGEERKLÆRING:
               type: object
               properties: {}
-            MEDLEMSKAP:
-              type: object
-              properties: {}
-            YRKESAKTIVITET:
+            OMSORGEN_FOR:
               type: object
               properties: {}
     AksjonspunktRequest:
@@ -273,10 +247,7 @@ components:
         LEGEERKLÆRING:
           type: object
           properties: {}
-        MEDLEMSKAP:
-          type: object
-          properties: {}
-        YRKESAKTIVITET:
+        OMSORGEN_FOR:
           type: object
           properties: {}
     HentKroniskSyktBarnResponse:
