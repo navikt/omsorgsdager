@@ -25,6 +25,8 @@ internal data class Periode(
     override fun toString() = "$fom/$tom"
 
     internal companion object {
+        internal fun String.dato() = LocalDate.parse(this)
+        internal fun String.periode() = Periode(this)
         private val Oslo = ZoneId.of("Europe/Oslo")
         internal fun ZonedDateTime.toLocalDateOslo() = withZoneSameInstant(Oslo).toLocalDate()
         internal fun LocalDate.sisteDagIÅretOm18År() =

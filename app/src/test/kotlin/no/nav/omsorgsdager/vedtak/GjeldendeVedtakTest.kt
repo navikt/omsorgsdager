@@ -148,8 +148,8 @@ internal class GjeldendeVedtakTest {
         ))
     }
 
-    private companion object {
-        private data class TestVedtak(
+    internal companion object {
+        internal data class TestVedtak(
             override val saksnummer: Saksnummer = "1",
             override val behandlingId: BehandlingId = "1",
             override val status: VedtakStatus,

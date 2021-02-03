@@ -14,7 +14,6 @@ import no.nav.omsorgsdager.behandlingId
 import no.nav.omsorgsdager.kronisksyktbarn.dto.*
 import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSyktBarn
 import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSyktBarn.Request.Companion.hentKroniskSyktBarnRequest
-import no.nav.omsorgsdager.kronisksyktbarn.dto.LøsteAksjonspunkterRequest
 import no.nav.omsorgsdager.tilgangsstyring.Operasjon
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
 import no.nav.omsorgsdager.tid.Periode
@@ -35,7 +34,7 @@ internal fun Route.KroniskSyktBarnRoute(
 
         post {
             val request = call.objectNode()
-            val grunnlag = KronisktSyktBarnGrunnlag(request)
+            val grunnlag = OpprettKroniskSyktBarn.Grunnlag(request)
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.NyBehandlingKroniskSyktBarn.copy(
                 identitetsnummer = setOf(
@@ -81,7 +80,7 @@ internal fun Route.KroniskSyktBarnRoute(
             }
 
             val request = call.objectNode()
-            val løsteAksjonspunkter = request.map<LøsteAksjonspunkterRequest>()
+            val løsteAksjonspunkter = request.map<LøsKroniskSyktBarnAksjonspunkt.Request>()
 
             // TODO: Hent behandling + identer
 
