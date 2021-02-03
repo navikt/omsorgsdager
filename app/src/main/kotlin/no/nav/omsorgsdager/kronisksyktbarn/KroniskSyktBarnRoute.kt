@@ -44,9 +44,8 @@ internal fun Route.KroniskSyktBarnRoute(
                 )
             ))
 
-            val sisteDagIÅretBarnetFyller18 = grunnlag.barn.fødselsdato.sisteDagIÅretOm18År()
             val tilOgMed = minOf(
-                sisteDagIÅretBarnetFyller18,
+                grunnlag.barn.fødselsdato.sisteDagIÅretOm18År(),
                 grunnlag.søker.sisteDagSøkerHarRettTilOmsorgsdager
             )
 
