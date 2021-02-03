@@ -135,10 +135,6 @@ paths:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
           description: Om vedtaket allerede har `status=FASTSATT`
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
   /kronisk-sykt-barn/{behandlingId}/fastsett:
     patch:
       tags:
@@ -161,10 +157,6 @@ paths:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
           description: Om det er uløste aksjonspunkter på vedtaket.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
   /kronisk-sykt-barn/{behandlingId}/deaktiver:
     patch:
       tags:
@@ -238,9 +230,8 @@ components:
         potensielleStatuser:
           type: array
           items:
-            type: String
-            example: 'DEAKTVERT'
-
+            type: string
+            example: 'DEAKTIVERT'
         uløsteAksjonspunkter:
           type: object
           properties:
