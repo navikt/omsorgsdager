@@ -24,8 +24,7 @@ internal class NormalflytInngvilgetSøknadTest(
                 "mottatt": "2020-12-31T23:59:59.000Z",
                 "søker": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "1990-01-01",
-                    "jobberINorge": true
+                    "fødselsdato": "1990-01-01"
                 },
                 "barn": {
                     "identitetsnummer": "123",

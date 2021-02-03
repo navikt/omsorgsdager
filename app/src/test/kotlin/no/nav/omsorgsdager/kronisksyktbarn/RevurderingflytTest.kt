@@ -325,8 +325,7 @@ internal class RevurderingflytTest(
                 "mottatt": "$mottatt",
                 "søker": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "1990-01-01",
-                    "jobberINorge": true
+                    "fødselsdato": "1990-01-01"
                 },
                 "barn": {
                     "identitetsnummer": "123",
