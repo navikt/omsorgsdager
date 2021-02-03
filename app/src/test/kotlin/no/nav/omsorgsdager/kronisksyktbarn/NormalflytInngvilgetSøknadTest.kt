@@ -4,7 +4,6 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.omsorgsdager.testutils.TestApplicationExtension
 import org.intellij.lang.annotations.Language
-import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
@@ -117,7 +116,7 @@ internal class NormalflytInngvilgetSøknadTest(
         with(testApplicationEngine) {
             hentBehandling(
                 behandlingId = behandlingId,
-                forventetResponse = forventetResponseHentBehandling
+                forventetResponse = forventetResponseHentVedtak
             )
         }
     }
@@ -125,15 +124,10 @@ internal class NormalflytInngvilgetSøknadTest(
     @Test
     @Order(6)
     fun `Hente saken`() {
-        val vedtak = JSONArray().also { it.put(JSONObject(
-            forventetResponseHentBehandling
-        ))}
         with(testApplicationEngine) {
             hentSak(
                 saksnummer = saksnummer,
-                forventetResponse = JSONObject().also {
-                    it.put("vedtak", vedtak)
-                }.toString()
+                forventetResponse = forventetResponseHentVedtak
             )
         }
     }
@@ -153,24 +147,26 @@ internal class NormalflytInngvilgetSøknadTest(
             """.trimIndent()
 
         @Language("JSON")
-        val forventetResponseHentBehandling = """
+        val forventetResponseHentVedtak = """
             {
-              "barn": {
-                "identitetsnummer": "123",
-                "fødselsdato": "2020-01-01"
-              },
-              "behandlingId": "$behandlingId",
-              "gyldigFraOgMed": "2021-01-01",
-              "gyldigTilOgMed": "2038-12-31",
-              "status": "FASTSATT",
-              "uløsteAksjonspunkter": {},
-              "løsteAksjonspunkter": {
-                "LEGEERKLÆRING": {
-                    "begrunnelse": "foo bar",
-                    "barnetErKroniskSykt": true,
-                    "barnetErFunksjonshemmet": false
-                }
-              }
+              "vedtak": [{
+                  "barn": {
+                    "identitetsnummer": "123",
+                    "fødselsdato": "2020-01-01"
+                  },
+                  "behandlingId": "$behandlingId",
+                  "gyldigFraOgMed": "2021-01-01",
+                  "gyldigTilOgMed": "2038-12-31",
+                  "status": "FASTSATT",
+                  "uløsteAksjonspunkter": {},
+                  "løsteAksjonspunkter": {
+                    "LEGEERKLÆRING": {
+                        "begrunnelse": "foo bar",
+                        "barnetErKroniskSykt": true,
+                        "barnetErFunksjonshemmet": false
+                    }
+                  }
+                }]
             }
         """.trimIndent()
     }

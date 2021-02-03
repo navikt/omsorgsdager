@@ -168,25 +168,27 @@ internal fun Route.KroniskSyktBarnRoute(
         }
 
         suspend fun ApplicationCall.hentForBehandling(
-            request: HentKroniskSyktBarn.Request) : HentKroniskSyktBarn.BehandlingResponse? {
-            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.hent(behandlingId = request.behandlingId!!)?:return null
+            request: HentKroniskSyktBarn.Request) : HentKroniskSyktBarn.Response {
+            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.hent(behandlingId = request.behandlingId!!) ?: return HentKroniskSyktBarn.Response()
 
             if (!vedtak.erInnenforDatoer(fom = request.gyldigFraOgMed, tom = request.gyldigTilOgMed)) {
-                return null
+                return HentKroniskSyktBarn.Response()
             }
 
             tilgangsstyring.verifiserTilgang(this, Operasjoner.HenteKroniskSyktBarnBehandling.copy(
                 identitetsnummer = vedtak.involverteIdentitetsnummer
             ))
 
-            return HentKroniskSyktBarn.BehandlingResponse(
-                vedtak = vedtak,
-                aksjonspunkter = aksjonspunkter
+            return HentKroniskSyktBarn.Response(
+                vedtak = listOf(HentKroniskSyktBarn.Vedtak(
+                    vedtak = vedtak,
+                    aksjonspunkter = aksjonspunkter
+                ))
             )
         }
 
         suspend fun ApplicationCall.hentForSak(
-            request: HentKroniskSyktBarn.Request) : HentKroniskSyktBarn.SakResponse {
+            request: HentKroniskSyktBarn.Request) : HentKroniskSyktBarn.Response {
             val alle = kroniskSyktBarnRepository.hentAlle(saksnummer = request.saksnummer!!)
             val gjeldendeVedtak = alle.map { it.first }.gjeldendeVedtak()
             val identitetsnummer = gjeldendeVedtak.map { it.involverteIdentitetsnummer }.flatten().toSet()
@@ -198,12 +200,12 @@ internal fun Route.KroniskSyktBarnRoute(
             val vedtak = gjeldendeVedtak.filtrerPåDatoer(
                 fom = request.gyldigFraOgMed,
                 tom = request.gyldigTilOgMed
-            ).map { gjeldendeVedtak -> HentKroniskSyktBarn.BehandlingResponse(
+            ).map { gjeldendeVedtak -> HentKroniskSyktBarn.Vedtak(
                 vedtak = gjeldendeVedtak,
                 aksjonspunkter = alle.first { it.first.behandlingId == gjeldendeVedtak.behandlingId }.second
             )}
 
-            return HentKroniskSyktBarn.SakResponse(vedtak)
+            return HentKroniskSyktBarn.Response(vedtak)
         }
 
         get {
