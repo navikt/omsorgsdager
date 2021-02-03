@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager.kronisksyktbarn.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import no.nav.omsorgsdager.Fritekst
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.aksjonspunkt.LøstAksjonpunkt
 
@@ -22,7 +23,7 @@ internal object LøsKroniskSyktBarnAksjonspunkt {
         {
             "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,
             "erSammenhengMedSøkersRisikoForFraværeFraArbeid": $erSammenhengMedSøkersRisikoForFraværeFraArbeid,
-            "vurdering": "$vurdering"
+            "vurdering": "${Fritekst(vurdering).tekst}"
         }
         """.trimIndent().somJson()
     }

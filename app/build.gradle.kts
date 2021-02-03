@@ -40,6 +40,7 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonDateTime")
+    implementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
 
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")
@@ -51,7 +52,6 @@ dependencies {
     // Test
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
-    testImplementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")

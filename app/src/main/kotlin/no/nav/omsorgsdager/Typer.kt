@@ -5,6 +5,8 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.util.*
 import org.json.JSONObject
+import org.skyscreamer.jsonassert.JSONCompare
+import org.skyscreamer.jsonassert.JSONCompareMode
 import java.util.*
 
 internal typealias CorrelationId = String
@@ -26,8 +28,26 @@ internal class Json private constructor(json: String) {
     internal val raw = requireNotNull(jsonObject.toString()) {
         "Ugyldig JSON $json"
     }
+
+    override fun equals(other: Any?) = when (other) {
+        !is Json -> false
+        else -> JSONCompare.compareJSON(raw, other.raw, JSONCompareMode.NON_EXTENSIBLE).passed()
+    }
+
+    override fun toString() = raw
+
     internal companion object {
         internal fun String.somJson() = Json(json = this)
+        internal fun JSONObject.somJson() = Json(json = toString())
         internal fun ObjectNode.somJson() = Json(json = toString())
+    }
+}
+
+internal class Fritekst(
+    input: String) {
+    internal val tekst = input
+    init { require(input.length <= 4000 && input.matches(Regex)) }
+    private companion object {
+        private val Regex = "^[\\p{Graph}\\p{Space}\\p{Sc}\\p{L}\\p{M}\\p{N}§]+$".toRegex()
     }
 }
