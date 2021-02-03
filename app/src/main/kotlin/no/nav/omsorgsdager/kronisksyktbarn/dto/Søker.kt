@@ -5,7 +5,7 @@ import no.nav.omsorgsdager.tid.Periode.Companion.erFørEllerLik
 import no.nav.omsorgsdager.Identitetsnummer
 import java.time.LocalDate
 
-internal data class Søker private constructor(
+internal data class Søker constructor(
     val identitetsnummer: Identitetsnummer,
     val fødselsdato: LocalDate) {
     internal constructor(node: ObjectNode) : this(
