@@ -40,6 +40,8 @@ paths:
       tags:
         - Kronisk sykt barn - skriv
       summary: Registrere ny vedtak for kronisk sykt barn
+      description: >
+        - `identitetsnummer` på barn er optional.
       requestBody:
         content:
           application/json:
@@ -252,6 +254,7 @@ components:
           type: string
           format: string
           example: '29099011111'
+          required: false
         fødselsdato:
           type: string
           format: date

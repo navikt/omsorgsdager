@@ -2,6 +2,7 @@ package no.nav.omsorgsdager.tid
 
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 internal data class Periode(
@@ -25,6 +26,7 @@ internal data class Periode(
     override fun toString() = "$fom/$tom"
 
     internal companion object {
+        internal fun utcNå() = ZonedDateTime.now(ZoneOffset.UTC)
         internal fun String.dato() = LocalDate.parse(this)
         internal fun String.periode() = Periode(this)
         private val Oslo = ZoneId.of("Europe/Oslo")

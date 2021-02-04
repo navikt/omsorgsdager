@@ -37,6 +37,10 @@ internal class Json private constructor(json: String) {
     override fun toString() = raw
 
     internal companion object {
+        internal fun String.somJsonOrNull() = kotlin.runCatching { somJson() }.fold(
+            onSuccess = {it},
+            onFailure = {null}
+        )
         internal fun String.somJson() = Json(json = this)
         internal fun JSONObject.somJson() = Json(json = toString())
         internal fun ObjectNode.somJson() = Json(json = toString())
