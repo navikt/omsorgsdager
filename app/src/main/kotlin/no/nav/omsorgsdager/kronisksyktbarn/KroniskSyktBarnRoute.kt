@@ -110,7 +110,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
         }
 
-        patch("/{behandlingId}/innvilgelse") {
+        patch("/{behandlingId}/innvilget") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
@@ -146,7 +146,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
         }
 
-        patch("/{behandlingId}/forkast") {
+        patch("/{behandlingId}/forkastet") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
@@ -172,7 +172,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
         }
 
-        patch("/{behandlingId}/avslag") {
+        patch("/{behandlingId}/avslått") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
