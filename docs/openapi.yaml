@@ -270,10 +270,17 @@ components:
             - AVSLÅTT
             - DEAKTIVERT
         potensielleStatuser:
-          type: array
-          items:
-            type: string
-            example: 'DEAKTIVERT'
+          type: object
+          properties:
+            INNVILGET:
+              type: object
+              properties: {}
+            AVSLÅTT:
+              type: object
+              properties: {}
+            DEAKTIVERT:
+              type: object
+              properties: {}
         uløsteAksjonspunkter:
           type: object
           properties:
