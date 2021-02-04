@@ -201,7 +201,8 @@ internal class SøknadMedFlereBarnTest(
             {
                 "saksnummer": "$saksnummer",
                 "behandlingId": "$behandlingId",
-                "mottatt": "$mottatt",
+                "søknadMottatt": "$mottatt",
+                "tidspunkt": "2021-01-01T12:00:00.000Z",
                 "søker": {
                     "identitetsnummer": "123",
                     "fødselsdato": "1990-01-01"

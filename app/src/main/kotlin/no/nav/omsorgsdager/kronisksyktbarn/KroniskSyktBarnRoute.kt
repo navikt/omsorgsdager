@@ -46,7 +46,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
 
             val ekisterendeBehandling = kroniskSyktBarnRepository.hent(behandlingId = grunnlag.behandlingId)
-            if(ekisterendeBehandling != null) {
+            if (ekisterendeBehandling != null) {
                 call.respond(HttpStatusCode.Conflict)
                 return@post
             }
@@ -62,11 +62,11 @@ internal fun Route.KroniskSyktBarnRoute(
                     saksnummer = grunnlag.saksnummer,
                     behandlingId = grunnlag.behandlingId,
                     status = VedtakStatus.FORESLÅTT,
-                    statusSistEndret = ZonedDateTime.now(),
+                    statusSistEndret = grunnlag.tidspunkt,
                     søker = grunnlag.søker,
                     barn = grunnlag.barn,
                     periode = Periode(
-                        fom = grunnlag.mottatt.toLocalDateOslo(),
+                        fom = grunnlag.søknadMottatt.toLocalDateOslo(),
                         tom = tilOgMed
                     )
                 ),
