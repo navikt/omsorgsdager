@@ -19,9 +19,8 @@ internal class TokenResolver(
     private val openAmAuthorizedClients: Set<String>) {
 
     internal fun resolve(call: ApplicationCall) : Token {
-        val authorizationHeader = call.request.headers[HttpHeaders.Authorization]
-            ?: throw IllegalStateException("Authorization header ikke satt")
-        val decodedJwt = JWT.decode(authorizationHeader.removePrefix("Bearer "))
+        val token = call.token() ?: throw IllegalArgumentException("Finner ikke token i request.")
+        val decodedJwt = JWT.decode(token)
         return when (decodedJwt.issuer) {
             in azureIssuers -> decodedJwt.tokenFraAzure()
             in openAmIssuers -> decodedJwt.tokenFraOpenAm()
@@ -44,5 +43,13 @@ internal class TokenResolver(
             erPersonToken = claims["tokenName"]?.asString() == "id_token",
             harTilgangSomSystem = openAmAuthorizedClients.contains(clientId)
         )
+    }
+
+    internal companion object {
+        internal fun ApplicationCall.token() = when {
+            request.headers.contains(HttpHeaders.Authorization) -> request.headers[HttpHeaders.Authorization]!!.substringAfter(" ")
+            request.cookies["ID_token"] != null -> request.cookies["ID_token"]
+            else -> null
+        }
     }
 }
