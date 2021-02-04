@@ -14,7 +14,7 @@ internal class NormalflytInngvilgetSøknadTest(
 
     @Test
     @Order(1)
-    fun `Sende inn søknad`() {
+    fun `Oppretter nytt vedtak`() {
 
         @Language("JSON")
         val request = """
@@ -36,15 +36,19 @@ internal class NormalflytInngvilgetSøknadTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
-            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
+            "status": "FORESLÅTT",
+            "potensielleStatuser": {
+              "INNVILGET": {},
+              "FORKASTET": {}, 
+              "AVSLÅTT": {}
+            },
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nySøknad(
+            nyttVedtak(
                 requestBody = request,
                 forventetResponse = forventetResponse
             )
@@ -56,15 +60,19 @@ internal class NormalflytInngvilgetSøknadTest(
     fun `Løse aksjonspunkt for legeerklæring`() {
         @Language("JSON")
         val forventetResponse = """
-            {
-                "status": "FORSLAG",
-                "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
-                "uløsteAksjonspunkter": {}
-            }
-          """.trimIndent()
+        {
+            "status": "FORESLÅTT",
+            "potensielleStatuser": {
+              "INNVILGET": {},
+              "FORKASTET": {}, 
+              "AVSLÅTT": {}
+            },
+            "uløsteAksjonspunkter": {}
+        }
+      """.trimIndent()
 
         with(testApplicationEngine) {
-            aksjonspunkter(
+            aksjonspunkt(
                 behandlingId = behandlingId,
                 requestBody = løseAksjonspunktForLegeerklæringRequest,
                 forventetResponse = forventetResponse
@@ -74,17 +82,17 @@ internal class NormalflytInngvilgetSøknadTest(
 
     @Test
     @Order(3)
-    fun `Fastsette vedtaket`() {
+    fun `Innvilge vedtaket`() {
         @Language("JSON")
         val forventetResponse = """
-            {
-                "status": "FASTSATT",
-                "potensielleStatuser": [],
-                "uløsteAksjonspunkter": {}
-            }
-            """.trimIndent()
+        {
+            "status": "INNVILGET",
+            "potensielleStatuser": {},
+            "uløsteAksjonspunkter": {}
+        }
+        """.trimIndent()
         with(testApplicationEngine) {
-            fastsett(
+            innvilgelse(
                 behandlingId = behandlingId,
                 forventetResponse = forventetResponse
             )
@@ -93,17 +101,21 @@ internal class NormalflytInngvilgetSøknadTest(
 
     @Test
     @Order(4)
-    fun `Ikke mulig å endre vedtaket etter at det er fastsatt`() {
+    fun `Ikke mulig å endre vedtaket etter at det er innvilget`() {
         with(testApplicationEngine) {
-            deaktiver(
+            forkast(
                 behandlingId = behandlingId,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
-            fastsett(
+            innvilgelse(
                 behandlingId = behandlingId,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
-            aksjonspunkter(
+            avslag(
+                behandlingId = behandlingId,
+                forventetStatusCode = HttpStatusCode.Conflict
+            )
+            aksjonspunkt(
                 behandlingId = behandlingId,
                 requestBody = løseAksjonspunktForLegeerklæringRequest,
                 forventetStatusCode = HttpStatusCode.Conflict
@@ -154,7 +166,7 @@ internal class NormalflytInngvilgetSøknadTest(
         """.trimIndent()
 
         with(testApplicationEngine) {
-            nySøknad(
+            nyttVedtak(
                 requestBody = request,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
@@ -171,7 +183,7 @@ internal class NormalflytInngvilgetSøknadTest(
               "LEGEERKLÆRING": {
                 "vurdering": "foo bar",
                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
+                "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
               }
             }
             """.trimIndent()
@@ -187,13 +199,13 @@ internal class NormalflytInngvilgetSøknadTest(
                   "behandlingId": "$behandlingId",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
-                  "status": "FASTSATT",
+                  "status": "INNVILGET",
                   "uløsteAksjonspunkter": {},
                   "løsteAksjonspunkter": {
                     "LEGEERKLÆRING": {
                         "vurdering": "foo bar",
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                        "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
+                        "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
                   }
               }]

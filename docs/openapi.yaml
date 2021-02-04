@@ -39,7 +39,7 @@ paths:
     post:
       tags:
         - Kronisk sykt barn - skriv
-      summary: Registrere ny søknad for kronisk sykt barn
+      summary: Registrere ny vedtak for kronisk sykt barn
       requestBody:
         content:
           application/json:
@@ -49,7 +49,7 @@ paths:
       responses:
         201:
           description: >
-            - Opprettet et vedtak. Ved opprettelse vil det alltid ha `status=FORSLAG`
+            - Opprettet et vedtak. Ved opprettelse vil det alltid ha `status=FORESLÅTT`
             ettersom det minst vil være ett aksjonspunkt i `uløsteAksjonspunkter`
 
             - `potensielleStatuser` inneholder liste om potensielle statuser vedtaket kan havne i.
@@ -66,7 +66,7 @@ paths:
         - Henter vedtak om kronisk sykt barn<br/>
         Enten for en behandling id eller aggregert for et saksnummer.</br>
 
-        - For `saksnummer+barn+periode` man kun ha ett vedtak, så vil kun være det siste som blir aggregert på saksnummer.</br>
+        - For `saksnummer+barn+periode` man kun ha ett vedtak, så vil kun være det siste som blir aggregert på saksnummer med status enten `INNVILGET` eller `AVSLÅTT`</br>
 
         - Må sette enten saksnummer eller behandlingId. Ikke begge.<br/>
 
@@ -130,18 +130,23 @@ paths:
         required: true
       responses:
         200:
-          description: Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles i `uløsteAksjonspunkter`
+          description: >
+            - Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles at det/de som ble løst nå er borte fra `uløsteAksjonspunkter`</br>
+
+            - Om `potensielleStatuser` ikke inneholder `INNVILGET` betyr det at vedtaket ikke kan innvilges ettersom en av løsningene på aksjonspuntene indikerer at det må bli `AVASLÅTT` eller `FORKASTET`
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
-          description: Om vedtaket allerede har `status=FASTSATT`
-  /kronisk-sykt-barn/{behandlingId}/fastsett:
+          description: >
+            - Om vedtaket har en annen status enn `FORESLÅTT`<br/>
+
+  /kronisk-sykt-barn/{behandlingId}/innvilgelse:
     patch:
       tags:
         - Kronisk sykt barn - skriv
-      summary: Fastsette vedtaket
+      summary: Innvilge vedtaket
       parameters:
         - name: behandlingId
           in: path
@@ -152,18 +157,23 @@ paths:
       responses:
         200:
           description: >
-            `status=FASTSATT`
+            `status=INNVILGET`
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
-          description: Om det er uløste aksjonspunkter på vedtaket.
-  /kronisk-sykt-barn/{behandlingId}/deaktiver:
+          description: >
+            - Om det er uløste aksjonspunkt<br/>
+
+            - Om vedtaket før innvilgelse har en annen status enn `FORESLÅTT`<br/>
+
+            - Om løsningene på et eller fler aksjonspunkt indikerer at vedtaket ikke kan innvilges
+  /kronisk-sykt-barn/{behandlingId}/avslag:
     patch:
       tags:
         - Kronisk sykt barn - skriv
-      summary: Deaktiver vedtaket
+      summary: Avslå vedtaket
       parameters:
         - name: behandlingId
           in: path
@@ -174,11 +184,37 @@ paths:
       responses:
         200:
           description: >
-            `status=DEAKTIVERT`
+            `status=AVSLÅTT`
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+        409:
+          description: >
+            - Om vedtaket før avslag har en annen status enn `FORESLÅTT`
+  /kronisk-sykt-barn/{behandlingId}/forkast:
+    patch:
+      tags:
+        - Kronisk sykt barn - skriv
+      summary: Forkaste vedtaket
+      parameters:
+        - name: behandlingId
+          in: path
+          description: Behandling ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: >
+            `status=FORKASTET`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+        409:
+          description: >
+            - Om vedtaket før forkasting har en annen status enn `FORESLÅTT`
 components:
   schemas:
     KroniskSyktBarnSoknadRequest:
@@ -219,6 +255,9 @@ components:
         fødselsdato:
           type: string
           format: date
+        harSammeBosted:
+          type: boolean
+          example: true
     KroniskSyktBarnSoknadResponse:
       type: object
       properties:
@@ -226,14 +265,22 @@ components:
           type: string
           description: Status på vedtaket
           enum:
-            - FORSLAG
-            - FASTSATT
-            - DEAKTIVERT
+            - FORESLÅTT
+            - INNVILGET
+            - AVSLÅTT
+            - FORKASTET
         potensielleStatuser:
-          type: array
-          items:
-            type: string
-            example: 'DEAKTIVERT'
+          type: object
+          properties:
+            INNVILGET:
+              type: object
+              properties: {}
+            AVSLÅTT:
+              type: object
+              properties: {}
+            FORKASTET:
+              type: object
+              properties: {}
         uløsteAksjonspunkter:
           type: object
           properties:
@@ -255,7 +302,7 @@ components:
             barnetErKroniskSyktEllerHarEnFunksjonshemning:
               type: boolean
               example: true
-            erSammenhengMedSøkersRisikoForFraværeFraArbeid:
+            erSammenhengMedSøkersRisikoForFraværFraArbeid:
               type: boolean
               example: true
         OMSORGEN_FOR:
@@ -280,9 +327,10 @@ components:
           type: string
           description: Status på vedtaket
           enum:
-            - FORSLAG
-            - FASTSATT
-            - DEAKTIVERT
+            - FORESLÅTT
+            - INNVILGET
+            - AVSLÅTT
+            - FORKASTET
         uløsteAksjonspunkter:
           type: object
           properties:
@@ -301,7 +349,7 @@ components:
                 barnetErKroniskSyktEllerHarEnFunksjonshemning:
                   type: boolean
                   example: true
-                erSammenhengMedSøkersRisikoForFraværeFraArbeid:
+                erSammenhengMedSøkersRisikoForFraværFraArbeid:
                   type: boolean
                   example: true
         lovhenvisnigner:

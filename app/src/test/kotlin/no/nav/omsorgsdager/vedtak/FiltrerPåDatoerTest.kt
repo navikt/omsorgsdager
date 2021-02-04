@@ -50,7 +50,7 @@ internal class FiltrerPåDatoerTest {
         private val vedtakene = listOf(vedtak1, vedtak2, vedtak3)
 
         private fun Periode.vedtak() = GjeldendeVedtakTest.Companion.TestVedtak(
-            status = VedtakStatus.FASTSATT,
+            status = VedtakStatus.INNVILGET,
             periode = this,
             statusSistEndret = ZonedDateTime.now(),
             barn = 1

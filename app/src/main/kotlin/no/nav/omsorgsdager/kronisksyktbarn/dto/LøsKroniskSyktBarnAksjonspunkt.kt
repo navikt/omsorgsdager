@@ -13,16 +13,16 @@ internal object LøsKroniskSyktBarnAksjonspunkt {
      */
     internal data class Legeerklæring(
         val barnetErKroniskSyktEllerHarEnFunksjonshemning: Boolean,
-        val erSammenhengMedSøkersRisikoForFraværeFraArbeid: Boolean,
+        val erSammenhengMedSøkersRisikoForFraværFraArbeid: Boolean,
         val vurdering: String
     ) : LøstAksjonpunkt {
         override val navn = "LEGEERKLÆRING"
         override val versjon = "0.0.1"
-        override val kanFastsettes = barnetErKroniskSyktEllerHarEnFunksjonshemning && erSammenhengMedSøkersRisikoForFraværeFraArbeid
+        override val kanInnvilges = barnetErKroniskSyktEllerHarEnFunksjonshemning && erSammenhengMedSøkersRisikoForFraværFraArbeid
         override val løsning = """
         {
             "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,
-            "erSammenhengMedSøkersRisikoForFraværeFraArbeid": $erSammenhengMedSøkersRisikoForFraværeFraArbeid,
+            "erSammenhengMedSøkersRisikoForFraværFraArbeid": $erSammenhengMedSøkersRisikoForFraværFraArbeid,
             "vurdering": "${Fritekst(vurdering).tekst}"
         }
         """.trimIndent().somJson()

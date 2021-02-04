@@ -13,7 +13,7 @@ internal class SøkerOver70ÅrTest(
 
     @Test
     @Order(1)
-    fun `Sende inn søknad der søker fyller 70 år 2025, barnet fyller 18 år 2038`() {
+    fun `Sende inn vedtak der søker fyller 70 år 2025, barnet fyller 18 år 2038`() {
 
         @Language("JSON")
         val request = """
@@ -35,15 +35,19 @@ internal class SøkerOver70ÅrTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
-            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
+            "status": "FORESLÅTT",
+            "potensielleStatuser": {
+              "INNVILGET": {},
+              "FORKASTET": {}, 
+              "AVSLÅTT": {}
+            },
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nySøknad(
+            nyttVedtak(
                 requestBody = request,
                 forventetResponse = forventetResponse
             )
@@ -52,7 +56,7 @@ internal class SøkerOver70ÅrTest(
 
     @Test
     @Order(2)
-    fun `Hent Søknad, tom er satt till dato då søker fyller 70`() {
+    fun `Hent vedtak, tom er satt till dato då søker fyller 70`() {
         with(testApplicationEngine) {
             hentBehandling(
                 behandlingId = behandlingId,
@@ -76,7 +80,7 @@ internal class SøkerOver70ÅrTest(
                   "behandlingId": "$behandlingId",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2024-12-31",
-                  "status": "FORSLAG",
+                  "status": "FORESLÅTT",
                   "uløsteAksjonspunkter": {
                     "LEGEERKLÆRING": {}
                   },
