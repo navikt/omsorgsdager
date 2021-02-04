@@ -1,13 +1,13 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitJupiterVersion = "5.7.0"
-val dusseldorfVersion = "1.5.0.ae98b7c"
-val ktorVersion = "1.5.0"
+val dusseldorfVersion = "1.5.1.fa7db77"
+val ktorVersion = "1.5.1"
 val jsonassertVersion = "1.5.0"
-val kafkaVersion = "2.4.0"
+val kafkaVersion = "2.7.0"
 val mockkVersion = "1.10.5"
 val assertjVersion = "3.19.0"
-val jacksonDateTime = "2.12.1"
+val jacksonVersion = "2.12.1"
 
 // Database
 val flywayVersion = "7.5.2"
@@ -19,7 +19,7 @@ val embeddedPostgres = "1.2.10"
 val mainClass = "no.nav.omsorgsdager.AppKt"
 
 plugins {
-    kotlin("jvm") version "1.4.21"
+    kotlin("jvm") version "1.4.30"
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
@@ -39,7 +39,7 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
     implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonDateTime")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
 
     // Database
