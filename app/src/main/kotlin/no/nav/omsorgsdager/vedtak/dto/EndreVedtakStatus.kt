@@ -18,7 +18,7 @@ internal object EndreVedtakStatus {
             ?.let { ZonedDateTime.parse(it.toString())}
         return when (tidspunkt) {
             null -> utcNå().also { logger.info("Tidspunkt ikke satt i requesten, bruker $it") }
-            else -> tidspunkt.also { logger.info("Tidspunkt satt i requestem, $it") }
+            else -> tidspunkt.also { logger.info("Tidspunkt satt i requesten, $it") }
         }
     }
 }
