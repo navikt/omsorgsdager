@@ -14,4 +14,5 @@ internal data class Barn private constructor(
         fødselsdato = node["fødselsdato"].asText().let { LocalDate.parse(it) },
         harSammeBosted = node["harSammeBosted"].asBoolean()
     )
+
 }

@@ -38,10 +38,10 @@ internal fun Route.KroniskSyktBarnRoute(
             val grunnlag = OpprettKroniskSyktBarn.Grunnlag(request)
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.NyBehandlingKroniskSyktBarn.copy(
-                identitetsnummer = when(grunnlag.barn.identitetsnummer) {
-                    null -> setOf(grunnlag.søker.identitetsnummer, grunnlag.barn.identitetsnummer)
-                    else -> setOf(grunnlag.søker.identitetsnummer)
-                } as Set<String>
+                identitetsnummer = setOf(
+                    grunnlag.søker.identitetsnummer,
+                    grunnlag.barn.identitetsnummer
+                ).filterNotNull().toSet()
             ))
 
             val ekisterendeBehandling = kroniskSyktBarnRepository.hent(behandlingId = grunnlag.behandlingId)

@@ -22,6 +22,8 @@ internal data class KroniskSyktBarnVedtak(
         periode = nyPeriode
     )
     override val søkersIdentitetsnummer = søker.identitetsnummer
-    internal val involverteIdentitetsnummer : Set<Identitetsnummer> = setOf(søker.identitetsnummer)
-        .also { if(barn.identitetsnummer != null) it.plus(barn.identitetsnummer) }
+    internal val involverteIdentitetsnummer : Set<Identitetsnummer> = setOf(
+        søker.identitetsnummer,
+        barn.identitetsnummer
+    ).filterNotNull().toSet()
 }
