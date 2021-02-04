@@ -2,7 +2,6 @@ package no.nav.omsorgsdager.kronisksyktbarn
 
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.testutils.TestApplicationExtension
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.MethodOrderer
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.extension.ExtendWith
+import java.util.*
 
 @ExtendWith(TestApplicationExtension::class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -173,9 +173,9 @@ internal class SøknadMedFlereBarnTest(
     }
 
     private companion object {
-        val saksnummer = "S-1"
-        val behandlingId1 = "B-1"
-        val behandlingId2 = "B-2"
+        val saksnummer = UUID.randomUUID().toString()
+        val behandlingId1 = UUID.randomUUID().toString()
+        val behandlingId2 = UUID.randomUUID().toString()
 
         @Language("JSON")
         fun request(
