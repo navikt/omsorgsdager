@@ -27,7 +27,8 @@ internal class SøkerOver70ÅrTest(
                 },
                 "barn": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01"
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
                 }
             }
         """.trimIndent()
@@ -75,7 +76,8 @@ internal class SøkerOver70ÅrTest(
               "vedtak": [{
                   "barn": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01"
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
                   },
                   "behandlingId": "$behandlingId",
                   "gyldigFraOgMed": "2021-01-01",

@@ -217,7 +217,8 @@ internal class RevurderingflytTest(
                     "vedtak": [{
                         "barn": {
                             "identitetsnummer": "123",
-                            "fødselsdato": "2020-01-01"
+                            "fødselsdato": "2020-01-01",
+                            "harSammeBosted": true
                         },
                         "behandlingId": "$behandlingId1",
                         "gyldigFraOgMed": "2021-01-01",
@@ -238,7 +239,8 @@ internal class RevurderingflytTest(
                     "vedtak": [{
                         "barn": {
                             "identitetsnummer": "123",
-                            "fødselsdato": "2020-01-01"
+                            "fødselsdato": "2020-01-01",
+                            "harSammeBosted": true
                         },
                         "behandlingId": "$behandlingId2",
                         "gyldigFraOgMed": "2021-01-01",
@@ -263,7 +265,8 @@ internal class RevurderingflytTest(
                     "vedtak": [{
                         "barn": {
                             "identitetsnummer": "123",
-                            "fødselsdato": "2020-01-01"
+                            "fødselsdato": "2020-01-01",
+                            "harSammeBosted": true
                         },
                         "behandlingId": "$behandlingId3",
                         "gyldigFraOgMed": "2021-03-30",
@@ -294,7 +297,8 @@ internal class RevurderingflytTest(
             "vedtak": [{
                 "barn": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01"
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
                 },
                 "behandlingId": "$behandlingId3",
                 "gyldigFraOgMed": "2021-03-30",
@@ -311,7 +315,8 @@ internal class RevurderingflytTest(
             }, {
                 "barn": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01"
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
                 },
                 "behandlingId": "$behandlingId2",
                 "gyldigFraOgMed": "2021-01-01",
@@ -356,7 +361,8 @@ internal class RevurderingflytTest(
                 },
                 "barn": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01"
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
                 }
             }
         """.trimIndent()

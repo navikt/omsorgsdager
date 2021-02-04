@@ -141,7 +141,8 @@ internal class SøknadMedFlereBarnTest(
                 {
                   "barn": {
                     "identitetsnummer": "456",
-                    "fødselsdato": "2020-01-01"
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
                   },
                   "behandlingId": "$behandlingId2",
                   "gyldigFraOgMed": "2021-01-01",
@@ -159,7 +160,8 @@ internal class SøknadMedFlereBarnTest(
                 {
                   "barn": {
                     "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01"
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
                   },
                   "behandlingId": "$behandlingId1",
                   "gyldigFraOgMed": "2021-01-01",
@@ -206,7 +208,8 @@ internal class SøknadMedFlereBarnTest(
                 },
                 "barn": {
                     "identitetsnummer": "$barnIdentitetsnummer",
-                    "fødselsdato": "2020-01-01"
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
                 }
             }
         """.trimIndent()
