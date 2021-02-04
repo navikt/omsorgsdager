@@ -302,7 +302,7 @@ components:
             barnetErKroniskSyktEllerHarEnFunksjonshemning:
               type: boolean
               example: true
-            erSammenhengMedSøkersRisikoForFraværeFraArbeid:
+            erSammenhengMedSøkersRisikoForFraværFraArbeid:
               type: boolean
               example: true
         OMSORGEN_FOR:
@@ -349,7 +349,7 @@ components:
                 barnetErKroniskSyktEllerHarEnFunksjonshemning:
                   type: boolean
                   example: true
-                erSammenhengMedSøkersRisikoForFraværeFraArbeid:
+                erSammenhengMedSøkersRisikoForFraværFraArbeid:
                   type: boolean
                   example: true
         lovhenvisnigner:

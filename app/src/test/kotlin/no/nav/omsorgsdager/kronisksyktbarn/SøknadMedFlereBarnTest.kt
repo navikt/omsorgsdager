@@ -93,7 +93,7 @@ internal class SøknadMedFlereBarnTest(
                 behandlingId = behandlingId1,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
-                    erSammenhengMedSøkersRisikoForFraværeFraArbeid = true
+                    erSammenhengMedSøkersRisikoForFraværFraArbeid = true
                 ),
                 forventetResponse = forventetResponse
             )
@@ -101,7 +101,7 @@ internal class SøknadMedFlereBarnTest(
                 behandlingId = behandlingId2,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
-                    erSammenhengMedSøkersRisikoForFraværeFraArbeid = true
+                    erSammenhengMedSøkersRisikoForFraværFraArbeid = true
                 ),
                 forventetResponse = forventetResponse
             )
@@ -152,7 +152,7 @@ internal class SøknadMedFlereBarnTest(
                     "LEGEERKLÆRING": {
                       "vurdering": "foo bar",
                       "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                      "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
+                      "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
                   }
                 },
@@ -170,7 +170,7 @@ internal class SøknadMedFlereBarnTest(
                     "LEGEERKLÆRING": {
                       "vurdering": "foo bar",
                       "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                      "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
+                      "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
                   }
                 }
@@ -214,13 +214,13 @@ internal class SøknadMedFlereBarnTest(
         @Language("JSON")
         private fun løseAksjonspunktForLegeerklæringRequest(
             barnetErKroniskSyktEllerHarEnFunksjonshemning: Boolean,
-            erSammenhengMedSøkersRisikoForFraværeFraArbeid: Boolean
+            erSammenhengMedSøkersRisikoForFraværFraArbeid: Boolean
         ) = """
             {
               "LEGEERKLÆRING": {
                 "vurdering": "foo bar",
                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,
-                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": $erSammenhengMedSøkersRisikoForFraværeFraArbeid
+                "erSammenhengMedSøkersRisikoForFraværFraArbeid": $erSammenhengMedSøkersRisikoForFraværFraArbeid
               }
             }
             """.trimIndent()

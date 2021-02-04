@@ -106,7 +106,7 @@ internal class RevurderingflytTest(
                 behandlingId = behandlingId2,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
-                    erSammenhengMedSøkersRisikoForFraværeFraArbeid = true
+                    erSammenhengMedSøkersRisikoForFraværFraArbeid = true
                 ),
                 forventetResponse = forventetResponse
             )
@@ -180,7 +180,7 @@ internal class RevurderingflytTest(
                 behandlingId = behandlingId3,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
-                    erSammenhengMedSøkersRisikoForFraværeFraArbeid = false
+                    erSammenhengMedSøkersRisikoForFraværFraArbeid = false
                 ),
                 forventetResponse = forventetResponse
             )
@@ -249,7 +249,7 @@ internal class RevurderingflytTest(
                             "LEGEERKLÆRING": {
                                 "vurdering": "foo bar",
                                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
+                                "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                             }
                         }
                     }]
@@ -274,7 +274,7 @@ internal class RevurderingflytTest(
                             "LEGEERKLÆRING": {
                                 "vurdering": "foo bar",
                                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": false
+                                "erSammenhengMedSøkersRisikoForFraværFraArbeid": false
                             }
                         }
                     }]
@@ -305,7 +305,7 @@ internal class RevurderingflytTest(
                     "LEGEERKLÆRING": {
                         "vurdering": "foo bar",
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                        "erSammenhengMedSøkersRisikoForFraværeFraArbeid": false
+                        "erSammenhengMedSøkersRisikoForFraværFraArbeid": false
                     }
                 }
             }, {
@@ -322,7 +322,7 @@ internal class RevurderingflytTest(
                     "LEGEERKLÆRING": {
                         "vurdering": "foo bar",
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                        "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
+                        "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
                 }
             }]
@@ -364,13 +364,13 @@ internal class RevurderingflytTest(
         @Language("JSON")
         private fun løseAksjonspunktForLegeerklæringRequest(
             barnetErKroniskSyktEllerHarEnFunksjonshemning: Boolean,
-            erSammenhengMedSøkersRisikoForFraværeFraArbeid: Boolean
+            erSammenhengMedSøkersRisikoForFraværFraArbeid: Boolean
         ) = """
             {
               "LEGEERKLÆRING": {
                 "vurdering": "foo bar",
                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,
-                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": $erSammenhengMedSøkersRisikoForFraværeFraArbeid
+                "erSammenhengMedSøkersRisikoForFraværFraArbeid": $erSammenhengMedSøkersRisikoForFraværFraArbeid
               }
             }
             """.trimIndent()

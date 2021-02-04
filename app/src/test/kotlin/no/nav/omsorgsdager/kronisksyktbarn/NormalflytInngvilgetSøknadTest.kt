@@ -183,7 +183,7 @@ internal class NormalflytInngvilgetSøknadTest(
               "LEGEERKLÆRING": {
                 "vurdering": "foo bar",
                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
+                "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
               }
             }
             """.trimIndent()
@@ -205,7 +205,7 @@ internal class NormalflytInngvilgetSøknadTest(
                     "LEGEERKLÆRING": {
                         "vurdering": "foo bar",
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                        "erSammenhengMedSøkersRisikoForFraværeFraArbeid": true
+                        "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
                   }
               }]
