@@ -1,14 +1,17 @@
 package no.nav.omsorgsdager.kronisksyktbarn
 
+import com.github.tomakehurst.wiremock.http.Cookie
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Saksnummer
+import no.nav.omsorgsdager.tilgangsstyring.TilgangsstyringTest.Companion.azureSystemToken
+import no.nav.omsorgsdager.tilgangsstyring.TilgangsstyringTest.Companion.openAmPersonToken
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.skyscreamer.jsonassert.JSONAssert
 
-private val authorizationHeader = "Bearer ${Azure.V2_0.generateJwt("omsorgsdager", "omsorgsdager")}"
+private val authorizationHeaderSystem = "Bearer ${azureSystemToken(medTilgang = true)}"
+private val cookieSaksbehandler = Cookie(listOf("ID_token=${openAmPersonToken()}", "Path=/", "Domain=localhost")).toString()
 
 private fun TestApplicationCall.assertForventetResponse(forventetResponse: String?) {
     if (forventetResponse == null) {
@@ -23,7 +26,7 @@ internal fun TestApplicationEngine.nyttVedtak(
     forventetStatusCode: HttpStatusCode = HttpStatusCode.Created,
     forventetResponse: String? = null) {
     handleRequest(HttpMethod.Post, "/api/kroniskt-sykt-barn") {
-        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         setBody(requestBody)
     }.apply {
@@ -38,7 +41,7 @@ internal fun TestApplicationEngine.aksjonspunkt(
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
     handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/aksjonspunkt") {
-        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.Cookie, cookieSaksbehandler)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         setBody(requestBody)
     }.apply {
@@ -52,7 +55,7 @@ internal fun TestApplicationEngine.innvilgelse(
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
     handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/innvilgelse") {
-        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
         assertEquals(forventetStatusCode, response.status())
@@ -65,7 +68,7 @@ internal fun TestApplicationEngine.avslag(
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
     handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/avslag") {
-        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
         assertEquals(forventetStatusCode, response.status())
@@ -78,7 +81,7 @@ internal fun TestApplicationEngine.forkast(
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
     handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/forkast") {
-        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
         assertEquals(forventetStatusCode, response.status())
@@ -91,7 +94,7 @@ internal fun TestApplicationEngine.hentBehandling(
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
     handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn?behandlingId=$behandlingId") {
-        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
         assertEquals(forventetStatusCode, response.status())
@@ -104,7 +107,7 @@ internal fun TestApplicationEngine.hentSak(
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
     handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn?saksnummer=$saksnummer") {
-        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
         assertEquals(forventetStatusCode, response.status())

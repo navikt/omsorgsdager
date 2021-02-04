@@ -200,7 +200,7 @@ internal class TilgangsstyringTest {
         }.returns(tilgangEndring)
     }
 
-    private companion object {
+    internal companion object {
         private val VisningOperasjon = Operasjon(
             type = Operasjon.Type.Visning,
             beskrivelse = "Tester tilgangsstyring",
@@ -213,12 +213,12 @@ internal class TilgangsstyringTest {
             identitetsnummer = setOf("123")
         )
 
-        private fun azureSystemToken(medTilgang: Boolean) = Azure.V2_0.generateJwt(
+        internal fun azureSystemToken(medTilgang: Boolean) = Azure.V2_0.generateJwt(
             clientId = "any",
-            audience = "sjekkes-ved-sjekk-på-signatur",
+            audience = "omsorgsdager",
             accessAsApplication = medTilgang
         )
-        private fun azurePersonToken() = Azure.V2_0.generateJwt(
+        internal fun azurePersonToken() = Azure.V2_0.generateJwt(
             clientId = "any",
             audience = "sjekkes-ved-sjekk-på-signatur",
             accessAsApplication = false,
@@ -227,7 +227,7 @@ internal class TilgangsstyringTest {
                 "preferred_username" to "user"
             )
         )
-        private fun openAmSytemToken(medTilgang: Boolean) = NaisSts.generateJwt(
+        internal fun openAmSytemToken(medTilgang: Boolean) = NaisSts.generateJwt(
             application = "any",
             overridingClaims = mapOf(
                 "azp" to when (medTilgang) {
@@ -237,7 +237,7 @@ internal class TilgangsstyringTest {
             )
         )
 
-        private fun openAmPersonToken() = NaisSts.generateJwt(
+        internal fun openAmPersonToken() = NaisSts.generateJwt(
             application = "any",
             overridingClaims = mapOf(
                 "azp" to "any",
