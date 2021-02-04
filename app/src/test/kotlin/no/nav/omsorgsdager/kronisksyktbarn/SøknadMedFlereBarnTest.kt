@@ -22,10 +22,10 @@ internal class SøknadMedFlereBarnTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
+            "status": "FORESLÅTT",
             "potensielleStatuser": {
               "INNVILGET": {},
-              "DEAKTIVERT": {}, 
+              "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
             "uløsteAksjonspunkter": {
@@ -50,11 +50,11 @@ internal class SøknadMedFlereBarnTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
+            "status": "FORESLÅTT",
             "potensielleStatuser": {
               "INNVILGET": {},
               "AVSLÅTT": {},
-              "DEAKTIVERT": {}
+              "FORKASTET": {}
             },
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
@@ -78,11 +78,11 @@ internal class SøknadMedFlereBarnTest(
         @Language("JSON")
         val forventetResponse = """
             {
-                "status": "FORSLAG",
+                "status": "FORESLÅTT",
                 "potensielleStatuser": {
                   "INNVILGET": {},
                   "AVSLÅTT": {},
-                  "DEAKTIVERT": {}
+                  "FORKASTET": {}
                 },
                 "uløsteAksjonspunkter": {}
             }

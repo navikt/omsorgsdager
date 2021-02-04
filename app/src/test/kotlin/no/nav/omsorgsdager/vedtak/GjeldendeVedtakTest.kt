@@ -16,17 +16,17 @@ internal class GjeldendeVedtakTest {
     }
 
     @Test
-    fun `kun vedtaksforslag`() {
+    fun `kun vedtaksFORESLÅTT`() {
         val nå = ZonedDateTime.now()
         assertThat(listOf(
             TestVedtak(
-                status = VedtakStatus.FORSLAG,
+                status = VedtakStatus.FORESLÅTT,
                 statusSistEndret = nå,
                 barn = "2",
                 periode = Periode("2021-01-01/2021-12-31")
             ),
             TestVedtak(
-                status = VedtakStatus.FORSLAG,
+                status = VedtakStatus.FORESLÅTT,
                 statusSistEndret = nå,
                 barn = "2",
                 periode = Periode("2021-01-01/2021-12-31")
@@ -55,7 +55,7 @@ internal class GjeldendeVedtakTest {
         val nå = ZonedDateTime.now()
         val periode = Periode("2021-01-01/2021-12-31")
         val vedtak1 = TestVedtak(
-            status = VedtakStatus.DEAKTIVERT,
+            status = VedtakStatus.FORKASTET,
             statusSistEndret = nå,
             barn = "1",
             periode = periode
@@ -84,7 +84,7 @@ internal class GjeldendeVedtakTest {
         )
         val vedtak3 = vedtak1.copy(
             periode = Periode("2021-12-01/2021-12-31"),
-            status = VedtakStatus.FORSLAG,
+            status = VedtakStatus.FORESLÅTT,
             statusSistEndret = nå.plusMinutes(10)
         )
 
@@ -109,7 +109,7 @@ internal class GjeldendeVedtakTest {
         // Avslag førstegangssøknad, innvilget i klage, åpnet ny behandling
         val vedtak1Barn2 = TestVedtak(status = VedtakStatus.AVSLÅTT, statusSistEndret = nå, barn = 2, periode = periodeBarn2)
         val vedtak2Barn2 = TestVedtak(status = VedtakStatus.INNVILGET, statusSistEndret = nå.plusMinutes(1), barn = 2, periode = periodeBarn2)
-        val vedtak3Barn2 = TestVedtak(status = VedtakStatus.FORSLAG, statusSistEndret = nå.plusMinutes(2), barn = 2, periode = periodeBarn2)
+        val vedtak3Barn2 = TestVedtak(status = VedtakStatus.FORESLÅTT, statusSistEndret = nå.plusMinutes(2), barn = 2, periode = periodeBarn2)
 
         // Legge til i tilfeldig rekkefølge
         val vedtak = listOf(vedtak3Barn1, vedtak3Barn2, vedtak1Barn1, vedtak1Barn2, vedtak2Barn2, vedtak2Barn1)

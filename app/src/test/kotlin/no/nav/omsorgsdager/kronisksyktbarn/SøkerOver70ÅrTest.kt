@@ -35,10 +35,10 @@ internal class SøkerOver70ÅrTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
+            "status": "FORESLÅTT",
             "potensielleStatuser": {
               "INNVILGET": {},
-              "DEAKTIVERT": {}, 
+              "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
             "uløsteAksjonspunkter": {
@@ -80,7 +80,7 @@ internal class SøkerOver70ÅrTest(
                   "behandlingId": "$behandlingId",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2024-12-31",
-                  "status": "FORSLAG",
+                  "status": "FORESLÅTT",
                   "uløsteAksjonspunkter": {
                     "LEGEERKLÆRING": {}
                   },

@@ -1,8 +1,8 @@
 package no.nav.omsorgsdager.vedtak
 
 internal enum class VedtakStatus {
-    FORSLAG,
+    FORESLÅTT,
     INNVILGET,
     AVSLÅTT,
-    DEAKTIVERT
+    FORKASTET
 }

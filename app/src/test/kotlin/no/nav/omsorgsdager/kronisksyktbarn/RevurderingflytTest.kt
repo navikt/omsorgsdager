@@ -20,10 +20,10 @@ internal class RevurderingflytTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
+            "status": "FORESLÅTT",
             "potensielleStatuser": {
               "INNVILGET": {},
-              "DEAKTIVERT": {}, 
+              "FORKASTET": {}, 
               "AVSLÅTT": {}
             }, 
             "uløsteAksjonspunkter": {
@@ -66,10 +66,10 @@ internal class RevurderingflytTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
+            "status": "FORESLÅTT",
             "potensielleStatuser": {
               "INNVILGET": {},
-              "DEAKTIVERT": {}, 
+              "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
             "uløsteAksjonspunkter": {
@@ -91,10 +91,10 @@ internal class RevurderingflytTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
+            "status": "FORESLÅTT",
             "potensielleStatuser": {
               "INNVILGET": {},
-              "DEAKTIVERT": {}, 
+              "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
             "uløsteAksjonspunkter": {}
@@ -138,10 +138,10 @@ internal class RevurderingflytTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
+            "status": "FORESLÅTT",
             "potensielleStatuser": {
               "INNVILGET": {},
-              "DEAKTIVERT": {}, 
+              "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
             "uløsteAksjonspunkter": {
@@ -166,9 +166,9 @@ internal class RevurderingflytTest(
         @Language("JSON")
         val forventetResponse = """
             {
-                "status": "FORSLAG",
+                "status": "FORESLÅTT",
                 "potensielleStatuser": {
-                  "DEAKTIVERT": {}, 
+                  "FORKASTET": {}, 
                   "AVSLÅTT": {}
                 },
                 "uløsteAksjonspunkter": {}

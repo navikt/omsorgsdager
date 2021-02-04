@@ -73,11 +73,11 @@ internal fun TestApplicationEngine.avslag(
     }
 }
 
-internal fun TestApplicationEngine.deaktivering(
+internal fun TestApplicationEngine.forkast(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/deaktivering") {
+    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/forkast") {
         addHeader(HttpHeaders.Authorization, authorizationHeader)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {

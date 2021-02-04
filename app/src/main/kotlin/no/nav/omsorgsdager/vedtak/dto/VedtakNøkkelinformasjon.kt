@@ -15,11 +15,11 @@ internal object VedtakNøkkelinformasjon {
             aksjonspunkter: Aksjonspunkter) : this(
             status = vedtak.status,
             potensielleStatuser = when (vedtak.status) {
-                VedtakStatus.FORSLAG -> when {
+                VedtakStatus.FORESLÅTT -> when {
                     aksjonspunkter.løsteAksjonspunkter.kanInnvilges() -> setOf(
-                        VedtakStatus.INNVILGET, VedtakStatus.AVSLÅTT, VedtakStatus.DEAKTIVERT
+                        VedtakStatus.INNVILGET, VedtakStatus.AVSLÅTT, VedtakStatus.FORKASTET
                     )
-                    else -> setOf(VedtakStatus.AVSLÅTT, VedtakStatus.DEAKTIVERT)
+                    else -> setOf(VedtakStatus.AVSLÅTT, VedtakStatus.FORKASTET)
                 }
                 else -> emptySet()
             }.associateBy { it.name }.mapValues { Any() },

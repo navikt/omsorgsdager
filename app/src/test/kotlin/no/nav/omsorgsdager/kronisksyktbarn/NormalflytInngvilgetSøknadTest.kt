@@ -36,10 +36,10 @@ internal class NormalflytInngvilgetSøknadTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
+            "status": "FORESLÅTT",
             "potensielleStatuser": {
               "INNVILGET": {},
-              "DEAKTIVERT": {}, 
+              "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
             "uløsteAksjonspunkter": {
@@ -61,10 +61,10 @@ internal class NormalflytInngvilgetSøknadTest(
         @Language("JSON")
         val forventetResponse = """
         {
-            "status": "FORSLAG",
+            "status": "FORESLÅTT",
             "potensielleStatuser": {
               "INNVILGET": {},
-              "DEAKTIVERT": {}, 
+              "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
             "uløsteAksjonspunkter": {}
@@ -103,7 +103,7 @@ internal class NormalflytInngvilgetSøknadTest(
     @Order(4)
     fun `Ikke mulig å endre vedtaket etter at det er innvilget`() {
         with(testApplicationEngine) {
-            deaktivering(
+            forkast(
                 behandlingId = behandlingId,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
