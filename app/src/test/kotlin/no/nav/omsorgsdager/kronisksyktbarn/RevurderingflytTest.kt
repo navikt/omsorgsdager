@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.ZonedDateTime
 
 @ExtendWith(TestApplicationExtension::class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -354,7 +355,8 @@ internal class RevurderingflytTest(
             {
                 "saksnummer": "$saksnummer",
                 "behandlingId": "$behandlingId",
-                "mottatt": "$mottatt",
+                "søknadMottatt": "$mottatt",
+                "tidspunkt": "${ZonedDateTime.parse(mottatt).plusMinutes(10)}",
                 "søker": {
                     "identitetsnummer": "123",
                     "fødselsdato": "1990-01-01"

@@ -9,6 +9,7 @@ import no.nav.omsorgsdager.tilgangsstyring.TilgangsstyringTest.Companion.azureSy
 import no.nav.omsorgsdager.tilgangsstyring.TilgangsstyringTest.Companion.openAmPersonToken
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.skyscreamer.jsonassert.JSONAssert
+import java.time.ZonedDateTime
 
 private val authorizationHeaderSystem = "Bearer ${azureSystemToken(medTilgang = true)}"
 private val cookieSaksbehandler = Cookie(listOf("ID_token=${openAmPersonToken()}", "Path=/", "Domain=localhost")).toString()
@@ -54,9 +55,8 @@ internal fun TestApplicationEngine.innvilgelse(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/innvilgelse") {
+    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/innvilget") {
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
-        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
         assertEquals(forventetStatusCode, response.status())
         assertForventetResponse(forventetResponse)
@@ -67,11 +67,13 @@ internal fun TestApplicationEngine.avslag(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/avslag") {
+    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/avslått") {
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        setBody("""{"tidspunkt":"${ZonedDateTime.now()}"}""")
     }.apply {
         assertEquals(forventetStatusCode, response.status())
+
         assertForventetResponse(forventetResponse)
     }
 }
@@ -80,9 +82,8 @@ internal fun TestApplicationEngine.forkast(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/forkast") {
+    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/forkastet") {
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
-        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
         assertEquals(forventetStatusCode, response.status())
         assertForventetResponse(forventetResponse)

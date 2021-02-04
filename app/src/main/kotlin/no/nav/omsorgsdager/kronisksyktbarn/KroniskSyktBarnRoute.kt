@@ -24,6 +24,7 @@ import no.nav.omsorgsdager.vedtak.Vedtak.Companion.erInnenforDatoer
 import no.nav.omsorgsdager.vedtak.Vedtak.Companion.filtrerPåDatoer
 import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
+import no.nav.omsorgsdager.vedtak.dto.EndreVedtakStatus.endreVedtakStatusTidspunkt
 import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon
 import java.time.ZonedDateTime
 
@@ -45,7 +46,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
 
             val ekisterendeBehandling = kroniskSyktBarnRepository.hent(behandlingId = grunnlag.behandlingId)
-            if(ekisterendeBehandling != null) {
+            if (ekisterendeBehandling != null) {
                 call.respond(HttpStatusCode.Conflict)
                 return@post
             }
@@ -61,11 +62,11 @@ internal fun Route.KroniskSyktBarnRoute(
                     saksnummer = grunnlag.saksnummer,
                     behandlingId = grunnlag.behandlingId,
                     status = VedtakStatus.FORESLÅTT,
-                    statusSistEndret = ZonedDateTime.now(),
+                    statusSistEndret = grunnlag.tidspunkt,
                     søker = grunnlag.søker,
                     barn = grunnlag.barn,
                     periode = Periode(
-                        fom = grunnlag.mottatt.toLocalDateOslo(),
+                        fom = grunnlag.søknadMottatt.toLocalDateOslo(),
                         tom = tilOgMed
                     )
                 ),
@@ -110,7 +111,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
         }
 
-        patch("/{behandlingId}/innvilgelse") {
+        patch("/{behandlingId}/innvilget") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
@@ -134,8 +135,10 @@ internal fun Route.KroniskSyktBarnRoute(
                 identitetsnummer = vedtakOgAksjonspunkter.first.involverteIdentitetsnummer
             ))
 
-            val (innvilgetVedtak, innvilgetAksjonspunkter) = kroniskSyktBarnRepository.innvilg(
-                behandlingId = behandlingId
+            val (innvilgetVedtak, innvilgetAksjonspunkter) = kroniskSyktBarnRepository.endreStatus(
+                behandlingId = behandlingId,
+                status = VedtakStatus.INNVILGET,
+                tidspunkt = call.endreVedtakStatusTidspunkt()
             )
 
             // TODO: Oppdater db & send till k9-vaktmester
@@ -146,7 +149,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
         }
 
-        patch("/{behandlingId}/forkast") {
+        patch("/{behandlingId}/forkastet") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
@@ -162,8 +165,10 @@ internal fun Route.KroniskSyktBarnRoute(
                 identitetsnummer = vedtakOgAksjonspunkter.first.involverteIdentitetsnummer
             ))
 
-            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.forkast(
-                behandlingId = behandlingId
+            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.endreStatus(
+                behandlingId = behandlingId,
+                status = VedtakStatus.FORKASTET,
+                tidspunkt = call.endreVedtakStatusTidspunkt()
             )
 
             call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
@@ -172,7 +177,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
         }
 
-        patch("/{behandlingId}/avslag") {
+        patch("/{behandlingId}/avslått") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
@@ -188,8 +193,10 @@ internal fun Route.KroniskSyktBarnRoute(
                 identitetsnummer = vedtakOgAksjonspunkter.first.involverteIdentitetsnummer
             ))
 
-            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.avslå(
-                behandlingId = behandlingId
+            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.endreStatus(
+                behandlingId = behandlingId,
+                status = VedtakStatus.AVSLÅTT,
+                tidspunkt = call.endreVedtakStatusTidspunkt()
             )
 
             call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(

@@ -21,7 +21,8 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
             {
                 "saksnummer": "$saksnummer",
                 "behandlingId": "$behandlingId",
-                "mottatt": "2020-12-31T23:59:59.000Z",
+                "søknadMottatt": "2020-12-31T23:59:59.000Z",
+                "tidspunkt": "2021-01-01T12:00:00.000Z",
                 "søker": {
                     "identitetsnummer": "123",
                     "fødselsdato": "1990-01-01"
