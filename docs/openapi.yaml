@@ -39,7 +39,7 @@ paths:
     post:
       tags:
         - Kronisk sykt barn - skriv
-      summary: Registrere ny søknad for kronisk sykt barn
+      summary: Registrere ny vedtak for kronisk sykt barn
       requestBody:
         content:
           application/json:

@@ -18,22 +18,27 @@ internal class SøknadMedFlereBarnTest(
 
     @Test
     @Order(1)
-    fun `Sende inn søknad med barn 123 (behandling1)`() {
+    fun `Sende inn vedtak med barn 123 (behandling1)`() {
         @Language("JSON")
         val forventetResponse = """
         {
             "status": "FORSLAG",
-            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
+            "potensielleStatuser": {
+              "INNVILGET": {},
+              "DEAKTIVERT": {}, 
+              "AVSLÅTT": {}
+            },
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nySøknad(
+            nyttVedtak(
                 requestBody = request(
                     behandlingId = behandlingId1,
-                    barnIdentitetsnummer = "123"),
+                    barnIdentitetsnummer = "123"
+                ),
                 forventetResponse = forventetResponse
             )
         }
@@ -41,22 +46,27 @@ internal class SøknadMedFlereBarnTest(
 
     @Test
     @Order(2)
-    fun `Sende inn søknad med barn 456 (behandling2)`() {
+    fun `Sende inn vedtak med barn 456 (behandling2)`() {
         @Language("JSON")
         val forventetResponse = """
         {
             "status": "FORSLAG",
-            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
+            "potensielleStatuser": {
+              "INNVILGET": {},
+              "AVSLÅTT": {},
+              "DEAKTIVERT": {}
+            },
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nySøknad(
+            nyttVedtak(
                 requestBody = request(
                     behandlingId = behandlingId2,
-                    barnIdentitetsnummer = "456"),
+                    barnIdentitetsnummer = "456"
+                ),
                 forventetResponse = forventetResponse
             )
         }
@@ -69,13 +79,17 @@ internal class SøknadMedFlereBarnTest(
         val forventetResponse = """
             {
                 "status": "FORSLAG",
-                "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
+                "potensielleStatuser": {
+                  "INNVILGET": {},
+                  "AVSLÅTT": {},
+                  "DEAKTIVERT": {}
+                },
                 "uløsteAksjonspunkter": {}
             }
           """.trimIndent()
 
         with(testApplicationEngine) {
-            aksjonspunkter(
+            aksjonspunkt(
                 behandlingId = behandlingId1,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
@@ -83,7 +97,7 @@ internal class SøknadMedFlereBarnTest(
                 ),
                 forventetResponse = forventetResponse
             )
-            aksjonspunkter(
+            aksjonspunkt(
                 behandlingId = behandlingId2,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
@@ -96,21 +110,21 @@ internal class SøknadMedFlereBarnTest(
 
     @Test
     @Order(4)
-    fun `Fastsetter vedtak 1 & 2`() {
+    fun `Innvilger vedtak 1 & 2`() {
         @Language("JSON")
         val forventetResponse = """
             {
-                "status": "FASTSATT",
-                "potensielleStatuser": [],
+                "status": "INNVILGET",
+                "potensielleStatuser": {},
                 "uløsteAksjonspunkter": {}
             }
             """.trimIndent()
         with(testApplicationEngine) {
-            fastsett(
+            innvilgelse(
                 behandlingId = behandlingId1,
                 forventetResponse = forventetResponse
             )
-            fastsett(
+            innvilgelse(
                 behandlingId = behandlingId2,
                 forventetResponse = forventetResponse
             )
@@ -132,7 +146,7 @@ internal class SøknadMedFlereBarnTest(
                   "behandlingId": "$behandlingId2",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
-                  "status": "FASTSATT",
+                  "status": "INNVILGET",
                   "uløsteAksjonspunkter": {},
                   "løsteAksjonspunkter": {
                     "LEGEERKLÆRING": {
@@ -150,7 +164,7 @@ internal class SøknadMedFlereBarnTest(
                   "behandlingId": "$behandlingId1",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
-                  "status": "FASTSATT",
+                  "status": "INNVILGET",
                   "uløsteAksjonspunkter": {},
                   "løsteAksjonspunkter": {
                     "LEGEERKLÆRING": {

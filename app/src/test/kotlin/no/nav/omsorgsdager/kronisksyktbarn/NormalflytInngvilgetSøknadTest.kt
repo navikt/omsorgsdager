@@ -166,7 +166,7 @@ internal class NormalflytInngvilgetSøknadTest(
         """.trimIndent()
 
         with(testApplicationEngine) {
-            nySøknad(
+            nyttVedtak(
                 requestBody = request,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
