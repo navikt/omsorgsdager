@@ -149,6 +149,13 @@ paths:
       tags:
         - Kronisk sykt barn - skriv
       summary: Innvilge vedtaket
+      description: >
+        - `tidspunkt` er optional, defaulter til utc now
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndreVedtakStatus'
       parameters:
         - name: behandlingId
           in: path
@@ -176,6 +183,13 @@ paths:
       tags:
         - Kronisk sykt barn - skriv
       summary: Avslå vedtaket
+      description: >
+        - `tidspunkt` er optional, defaulter til utc now
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndreVedtakStatus'
       parameters:
         - name: behandlingId
           in: path
@@ -199,6 +213,13 @@ paths:
       tags:
         - Kronisk sykt barn - skriv
       summary: Forkaste vedtaket
+      description: >
+        - `tidspunkt` er optional, defaulter til utc now
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndreVedtakStatus'
       parameters:
         - name: behandlingId
           in: path
@@ -230,7 +251,10 @@ components:
           type: string
           format: string
           example: 'UUID-123-123'
-        mottatt:
+        tidspunkt:
+          type: string
+          format: date-time
+        søknadMottatt:
           type: string
           format: date-time
         søker:
@@ -254,7 +278,6 @@ components:
           type: string
           format: string
           example: '29099011111'
-          required: false
         fødselsdato:
           type: string
           format: date
@@ -371,4 +394,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HentKroniskSyktBarnResponse'
+    EndreVedtakStatus:
+      type: object
+      properties:
+        tidspunkt:
+          type: string
+          format: date-time
       
