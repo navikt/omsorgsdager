@@ -42,7 +42,7 @@ internal fun Route.KroniskSyktBarnRoute(
                 identitetsnummer = setOf(
                     grunnlag.søker.identitetsnummer,
                     grunnlag.barn.identitetsnummer
-                )
+                ).filterNotNull().toSet()
             ))
 
             val ekisterendeBehandling = kroniskSyktBarnRepository.hent(behandlingId = grunnlag.behandlingId)

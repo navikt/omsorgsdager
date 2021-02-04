@@ -1,15 +1,15 @@
 package no.nav.omsorgsdager.kronisksyktbarn
 
-import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.omsorgsdager.testutils.TestApplicationExtension
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
+import java.util.*
 
 @ExtendWith(TestApplicationExtension::class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
-internal class NormalflytInngvilgetSøknadTest(
+internal class SøknadMedBarnUtenIdentitetsnummerTest(
     private val testApplicationEngine: TestApplicationEngine) {
 
     @Test
@@ -27,7 +27,6 @@ internal class NormalflytInngvilgetSøknadTest(
                     "fødselsdato": "1990-01-01"
                 },
                 "barn": {
-                    "identitetsnummer": "123",
                     "fødselsdato": "2020-01-01",
                     "harSammeBosted": true
                 }
@@ -101,30 +100,6 @@ internal class NormalflytInngvilgetSøknadTest(
     }
 
     @Test
-    @Order(4)
-    fun `Ikke mulig å endre vedtaket etter at det er innvilget`() {
-        with(testApplicationEngine) {
-            forkast(
-                behandlingId = behandlingId,
-                forventetStatusCode = HttpStatusCode.Conflict
-            )
-            innvilgelse(
-                behandlingId = behandlingId,
-                forventetStatusCode = HttpStatusCode.Conflict
-            )
-            avslag(
-                behandlingId = behandlingId,
-                forventetStatusCode = HttpStatusCode.Conflict
-            )
-            aksjonspunkt(
-                behandlingId = behandlingId,
-                requestBody = løseAksjonspunktForLegeerklæringRequest,
-                forventetStatusCode = HttpStatusCode.Conflict
-            )
-        }
-    }
-
-    @Test
     @Order(5)
     fun `Hente behandlingen`() {
         with(testApplicationEngine) {
@@ -135,49 +110,9 @@ internal class NormalflytInngvilgetSøknadTest(
         }
     }
 
-    @Test
-    @Order(6)
-    fun `Hente saken`() {
-        with(testApplicationEngine) {
-            hentSak(
-                saksnummer = saksnummer,
-                forventetResponse = forventetResponseHentVedtak
-            )
-        }
-    }
-
-    @Test
-    @Order(7)
-    fun `Send in søknad med brukt behandlingsId forvent 409`() {
-        @Language("JSON")
-        val request = """
-            {
-                "saksnummer": "123",
-                "behandlingId": "$behandlingId",
-                "mottatt": "2021-02-01T23:59:59.000Z",
-                "søker": {
-                    "identitetsnummer": "456",
-                    "fødselsdato": "1990-01-01"
-                },
-                "barn": {
-                    "identitetsnummer": "456",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                }
-            }
-        """.trimIndent()
-
-        with(testApplicationEngine) {
-            nyttVedtak(
-                requestBody = request,
-                forventetStatusCode = HttpStatusCode.Conflict
-            )
-        }
-    }
-
     private companion object {
-        private const val saksnummer = "123"
-        private const val behandlingId = "456"
+        private val saksnummer = UUID.randomUUID().toString()
+        private val behandlingId = UUID.randomUUID().toString()
 
         @Language("JSON")
         private val løseAksjonspunktForLegeerklæringRequest = """
@@ -195,7 +130,7 @@ internal class NormalflytInngvilgetSøknadTest(
             {
               "vedtak": [{
                   "barn": {
-                    "identitetsnummer": "123",
+                    "identitetsnummer": null,
                     "fødselsdato": "2020-01-01",
                     "harSammeBosted": true
                   },
