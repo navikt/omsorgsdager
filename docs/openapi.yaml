@@ -66,7 +66,7 @@ paths:
         - Henter vedtak om kronisk sykt barn<br/>
         Enten for en behandling id eller aggregert for et saksnummer.</br>
 
-        - For `saksnummer+barn+periode` man kun ha ett vedtak, så vil kun være det siste som blir aggregert på saksnummer.</br>
+        - For `saksnummer+barn+periode` man kun ha ett vedtak, så vil kun være det siste som blir aggregert på saksnummer med status enten `INNVILGET` eller `AVSLÅTT`</br>
 
         - Må sette enten saksnummer eller behandlingId. Ikke begge.<br/>
 
@@ -130,18 +130,23 @@ paths:
         required: true
       responses:
         200:
-          description: Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles i `uløsteAksjonspunkter`
+          description: >
+            - Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles at det/de som ble løst nå er borte fra `uløsteAksjonspunkter`</br>
+
+            - Om `potensielleStatuser` ikke inneholder `INNVILGET` betyr det at vedtaket ikke kan innvilges ettersom en av løsningene på aksjonspuntene indikerer at det må bli `AVASLÅTT` eller `DEAKTIVERT`
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
-          description: Om vedtaket allerede har `status=FASTSATT`
-  /kronisk-sykt-barn/{behandlingId}/fastsett:
+          description: >
+            - Om vedtaket har en annen status enn `FORSLAG`<br/>
+
+  /kronisk-sykt-barn/{behandlingId}/innvilgelse:
     patch:
       tags:
         - Kronisk sykt barn - skriv
-      summary: Fastsette vedtaket
+      summary: Innvilge vedtaket
       parameters:
         - name: behandlingId
           in: path
@@ -152,18 +157,46 @@ paths:
       responses:
         200:
           description: >
-            `status=FASTSATT`
+            `status=INNVILGET`
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
-          description: Om det er uløste aksjonspunkter på vedtaket.
-  /kronisk-sykt-barn/{behandlingId}/deaktiver:
+          description: >
+            - Om det er uløste aksjonspunkt<br/>
+
+            - Om vedtaket før innvilgelse har en annen status enn `FORSLAG`<br/>
+
+            - Om løsningene på et eller fler aksjonspunkt indikerer at vedtaket ikke kan innvilges
+  /kronisk-sykt-barn/{behandlingId}/avslag:
     patch:
       tags:
         - Kronisk sykt barn - skriv
-      summary: Deaktiver vedtaket
+      summary: Avslå vedtaket
+      parameters:
+        - name: behandlingId
+          in: path
+          description: Behandling ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: >
+            `status=AVSLÅTT`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+        409:
+          description: >
+            - Om vedtaket før avslag har en annen status enn `FORSLAG`
+  /kronisk-sykt-barn/{behandlingId}/deaktivering:
+    patch:
+      tags:
+        - Kronisk sykt barn - skriv
+      summary: Deaktivere vedtaket
       parameters:
         - name: behandlingId
           in: path
@@ -179,6 +212,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+        409:
+          description: >
+            - Om vedtaket før deaktivering har en annen status enn `FORSLAG`
 components:
   schemas:
     KroniskSyktBarnSoknadRequest:
@@ -219,6 +255,9 @@ components:
         fødselsdato:
           type: string
           format: date
+        harSammeBosted:
+          type: boolean
+          example: true
     KroniskSyktBarnSoknadResponse:
       type: object
       properties:
@@ -227,7 +266,8 @@ components:
           description: Status på vedtaket
           enum:
             - FORSLAG
-            - FASTSATT
+            - INNVILGET
+            - AVSLÅTT
             - DEAKTIVERT
         potensielleStatuser:
           type: array
@@ -281,7 +321,8 @@ components:
           description: Status på vedtaket
           enum:
             - FORSLAG
-            - FASTSATT
+            - INNVILGET
+            - AVSLÅTT
             - DEAKTIVERT
         uløsteAksjonspunkter:
           type: object

@@ -16,19 +16,23 @@ internal class RevurderingflytTest(
 
     @Test
     @Order(1)
-    fun `Sende inn søknad`() {
+    fun `Opprett nytt vedtak`() {
         @Language("JSON")
         val forventetResponse = """
         {
             "status": "FORSLAG",
-            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
+            "potensielleStatuser": {
+              "INNVILGET": {},
+              "DEAKTIVERT": {}, 
+              "AVSLÅTT": {}
+            }, 
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nySøknad(
+            nyttVedtak(
                 requestBody = request(behandlingId = behandlingId1),
                 forventetResponse = forventetResponse
             )
@@ -37,19 +41,19 @@ internal class RevurderingflytTest(
 
     @Test
     @Order(2)
-    fun `Deaktivere vedtaket`() {
+    fun `Avslå vedtaket`() {
         @Language("JSON")
         val forventetResponse = """
             {
-                "status": "DEAKTIVERT",
-                "potensielleStatuser": [],
+                "status": "AVSLÅTT",
+                "potensielleStatuser": {},
                 "uløsteAksjonspunkter": {
                   "LEGEERKLÆRING": {}
                 }
             }
             """.trimIndent()
         with(testApplicationEngine) {
-            deaktiver(
+            avslag(
                 behandlingId = behandlingId1,
                 forventetResponse = forventetResponse
             )
@@ -58,19 +62,23 @@ internal class RevurderingflytTest(
 
     @Test
     @Order(3)
-    fun `Sender inn søknad på nytt`() {
+    fun `Oppretter vedtaket andre gang`() {
         @Language("JSON")
         val forventetResponse = """
         {
             "status": "FORSLAG",
-            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
+            "potensielleStatuser": {
+              "INNVILGET": {},
+              "DEAKTIVERT": {}, 
+              "AVSLÅTT": {}
+            },
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nySøknad(
+            nyttVedtak(
                 requestBody = request(behandlingId = behandlingId2),
                 forventetResponse = forventetResponse
             )
@@ -82,15 +90,19 @@ internal class RevurderingflytTest(
     fun `Løse aksjonspunkt for legeerklæring`() {
         @Language("JSON")
         val forventetResponse = """
-            {
-                "status": "FORSLAG",
-                "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
-                "uløsteAksjonspunkter": {}
-            }
+        {
+            "status": "FORSLAG",
+            "potensielleStatuser": {
+              "INNVILGET": {},
+              "DEAKTIVERT": {}, 
+              "AVSLÅTT": {}
+            },
+            "uløsteAksjonspunkter": {}
+        }
           """.trimIndent()
 
         with(testApplicationEngine) {
-            aksjonspunkter(
+            aksjonspunkt(
                 behandlingId = behandlingId2,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
@@ -103,17 +115,17 @@ internal class RevurderingflytTest(
 
     @Test
     @Order(5)
-    fun `Fastsetter vedtaket`() {
+    fun `Innvilger vedtaket`() {
         @Language("JSON")
         val forventetResponse = """
             {
-                "status": "FASTSATT",
-                "potensielleStatuser": [],
+                "status": "INNVILGET",
+                "potensielleStatuser": {},
                 "uløsteAksjonspunkter": {}
             }
             """.trimIndent()
         with(testApplicationEngine) {
-            fastsett(
+            innvilgelse(
                 behandlingId = behandlingId2,
                 forventetResponse = forventetResponse
             )
@@ -122,19 +134,23 @@ internal class RevurderingflytTest(
 
     @Test
     @Order(6)
-    fun `Sender inn søknad på nytt med annen mottatt-dato`() {
+    fun `Oppretter vedtaket en tredje gang, nå med annen mottatt-dato`() {
         @Language("JSON")
         val forventetResponse = """
         {
             "status": "FORSLAG",
-            "potensielleStatuser": ["FASTSATT", "DEAKTIVERT"],
+            "potensielleStatuser": {
+              "INNVILGET": {},
+              "DEAKTIVERT": {}, 
+              "AVSLÅTT": {}
+            },
             "uløsteAksjonspunkter": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nySøknad(
+            nyttVedtak(
                 requestBody = request(
                     mottatt = "2021-03-30T12:00:00.000+02",
                     behandlingId = behandlingId3
@@ -151,13 +167,16 @@ internal class RevurderingflytTest(
         val forventetResponse = """
             {
                 "status": "FORSLAG",
-                "potensielleStatuser": ["DEAKTIVERT"],
+                "potensielleStatuser": {
+                  "DEAKTIVERT": {}, 
+                  "AVSLÅTT": {}
+                },
                 "uløsteAksjonspunkter": {}
             }
           """.trimIndent()
 
         with(testApplicationEngine) {
-            aksjonspunkter(
+            aksjonspunkt(
                 behandlingId = behandlingId3,
                 requestBody = løseAksjonspunktForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
@@ -170,17 +189,17 @@ internal class RevurderingflytTest(
 
     @Test
     @Order(8)
-    fun `Deaktiverer vedtaket på nytt`() {
+    fun `Avslår vedtaket på nytt`() {
         @Language("JSON")
         val forventetResponse = """
             {
-                "status": "DEAKTIVERT",
-                "potensielleStatuser": [],
+                "status": "AVSLÅTT",
+                "potensielleStatuser": {},
                 "uløsteAksjonspunkter": {}
             }
             """.trimIndent()
         with(testApplicationEngine) {
-            deaktiver(
+            avslag(
                 behandlingId = behandlingId3,
                 forventetResponse = forventetResponse
             )
@@ -203,7 +222,7 @@ internal class RevurderingflytTest(
                         "behandlingId": "$behandlingId1",
                         "gyldigFraOgMed": "2021-01-01",
                         "gyldigTilOgMed": "2038-12-31",
-                        "status": "DEAKTIVERT",
+                        "status": "AVSLÅTT",
                         "uløsteAksjonspunkter": {
                             "LEGEERKLÆRING": {}
                         },
@@ -224,7 +243,7 @@ internal class RevurderingflytTest(
                         "behandlingId": "$behandlingId2",
                         "gyldigFraOgMed": "2021-01-01",
                         "gyldigTilOgMed": "2038-12-31",
-                        "status": "FASTSATT",
+                        "status": "INNVILGET",
                         "uløsteAksjonspunkter": {},
                         "løsteAksjonspunkter": {
                             "LEGEERKLÆRING": {
@@ -249,7 +268,7 @@ internal class RevurderingflytTest(
                         "behandlingId": "$behandlingId3",
                         "gyldigFraOgMed": "2021-03-30",
                         "gyldigTilOgMed": "2038-12-31",
-                        "status": "DEAKTIVERT",
+                        "status": "AVSLÅTT",
                         "uløsteAksjonspunkter": {},
                         "løsteAksjonspunkter": {
                             "LEGEERKLÆRING": {
@@ -280,7 +299,7 @@ internal class RevurderingflytTest(
                 "behandlingId": "$behandlingId3",
                 "gyldigFraOgMed": "2021-03-30",
                 "gyldigTilOgMed": "2038-12-31",
-                "status": "DEAKTIVERT",
+                "status": "AVSLÅTT",
                 "uløsteAksjonspunkter": {},
                 "løsteAksjonspunkter": {
                     "LEGEERKLÆRING": {
@@ -297,7 +316,7 @@ internal class RevurderingflytTest(
                 "behandlingId": "$behandlingId2",
                 "gyldigFraOgMed": "2021-01-01",
                 "gyldigTilOgMed": "2021-03-29",
-                "status": "FASTSATT",
+                "status": "INNVILGET",
                 "uløsteAksjonspunkter": {},
                 "løsteAksjonspunkter": {
                     "LEGEERKLÆRING": {

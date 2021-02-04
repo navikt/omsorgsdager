@@ -20,8 +20,9 @@ internal interface Vedtak {
 
     @Suppress("UNCHECKED_CAST")
     companion object {
+        private val ignorerStatuser = setOf(VedtakStatus.FORSLAG, VedtakStatus.DEAKTIVERT)
         internal fun <V: Vedtak> List<V>.gjeldendeVedtak() : List<V> = asSequence()
-            .filterNot { it.status == VedtakStatus.FORSLAG }
+            .filterNot { it.status in ignorerStatuser }
             .sortedByDescending { it.statusSistEndret }
             .groupBy { it.barn }
             .map { it.value.gjeldendeVedtakPerBarn() }

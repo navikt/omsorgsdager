@@ -18,7 +18,7 @@ private fun TestApplicationCall.assertForventetResponse(forventetResponse: Strin
     }
 }
 
-internal fun TestApplicationEngine.nySøknad(
+internal fun TestApplicationEngine.nyttVedtak(
     requestBody: String,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.Created,
     forventetResponse: String? = null) {
@@ -32,7 +32,7 @@ internal fun TestApplicationEngine.nySøknad(
     }
 }
 
-internal fun TestApplicationEngine.aksjonspunkter(
+internal fun TestApplicationEngine.aksjonspunkt(
     behandlingId: BehandlingId,
     requestBody: String,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
@@ -47,11 +47,11 @@ internal fun TestApplicationEngine.aksjonspunkter(
     }
 }
 
-internal fun TestApplicationEngine.fastsett(
+internal fun TestApplicationEngine.innvilgelse(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/fastsett") {
+    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/innvilgelse") {
         addHeader(HttpHeaders.Authorization, authorizationHeader)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
@@ -60,11 +60,24 @@ internal fun TestApplicationEngine.fastsett(
     }
 }
 
-internal fun TestApplicationEngine.deaktiver(
+internal fun TestApplicationEngine.avslag(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/deaktiver") {
+    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/avslag") {
+        addHeader(HttpHeaders.Authorization, authorizationHeader)
+        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+    }.apply {
+        assertEquals(forventetStatusCode, response.status())
+        assertForventetResponse(forventetResponse)
+    }
+}
+
+internal fun TestApplicationEngine.deaktivering(
+    behandlingId: BehandlingId,
+    forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
+    forventetResponse: String? = null) {
+    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/deaktivering") {
         addHeader(HttpHeaders.Authorization, authorizationHeader)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {

@@ -10,7 +10,7 @@ import io.ktor.util.pipeline.*
 import no.nav.omsorgsdager.SerDes.map
 import no.nav.omsorgsdager.SerDes.objectNode
 import no.nav.omsorgsdager.aksjonspunkt.UløstAksjonspunkt
-import no.nav.omsorgsdager.aksjonspunkt.kanFastsettes
+import no.nav.omsorgsdager.aksjonspunkt.kanInnvilges
 import no.nav.omsorgsdager.behandlingId
 import no.nav.omsorgsdager.kronisksyktbarn.dto.*
 import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSyktBarn
@@ -104,7 +104,7 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
         }
 
-        patch("/{behandlingId}/fastsett") {
+        patch("/{behandlingId}/innvilgelse") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
@@ -119,30 +119,28 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.Conflict)
                 return@patch
             }
-            if (!vedtakOgAksjonspunkter.second.løsteAksjonspunkter.kanFastsettes()) {
+            if (!vedtakOgAksjonspunkter.second.løsteAksjonspunkter.kanInnvilges()) {
                 call.respond(HttpStatusCode.Conflict)
                 return@patch
             }
 
-            // TODO: Løst alt men ikke kan fastsettes...
-
-            tilgangsstyring.verifiserTilgang(call, Operasjoner.FastsetteKroniskSyktBarn.copy(
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.InnvilgeKroniskSyktBarn.copy(
                 identitetsnummer = vedtakOgAksjonspunkter.first.involverteIdentitetsnummer
             ))
 
-            val (fastsattVedtak, fastsattAksjonspunkter) = kroniskSyktBarnRepository.fastsett(
+            val (innvilgetVedtak, innvilgetAksjonspunkter) = kroniskSyktBarnRepository.innvilg(
                 behandlingId = behandlingId
             )
 
             // TODO: Oppdater db & send till k9-vaktmester
 
             call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
-                vedtak = fastsattVedtak,
-                aksjonspunkter = fastsattAksjonspunkter
+                vedtak = innvilgetVedtak,
+                aksjonspunkter = innvilgetAksjonspunkter
             ))
         }
 
-        patch("/{behandlingId}/deaktiver") {
+        patch("/{behandlingId}/deaktivering") {
             val behandlingId = call.behandlingId()
             val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
             if (vedtakOgAksjonspunkter == null) {
@@ -159,6 +157,32 @@ internal fun Route.KroniskSyktBarnRoute(
             ))
 
             val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.deaktiver(
+                behandlingId = behandlingId
+            )
+
+            call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
+                vedtak = vedtak,
+                aksjonspunkter = aksjonspunkter
+            ))
+        }
+
+        patch("/{behandlingId}/avslag") {
+            val behandlingId = call.behandlingId()
+            val vedtakOgAksjonspunkter = kroniskSyktBarnRepository.hent(behandlingId = behandlingId)
+            if (vedtakOgAksjonspunkter == null) {
+                call.respond(HttpStatusCode.NotFound)
+                return@patch
+            }
+            if (vedtakOgAksjonspunkter.first.status != VedtakStatus.FORSLAG) {
+                call.respond(HttpStatusCode.Conflict)
+                return@patch
+            }
+
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.AvslåKroniskSyktBarn.copy(
+                identitetsnummer = vedtakOgAksjonspunkter.first.involverteIdentitetsnummer
+            ))
+
+            val (vedtak, aksjonspunkter) = kroniskSyktBarnRepository.avslå(
                 behandlingId = behandlingId
             )
 
@@ -226,9 +250,15 @@ private object Operasjoner {
         identitetsnummer = setOf()
     )
 
-    val FastsetteKroniskSyktBarn = Operasjon(
+    val InnvilgeKroniskSyktBarn = Operasjon(
         type = Operasjon.Type.Endring,
-        beskrivelse = "Fastsette vedtak for kronisk sykt barn",
+        beskrivelse = "Innvilge vedtak for kronisk sykt barn",
+        identitetsnummer = setOf()
+    )
+
+    val AvslåKroniskSyktBarn = Operasjon(
+        type = Operasjon.Type.Endring,
+        beskrivelse = "Avslå vedtak for kronisk sykt barn",
         identitetsnummer = setOf()
     )
 
