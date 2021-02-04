@@ -44,6 +44,12 @@ internal fun Route.KroniskSyktBarnRoute(
                 )
             ))
 
+            val ekisterendeBehandling = kroniskSyktBarnRepository.hent(behandlingId = grunnlag.behandlingId)
+            if(ekisterendeBehandling != null) {
+                call.respond(HttpStatusCode.Conflict)
+                return@post
+            }
+
             val tilOgMed = minOf(
                 grunnlag.barn.fødselsdato.sisteDagIÅretOm18År(),
                 grunnlag.søker.sisteDagSøkerHarRettTilOmsorgsdager
