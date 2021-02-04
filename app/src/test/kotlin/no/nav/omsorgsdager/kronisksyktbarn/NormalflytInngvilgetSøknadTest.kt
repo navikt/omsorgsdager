@@ -145,6 +145,34 @@ internal class NormalflytInngvilgetSøknadTest(
         }
     }
 
+    @Test
+    @Order(7)
+    fun `Send in søknad med brukt behandlingsId forvent 409`() {
+        @Language("JSON")
+        val request = """
+            {
+                "saksnummer": "123",
+                "behandlingId": "$behandlingId",
+                "mottatt": "2021-02-01T23:59:59.000Z",
+                "søker": {
+                    "identitetsnummer": "456",
+                    "fødselsdato": "1990-01-01"
+                },
+                "barn": {
+                    "identitetsnummer": "456",
+                    "fødselsdato": "2020-01-01"
+                }
+            }
+        """.trimIndent()
+
+        with(testApplicationEngine) {
+            nySøknad(
+                requestBody = request,
+                forventetStatusCode = HttpStatusCode.Conflict
+            )
+        }
+    }
+
     private companion object {
         private const val saksnummer = "123"
         private const val behandlingId = "456"
