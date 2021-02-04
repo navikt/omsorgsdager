@@ -38,6 +38,7 @@ internal class TestApplicationExtension : ParameterResolver {
         private val embeddedPostgres = embeddedPostgress(createTempDirectory("tmp_postgres").toFile())
         private val wireMockServer = WireMockBuilder()
             .withAzureSupport()
+            .withNaisStsSupport()
             .build()
             .stubTilgangApi()
             .stubPdlApi()
