@@ -12,13 +12,15 @@ internal object LøsKroniskSyktBarnAksjonspunkt {
         - Er det en sammenheng mellom barnets kroniske sykdom eller funksjonshemming og søkers risiko for fravær fra arbeid? Ja/nei
      */
     internal data class Legeerklæring(
-        val barnetErKroniskSyktEllerHarEnFunksjonshemning: Boolean,
-        val erSammenhengMedSøkersRisikoForFraværFraArbeid: Boolean,
+        val barnetErKroniskSyktEllerHarEnFunksjonshemning: Boolean?,
+        val erSammenhengMedSøkersRisikoForFraværFraArbeid: Boolean?,
         val vurdering: String
     ) : LøstAksjonpunkt {
         override val navn = "LEGEERKLÆRING"
         override val versjon = "0.0.1"
-        override val kanInnvilges = barnetErKroniskSyktEllerHarEnFunksjonshemning && erSammenhengMedSøkersRisikoForFraværFraArbeid
+        override val kanInnvilges =
+            requireNotNull(barnetErKroniskSyktEllerHarEnFunksjonshemning) { "barnetErKroniskSyktEllerHarEnFunksjonshemning må settes" } &&
+            requireNotNull(erSammenhengMedSøkersRisikoForFraværFraArbeid) { "erSammenhengMedSøkersRisikoForFraværFraArbeid må settes" }
         override val løsning = """
         {
             "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,
