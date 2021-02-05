@@ -10,7 +10,6 @@ import io.ktor.util.pipeline.*
 import no.nav.omsorgsdager.SerDes.map
 import no.nav.omsorgsdager.SerDes.objectNode
 import no.nav.omsorgsdager.behov.UløstBehov
-import no.nav.omsorgsdager.behov.kanInnvilges
 import no.nav.omsorgsdager.behandlingId
 import no.nav.omsorgsdager.kronisksyktbarn.dto.*
 import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSyktBarn
@@ -26,7 +25,9 @@ import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import no.nav.omsorgsdager.vedtak.dto.EndreVedtakStatus.endreVedtakStatusTidspunkt
 import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon
-import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon.potensielleStatuser
+import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon.kanAvslås
+import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon.kanForkastes
+import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon.kanInnvilges
 import no.nav.omsorgsdager.vedtak.harEnEndeligStatus
 
 internal fun Route.KroniskSyktBarnRoute(
@@ -117,7 +118,7 @@ internal fun Route.KroniskSyktBarnRoute(
             when {
                 vedtakOgBehov.first.status == VedtakStatus.INNVILGET ->
                     call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(vedtakOgBehov)).also { return@patch }
-                vedtakOgBehov.potensielleStatuser().contains(VedtakStatus.INNVILGET) -> proceed()
+                vedtakOgBehov.kanInnvilges() -> proceed()
                 else -> call.respond(HttpStatusCode.Conflict).also { return@patch }
             }
 
@@ -149,7 +150,7 @@ internal fun Route.KroniskSyktBarnRoute(
             when {
                 vedtakOgBehov.first.status == VedtakStatus.FORKASTET ->
                     call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(vedtakOgBehov)).also { return@patch }
-                vedtakOgBehov.potensielleStatuser().contains(VedtakStatus.FORKASTET) -> proceed()
+                vedtakOgBehov.kanForkastes() -> proceed()
                 else -> call.respond(HttpStatusCode.Conflict).also { return@patch }
             }
 
@@ -179,7 +180,7 @@ internal fun Route.KroniskSyktBarnRoute(
             when {
                 vedtakOgBehov.first.status == VedtakStatus.AVSLÅTT ->
                     call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(vedtakOgBehov)).also { return@patch }
-                vedtakOgBehov.potensielleStatuser().contains(VedtakStatus.AVSLÅTT) -> proceed()
+                vedtakOgBehov.kanAvslås() -> proceed()
                 else -> call.respond(HttpStatusCode.Conflict).also { return@patch }
             }
 

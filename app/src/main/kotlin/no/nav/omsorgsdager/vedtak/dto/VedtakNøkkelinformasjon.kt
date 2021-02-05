@@ -19,7 +19,7 @@ internal object VedtakNøkkelinformasjon {
         )
     }
 
-    internal fun Pair<Vedtak, Behov>.potensielleStatuser() = when (first.status) {
+    private fun Pair<Vedtak, Behov>.potensielleStatuser() = when (first.status) {
         VedtakStatus.FORESLÅTT -> when {
             second.løsteBehov.kanInnvilges() -> setOf(
                 VedtakStatus.INNVILGET, VedtakStatus.AVSLÅTT, VedtakStatus.FORKASTET
@@ -28,4 +28,10 @@ internal object VedtakNøkkelinformasjon {
         }
         else -> emptySet()
     }
+
+    internal fun Pair<Vedtak, Behov>.kanInnvilges() = potensielleStatuser().contains(VedtakStatus.INNVILGET) && second.uløsteBehov.isEmpty()
+
+    internal fun Pair<Vedtak, Behov>.kanAvslås() = potensielleStatuser().contains(VedtakStatus.AVSLÅTT)
+
+    internal fun Pair<Vedtak, Behov>.kanForkastes() = potensielleStatuser().contains(VedtakStatus.FORKASTET)
 }
