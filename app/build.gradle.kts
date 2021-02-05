@@ -64,7 +64,6 @@ dependencies {
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
     maven {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/navikt/k9-rapid")

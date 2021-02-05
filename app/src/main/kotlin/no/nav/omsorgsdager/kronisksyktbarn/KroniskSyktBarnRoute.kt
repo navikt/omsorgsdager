@@ -10,7 +10,6 @@ import io.ktor.util.pipeline.*
 import no.nav.omsorgsdager.SerDes.map
 import no.nav.omsorgsdager.SerDes.objectNode
 import no.nav.omsorgsdager.behov.UløstBehov
-import no.nav.omsorgsdager.behov.kanInnvilges
 import no.nav.omsorgsdager.behandlingId
 import no.nav.omsorgsdager.kronisksyktbarn.dto.*
 import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSyktBarn
@@ -26,6 +25,9 @@ import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import no.nav.omsorgsdager.vedtak.dto.EndreVedtakStatus.endreVedtakStatusTidspunkt
 import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon
+import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon.kanAvslås
+import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon.kanForkastes
+import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon.kanInnvilges
 import no.nav.omsorgsdager.vedtak.harEnEndeligStatus
 
 internal fun Route.KroniskSyktBarnRoute(
@@ -71,8 +73,7 @@ internal fun Route.KroniskSyktBarnRoute(
             )
 
             call.respond(HttpStatusCode.Created, VedtakNøkkelinformasjon.Response(
-                vedtak = vedtak,
-                behov = behov
+                vedtak to behov
             ))
         }
 
@@ -83,15 +84,14 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.NotFound)
                 return@patch
             }
-            if (vedtakOgBehov.first.status != VedtakStatus.FORESLÅTT) {
+
+            if (vedtakOgBehov.first.harEnEndeligStatus()) {
                 call.respond(HttpStatusCode.Conflict)
                 return@patch
             }
 
             val request = call.objectNode()
             val løsteBehov = request.map<LøsKroniskSyktBarnBehov.Request>()
-
-            // TODO: Hent behandling + identer
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.LøseBehovKroniskSyktBarn.copy(
                 identitetsnummer = vedtakOgBehov.first.involverteIdentitetsnummer
@@ -103,8 +103,7 @@ internal fun Route.KroniskSyktBarnRoute(
             )
 
             call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
-                vedtak = vedtak,
-                behov = behov
+                vedtak to behov
             ))
         }
 
@@ -115,17 +114,12 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.NotFound)
                 return@patch
             }
-            if (vedtakOgBehov.first.status != VedtakStatus.FORESLÅTT) {
-                call.respond(HttpStatusCode.Conflict)
-                return@patch
-            }
-            if (vedtakOgBehov.second.uløsteBehov.isNotEmpty()) {
-                call.respond(HttpStatusCode.Conflict)
-                return@patch
-            }
-            if (!vedtakOgBehov.second.løsteBehov.kanInnvilges()) {
-                call.respond(HttpStatusCode.Conflict)
-                return@patch
+
+            when {
+                vedtakOgBehov.first.status == VedtakStatus.INNVILGET ->
+                    call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(vedtakOgBehov)).also { return@patch }
+                vedtakOgBehov.kanInnvilges() -> proceed()
+                else -> call.respond(HttpStatusCode.Conflict).also { return@patch }
             }
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.InnvilgeKroniskSyktBarn.copy(
@@ -138,11 +132,10 @@ internal fun Route.KroniskSyktBarnRoute(
                 tidspunkt = call.endreVedtakStatusTidspunkt()
             )
 
-            // TODO: Oppdater db & send till k9-vaktmester
+            // TODO: send till k9-vaktmester
 
             call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
-                vedtak = innvilgetVedtak,
-                behov = innvilgetBehov
+                innvilgetVedtak to innvilgetBehov
             ))
         }
 
@@ -153,9 +146,12 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.NotFound)
                 return@patch
             }
-            if (vedtakOgBehov.first.status != VedtakStatus.FORESLÅTT) {
-                call.respond(HttpStatusCode.Conflict)
-                return@patch
+
+            when {
+                vedtakOgBehov.first.status == VedtakStatus.FORKASTET ->
+                    call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(vedtakOgBehov)).also { return@patch }
+                vedtakOgBehov.kanForkastes() -> proceed()
+                else -> call.respond(HttpStatusCode.Conflict).also { return@patch }
             }
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.ForkastKroniskSyktBarn.copy(
@@ -169,8 +165,7 @@ internal fun Route.KroniskSyktBarnRoute(
             )
 
             call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
-                vedtak = vedtak,
-                behov = behov
+                vedtak to behov
             ))
         }
 
@@ -181,9 +176,12 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.NotFound)
                 return@patch
             }
-            if (vedtakOgBehov.first.status != VedtakStatus.FORESLÅTT) {
-                call.respond(HttpStatusCode.Conflict)
-                return@patch
+
+            when {
+                vedtakOgBehov.first.status == VedtakStatus.AVSLÅTT ->
+                    call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(vedtakOgBehov)).also { return@patch }
+                vedtakOgBehov.kanAvslås() -> proceed()
+                else -> call.respond(HttpStatusCode.Conflict).also { return@patch }
             }
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.AvslåKroniskSyktBarn.copy(
@@ -197,8 +195,7 @@ internal fun Route.KroniskSyktBarnRoute(
             )
 
             call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
-                vedtak = vedtak,
-                behov = behov
+                vedtak to behov
             ))
         }
 
