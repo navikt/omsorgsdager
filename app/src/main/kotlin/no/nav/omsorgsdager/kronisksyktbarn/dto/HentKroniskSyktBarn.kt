@@ -3,7 +3,7 @@ package no.nav.omsorgsdager.kronisksyktbarn.dto
 import io.ktor.application.*
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Saksnummer
-import no.nav.omsorgsdager.aksjonspunkt.Aksjonspunkter
+import no.nav.omsorgsdager.behov.Behov
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import java.time.LocalDate
@@ -38,18 +38,18 @@ internal object HentKroniskSyktBarn {
         val gyldigFraOgMed: LocalDate,
         val gyldigTilOgMed: LocalDate,
         val status: VedtakStatus,
-        val uløsteAksjonspunkter: Map<String, Any>,
-        val løsteAksjonspunkter: Map<String, Any>) {
-        internal constructor(vedtak: KroniskSyktBarnVedtak, aksjonspunkter: Aksjonspunkter) : this(
+        val uløsteBehov: Map<String, Any>,
+        val løsteBehov: Map<String, Any>) {
+        internal constructor(vedtak: KroniskSyktBarnVedtak, behov: Behov) : this(
             barn = vedtak.barn,
             behandlingId = vedtak.behandlingId,
             gyldigFraOgMed = vedtak.periode.fom,
             gyldigTilOgMed = vedtak.periode.tom,
             status = vedtak.status,
-            uløsteAksjonspunkter = aksjonspunkter.uløsteAksjonspunkter
+            uløsteBehov = behov.uløsteBehov
                 .associateBy { it.navn }
                 .mapValues { Any() },
-            løsteAksjonspunkter = aksjonspunkter.løsteAksjonspunkter
+            løsteBehov = behov.løsteBehov
                 .associateBy { it.navn }
                 .mapValues { it.value.løsning.map }
         )

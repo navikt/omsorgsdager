@@ -43,7 +43,7 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
-            "uløsteAksjonspunkter": {
+            "uløsteBehov": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
@@ -58,7 +58,7 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
 
     @Test
     @Order(2)
-    fun `Løse aksjonspunkt for legeerklæring`() {
+    fun `Løse behov for legeerklæring`() {
         @Language("JSON")
         val forventetResponse = """
         {
@@ -68,14 +68,14 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
-            "uløsteAksjonspunkter": {}
+            "uløsteBehov": {}
         }
       """.trimIndent()
 
         with(testApplicationEngine) {
-            aksjonspunkt(
+            løs(
                 behandlingId = behandlingId,
-                requestBody = løseAksjonspunktForLegeerklæringRequest,
+                requestBody = løseBehovForLegeerklæringRequest,
                 forventetResponse = forventetResponse
             )
         }
@@ -89,7 +89,7 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
         {
             "status": "INNVILGET",
             "potensielleStatuser": {},
-            "uløsteAksjonspunkter": {}
+            "uløsteBehov": {}
         }
         """.trimIndent()
         with(testApplicationEngine) {
@@ -116,7 +116,7 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
         private val behandlingId = UUID.randomUUID().toString()
 
         @Language("JSON")
-        private val løseAksjonspunktForLegeerklæringRequest = """
+        private val løseBehovForLegeerklæringRequest = """
             {
               "LEGEERKLÆRING": {
                 "vurdering": "foo bar",
@@ -139,8 +139,8 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
                   "status": "INNVILGET",
-                  "uløsteAksjonspunkter": {},
-                  "løsteAksjonspunkter": {
+                  "uløsteBehov": {},
+                  "løsteBehov": {
                     "LEGEERKLÆRING": {
                         "vurdering": "foo bar",
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,

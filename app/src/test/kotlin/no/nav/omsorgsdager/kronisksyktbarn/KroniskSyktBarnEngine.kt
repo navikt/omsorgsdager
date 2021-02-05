@@ -36,12 +36,12 @@ internal fun TestApplicationEngine.nyttVedtak(
     }
 }
 
-internal fun TestApplicationEngine.aksjonspunkt(
+internal fun TestApplicationEngine.løs(
     behandlingId: BehandlingId,
     requestBody: String,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/aksjonspunkt") {
+    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/løst") {
         addHeader(HttpHeaders.Cookie, cookieSaksbehandler)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         setBody(requestBody)

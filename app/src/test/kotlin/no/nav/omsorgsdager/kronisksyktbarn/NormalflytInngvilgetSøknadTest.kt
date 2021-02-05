@@ -44,7 +44,7 @@ internal class NormalflytInngvilgetSøknadTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
-            "uløsteAksjonspunkter": {
+            "uløsteBehov": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
@@ -59,7 +59,7 @@ internal class NormalflytInngvilgetSøknadTest(
 
     @Test
     @Order(2)
-    fun `Løse aksjonspunkt for legeerklæring`() {
+    fun `Løse behov for legeerklæring`() {
         @Language("JSON")
         val forventetResponse = """
         {
@@ -69,14 +69,14 @@ internal class NormalflytInngvilgetSøknadTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
-            "uløsteAksjonspunkter": {}
+            "uløsteBehov": {}
         }
       """.trimIndent()
 
         with(testApplicationEngine) {
-            aksjonspunkt(
+            løs(
                 behandlingId = behandlingId,
-                requestBody = løseAksjonspunktForLegeerklæringRequest,
+                requestBody = løseBehovForLegeerklæringRequest,
                 forventetResponse = forventetResponse
             )
         }
@@ -90,7 +90,7 @@ internal class NormalflytInngvilgetSøknadTest(
         {
             "status": "INNVILGET",
             "potensielleStatuser": {},
-            "uløsteAksjonspunkter": {}
+            "uløsteBehov": {}
         }
         """.trimIndent()
         with(testApplicationEngine) {
@@ -117,9 +117,9 @@ internal class NormalflytInngvilgetSøknadTest(
                 behandlingId = behandlingId,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
-            aksjonspunkt(
+            løs(
                 behandlingId = behandlingId,
-                requestBody = løseAksjonspunktForLegeerklæringRequest,
+                requestBody = løseBehovForLegeerklæringRequest,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
         }
@@ -182,7 +182,7 @@ internal class NormalflytInngvilgetSøknadTest(
         private const val behandlingId = "456"
 
         @Language("JSON")
-        private val løseAksjonspunktForLegeerklæringRequest = """
+        private val løseBehovForLegeerklæringRequest = """
             {
               "LEGEERKLÆRING": {
                 "vurdering": "foo bar",
@@ -205,8 +205,8 @@ internal class NormalflytInngvilgetSøknadTest(
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
                   "status": "INNVILGET",
-                  "uløsteAksjonspunkter": {},
-                  "løsteAksjonspunkter": {
+                  "uløsteBehov": {},
+                  "løsteBehov": {
                     "LEGEERKLÆRING": {
                         "vurdering": "foo bar",
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,

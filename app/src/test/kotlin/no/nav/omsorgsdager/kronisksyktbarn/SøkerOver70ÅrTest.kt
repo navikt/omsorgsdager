@@ -43,7 +43,7 @@ internal class SøkerOver70ÅrTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
-            "uløsteAksjonspunkter": {
+            "uløsteBehov": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
@@ -84,10 +84,10 @@ internal class SøkerOver70ÅrTest(
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2024-12-31",
                   "status": "FORESLÅTT",
-                  "uløsteAksjonspunkter": {
+                  "uløsteBehov": {
                     "LEGEERKLÆRING": {}
                   },
-                  "løsteAksjonspunkter": {}
+                  "løsteBehov": {}
                   }]
             }
         """.trimIndent()
