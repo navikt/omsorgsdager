@@ -28,7 +28,7 @@ internal class SøknadMedFlereBarnTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
-            "uløsteAksjonspunkter": {
+            "uløsteBehov": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
@@ -56,7 +56,7 @@ internal class SøknadMedFlereBarnTest(
               "AVSLÅTT": {},
               "FORKASTET": {}
             },
-            "uløsteAksjonspunkter": {
+            "uløsteBehov": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
@@ -74,7 +74,7 @@ internal class SøknadMedFlereBarnTest(
 
     @Test
     @Order(3)
-    fun `Løse aksjonspunkt for legeerklæring for behandling1 & behandling2`() {
+    fun `Løse behov for legeerklæring for behandling1 & behandling2`() {
         @Language("JSON")
         val forventetResponse = """
             {
@@ -84,22 +84,22 @@ internal class SøknadMedFlereBarnTest(
                   "AVSLÅTT": {},
                   "FORKASTET": {}
                 },
-                "uløsteAksjonspunkter": {}
+                "uløsteBehov": {}
             }
           """.trimIndent()
 
         with(testApplicationEngine) {
-            aksjonspunkt(
+            løs(
                 behandlingId = behandlingId1,
-                requestBody = løseAksjonspunktForLegeerklæringRequest(
+                requestBody = løseBehovForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
                     erSammenhengMedSøkersRisikoForFraværFraArbeid = true
                 ),
                 forventetResponse = forventetResponse
             )
-            aksjonspunkt(
+            løs(
                 behandlingId = behandlingId2,
-                requestBody = løseAksjonspunktForLegeerklæringRequest(
+                requestBody = løseBehovForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
                     erSammenhengMedSøkersRisikoForFraværFraArbeid = true
                 ),
@@ -116,7 +116,7 @@ internal class SøknadMedFlereBarnTest(
             {
                 "status": "INNVILGET",
                 "potensielleStatuser": {},
-                "uløsteAksjonspunkter": {}
+                "uløsteBehov": {}
             }
             """.trimIndent()
         with(testApplicationEngine) {
@@ -148,8 +148,8 @@ internal class SøknadMedFlereBarnTest(
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
                   "status": "INNVILGET",
-                  "uløsteAksjonspunkter": {},
-                  "løsteAksjonspunkter": {
+                  "uløsteBehov": {},
+                  "løsteBehov": {
                     "LEGEERKLÆRING": {
                       "vurdering": "foo bar",
                       "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
@@ -167,8 +167,8 @@ internal class SøknadMedFlereBarnTest(
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
                   "status": "INNVILGET",
-                  "uløsteAksjonspunkter": {},
-                  "løsteAksjonspunkter": {
+                  "uløsteBehov": {},
+                  "løsteBehov": {
                     "LEGEERKLÆRING": {
                       "vurdering": "foo bar",
                       "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
@@ -216,7 +216,7 @@ internal class SøknadMedFlereBarnTest(
         """.trimIndent()
 
         @Language("JSON")
-        private fun løseAksjonspunktForLegeerklæringRequest(
+        private fun løseBehovForLegeerklæringRequest(
             barnetErKroniskSyktEllerHarEnFunksjonshemning: Boolean,
             erSammenhengMedSøkersRisikoForFraværFraArbeid: Boolean
         ) = """

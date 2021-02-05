@@ -27,7 +27,7 @@ internal class RevurderingflytTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             }, 
-            "uløsteAksjonspunkter": {
+            "uløsteBehov": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
@@ -48,7 +48,7 @@ internal class RevurderingflytTest(
             {
                 "status": "AVSLÅTT",
                 "potensielleStatuser": {},
-                "uløsteAksjonspunkter": {
+                "uløsteBehov": {
                   "LEGEERKLÆRING": {}
                 }
             }
@@ -73,7 +73,7 @@ internal class RevurderingflytTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
-            "uløsteAksjonspunkter": {
+            "uløsteBehov": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
@@ -88,7 +88,7 @@ internal class RevurderingflytTest(
 
     @Test
     @Order(4)
-    fun `Løse aksjonspunkt for legeerklæring`() {
+    fun `Løse behov for legeerklæring`() {
         @Language("JSON")
         val forventetResponse = """
         {
@@ -98,14 +98,14 @@ internal class RevurderingflytTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
-            "uløsteAksjonspunkter": {}
+            "uløsteBehov": {}
         }
           """.trimIndent()
 
         with(testApplicationEngine) {
-            aksjonspunkt(
+            løs(
                 behandlingId = behandlingId2,
-                requestBody = løseAksjonspunktForLegeerklæringRequest(
+                requestBody = løseBehovForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
                     erSammenhengMedSøkersRisikoForFraværFraArbeid = true
                 ),
@@ -122,7 +122,7 @@ internal class RevurderingflytTest(
             {
                 "status": "INNVILGET",
                 "potensielleStatuser": {},
-                "uløsteAksjonspunkter": {}
+                "uløsteBehov": {}
             }
             """.trimIndent()
         with(testApplicationEngine) {
@@ -145,7 +145,7 @@ internal class RevurderingflytTest(
               "FORKASTET": {}, 
               "AVSLÅTT": {}
             },
-            "uløsteAksjonspunkter": {
+            "uløsteBehov": {
                 "LEGEERKLÆRING": {}
             }
         }""".trimIndent()
@@ -163,7 +163,7 @@ internal class RevurderingflytTest(
 
     @Test
     @Order(7)
-    fun `Løse aksjonspunkt for legeerklæring på nytt`() {
+    fun `Løse behov for legeerklæring på nytt`() {
         @Language("JSON")
         val forventetResponse = """
             {
@@ -172,14 +172,14 @@ internal class RevurderingflytTest(
                   "FORKASTET": {}, 
                   "AVSLÅTT": {}
                 },
-                "uløsteAksjonspunkter": {}
+                "uløsteBehov": {}
             }
           """.trimIndent()
 
         with(testApplicationEngine) {
-            aksjonspunkt(
+            løs(
                 behandlingId = behandlingId3,
-                requestBody = løseAksjonspunktForLegeerklæringRequest(
+                requestBody = løseBehovForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
                     erSammenhengMedSøkersRisikoForFraværFraArbeid = false
                 ),
@@ -196,7 +196,7 @@ internal class RevurderingflytTest(
             {
                 "status": "AVSLÅTT",
                 "potensielleStatuser": {},
-                "uløsteAksjonspunkter": {}
+                "uløsteBehov": {}
             }
             """.trimIndent()
         with(testApplicationEngine) {
@@ -225,10 +225,10 @@ internal class RevurderingflytTest(
                         "gyldigFraOgMed": "2021-01-01",
                         "gyldigTilOgMed": "2038-12-31",
                         "status": "AVSLÅTT",
-                        "uløsteAksjonspunkter": {
+                        "uløsteBehov": {
                             "LEGEERKLÆRING": {}
                         },
-                        "løsteAksjonspunkter": {}
+                        "løsteBehov": {}
                     }]
                 }
                 """.trimIndent()
@@ -247,8 +247,8 @@ internal class RevurderingflytTest(
                         "gyldigFraOgMed": "2021-01-01",
                         "gyldigTilOgMed": "2038-12-31",
                         "status": "INNVILGET",
-                        "uløsteAksjonspunkter": {},
-                        "løsteAksjonspunkter": {
+                        "uløsteBehov": {},
+                        "løsteBehov": {
                             "LEGEERKLÆRING": {
                                 "vurdering": "foo bar",
                                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
@@ -273,8 +273,8 @@ internal class RevurderingflytTest(
                         "gyldigFraOgMed": "2021-03-30",
                         "gyldigTilOgMed": "2038-12-31",
                         "status": "AVSLÅTT",
-                        "uløsteAksjonspunkter": {},
-                        "løsteAksjonspunkter": {
+                        "uløsteBehov": {},
+                        "løsteBehov": {
                             "LEGEERKLÆRING": {
                                 "vurdering": "foo bar",
                                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
@@ -305,8 +305,8 @@ internal class RevurderingflytTest(
                 "gyldigFraOgMed": "2021-03-30",
                 "gyldigTilOgMed": "2038-12-31",
                 "status": "AVSLÅTT",
-                "uløsteAksjonspunkter": {},
-                "løsteAksjonspunkter": {
+                "uløsteBehov": {},
+                "løsteBehov": {
                     "LEGEERKLÆRING": {
                         "vurdering": "foo bar",
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
@@ -323,8 +323,8 @@ internal class RevurderingflytTest(
                 "gyldigFraOgMed": "2021-01-01",
                 "gyldigTilOgMed": "2021-03-29",
                 "status": "INNVILGET",
-                "uløsteAksjonspunkter": {},
-                "løsteAksjonspunkter": {
+                "uløsteBehov": {},
+                "løsteBehov": {
                     "LEGEERKLÆRING": {
                         "vurdering": "foo bar",
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
@@ -370,7 +370,7 @@ internal class RevurderingflytTest(
         """.trimIndent()
 
         @Language("JSON")
-        private fun løseAksjonspunktForLegeerklæringRequest(
+        private fun løseBehovForLegeerklæringRequest(
             barnetErKroniskSyktEllerHarEnFunksjonshemning: Boolean,
             erSammenhengMedSøkersRisikoForFraværFraArbeid: Boolean
         ) = """

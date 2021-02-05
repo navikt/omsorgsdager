@@ -52,7 +52,7 @@ paths:
         201:
           description: >
             - Opprettet et vedtak. Ved opprettelse vil det alltid ha `status=FORESLÅTT`
-            ettersom det minst vil være ett aksjonspunkt i `uløsteAksjonspunkter`
+            ettersom det minst vil være ett behov i `uløsteBehov`
 
             - `potensielleStatuser` inneholder liste om potensielle statuser vedtaket kan havne i.
           content:
@@ -108,7 +108,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HentGjeldendeKroniskSyktBarnResponse'
-  /kronisk-sykt-barn/{behandlingId}/aksjonspunkt:
+  /kronisk-sykt-barn/{behandlingId}/løst:
     patch:
       tags:
         - Kronisk sykt barn - skriv
@@ -119,21 +119,21 @@ paths:
           required: true
           schema:
             type: string
-      summary: Legge til eller oppdatere aksjonspunkt
+      summary: Legge til eller oppdatere behov
       requestBody:
         description: >
-          - Legge til/oppdatere løsning på aksjonspunkt. Kan sende med på ett eller flere aksjonspunkt samtidig.<br/>
+          - Legge til/oppdatere løsning på behov. Kan sende med på ett eller flere behov samtidig.<br/>
 
-          - For de aksjonspunktene som inneholder informasjon overskrives eventuell tidligere vurderinger gjort på aksjonspunktet.
+          - For de behovene som inneholder informasjon overskrives eventuell tidligere vurderinger gjort på behovet.
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AksjonspunktRequest'
+              $ref: '#/components/schemas/BehovRequest'
         required: true
       responses:
         200:
           description: >
-            - Oppdatert vedtak etter at aksjonspunkt er løst, som gjenspeiles at det/de som ble løst nå er borte fra `uløsteAksjonspunkter`</br>
+            - Oppdatert vedtak etter at behov er løst, som gjenspeiles at det/de som ble løst nå er borte fra `uløsteBehov`</br>
 
             - Om `potensielleStatuser` ikke inneholder `INNVILGET` betyr det at vedtaket ikke kan innvilges ettersom en av løsningene på aksjonspuntene indikerer at det må bli `AVSLÅTT` eller `FORKASTET`
           content:
@@ -173,11 +173,11 @@ paths:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
           description: >
-            - Om det er uløste aksjonspunkt<br/>
+            - Om det er uløste behov<br/>
 
             - Om vedtaket før innvilgelse har en annen status enn `FORESLÅTT`<br/>
 
-            - Om løsningene på et eller fler aksjonspunkt indikerer at vedtaket ikke kan innvilges
+            - Om løsningene på et eller fler behov indikerer at vedtaket ikke kan innvilges
   /kronisk-sykt-barn/{behandlingId}/avslått:
     patch:
       tags:
@@ -307,7 +307,7 @@ components:
             FORKASTET:
               type: object
               properties: {}
-        uløsteAksjonspunkter:
+        uløsteBehov:
           type: object
           properties:
             LEGEERKLÆRING:
@@ -316,7 +316,7 @@ components:
             OMSORGEN_FOR:
               type: object
               properties: {}
-    AksjonspunktRequest:
+    BehovRequest:
       type: object
       properties:
         LEGEERKLÆRING:
@@ -357,13 +357,13 @@ components:
             - INNVILGET
             - AVSLÅTT
             - FORKASTET
-        uløsteAksjonspunkter:
+        uløsteBehov:
           type: object
           properties:
             OMSORGEN_FOR:
               type: object
               properties: {}
-        løsteAksjonspunkter:
+        løsteBehov:
           type: object
           properties:
             LEGEERKLÆRING:
