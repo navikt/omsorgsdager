@@ -26,7 +26,7 @@ import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import no.nav.omsorgsdager.vedtak.dto.EndreVedtakStatus.endreVedtakStatusTidspunkt
 import no.nav.omsorgsdager.vedtak.dto.VedtakNøkkelinformasjon
-import java.time.ZonedDateTime
+import no.nav.omsorgsdager.vedtak.harEnEndeligStatus
 
 internal fun Route.KroniskSyktBarnRoute(
     tilgangsstyring: Tilgangsstyring,
@@ -38,15 +38,12 @@ internal fun Route.KroniskSyktBarnRoute(
             val request = call.objectNode()
             val grunnlag = OpprettKroniskSyktBarn.Grunnlag(request)
 
-            tilgangsstyring.verifiserTilgang(call, Operasjoner.NyBehandlingKroniskSyktBarn.copy(
-                identitetsnummer = setOf(
-                    grunnlag.søker.identitetsnummer,
-                    grunnlag.barn.identitetsnummer
-                ).filterNotNull().toSet()
+            tilgangsstyring.verifiserTilgang(call, Operasjoner.NyttVedtakKroniskSyktBarn.copy(
+                identitetsnummer = grunnlag.involverteIdentitetsnummer
             ))
 
-            val ekisterendeBehandling = kroniskSyktBarnRepository.hent(behandlingId = grunnlag.behandlingId)
-            if (ekisterendeBehandling != null) {
+            val eksisterendeVedtak = kroniskSyktBarnRepository.hent(behandlingId = grunnlag.behandlingId)
+            if (eksisterendeVedtak != null && eksisterendeVedtak.first.harEnEndeligStatus()) {
                 call.respond(HttpStatusCode.Conflict)
                 return@post
             }
@@ -257,9 +254,9 @@ internal fun Route.KroniskSyktBarnRoute(
 }
 
 private object Operasjoner {
-    val NyBehandlingKroniskSyktBarn = Operasjon(
+    val NyttVedtakKroniskSyktBarn = Operasjon(
         type = Operasjon.Type.Endring,
-        beskrivelse = "Registrere ny behandling på søknad om kronisk sykt barn",
+        beskrivelse = "Registrere nytt vedtak for kronisk sykt barn",
         identitetsnummer = setOf()
     )
 
