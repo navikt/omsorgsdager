@@ -83,6 +83,7 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.NotFound)
                 return@patch
             }
+
             if (vedtakOgBehov.first.status != VedtakStatus.FORESLÅTT) {
                 call.respond(HttpStatusCode.Conflict)
                 return@patch
@@ -90,8 +91,6 @@ internal fun Route.KroniskSyktBarnRoute(
 
             val request = call.objectNode()
             val løsteBehov = request.map<LøsKroniskSyktBarnBehov.Request>()
-
-            // TODO: Hent behandling + identer
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.LøseBehovKroniskSyktBarn.copy(
                 identitetsnummer = vedtakOgBehov.first.involverteIdentitetsnummer
@@ -115,15 +114,15 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.NotFound)
                 return@patch
             }
-            if (vedtakOgBehov.first.status != VedtakStatus.FORESLÅTT) {
-                call.respond(HttpStatusCode.Conflict)
-                return@patch
+
+            when(vedtakOgBehov.first.status) {
+                VedtakStatus.FORESLÅTT -> proceed()
+                VedtakStatus.INNVILGET -> call.respond(HttpStatusCode.OK).also { return@patch }
+                else -> call.respond(HttpStatusCode.Conflict).also { return@patch }
             }
-            if (vedtakOgBehov.second.uløsteBehov.isNotEmpty()) {
-                call.respond(HttpStatusCode.Conflict)
-                return@patch
-            }
-            if (!vedtakOgBehov.second.løsteBehov.kanInnvilges()) {
+
+            if (vedtakOgBehov.second.uløsteBehov.isNotEmpty() ||
+                !vedtakOgBehov.second.løsteBehov.kanInnvilges()) {
                 call.respond(HttpStatusCode.Conflict)
                 return@patch
             }
@@ -138,7 +137,7 @@ internal fun Route.KroniskSyktBarnRoute(
                 tidspunkt = call.endreVedtakStatusTidspunkt()
             )
 
-            // TODO: Oppdater db & send till k9-vaktmester
+            // TODO: send till k9-vaktmester
 
             call.respond(HttpStatusCode.OK, VedtakNøkkelinformasjon.Response(
                 vedtak = innvilgetVedtak,
@@ -153,9 +152,11 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.NotFound)
                 return@patch
             }
-            if (vedtakOgBehov.first.status != VedtakStatus.FORESLÅTT) {
-                call.respond(HttpStatusCode.Conflict)
-                return@patch
+
+            when(vedtakOgBehov.first.status) {
+                VedtakStatus.FORESLÅTT -> proceed()
+                VedtakStatus.FORKASTET -> call.respond(HttpStatusCode.OK).also { return@patch }
+                else -> call.respond(HttpStatusCode.Conflict).also { return@patch }
             }
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.ForkastKroniskSyktBarn.copy(
@@ -181,9 +182,11 @@ internal fun Route.KroniskSyktBarnRoute(
                 call.respond(HttpStatusCode.NotFound)
                 return@patch
             }
-            if (vedtakOgBehov.first.status != VedtakStatus.FORESLÅTT) {
-                call.respond(HttpStatusCode.Conflict)
-                return@patch
+
+            when(vedtakOgBehov.first.status) {
+                VedtakStatus.FORESLÅTT -> proceed()
+                VedtakStatus.AVSLÅTT -> call.respond(HttpStatusCode.OK).also { return@patch }
+                else -> call.respond(HttpStatusCode.Conflict).also { return@patch }
             }
 
             tilgangsstyring.verifiserTilgang(call, Operasjoner.AvslåKroniskSyktBarn.copy(

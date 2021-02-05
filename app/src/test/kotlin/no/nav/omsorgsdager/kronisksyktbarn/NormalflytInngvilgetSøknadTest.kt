@@ -111,7 +111,7 @@ internal class NormalflytInngvilgetSøknadTest(
             )
             innvilgelse(
                 behandlingId = behandlingId,
-                forventetStatusCode = HttpStatusCode.Conflict
+                forventetStatusCode = HttpStatusCode.OK
             )
             avslag(
                 behandlingId = behandlingId,
