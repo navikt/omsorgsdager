@@ -13,6 +13,7 @@ internal object OpprettKroniskSyktBarn {
         val søknadMottatt: ZonedDateTime,
         val søker: Søker,
         val barn: Barn) {
+        internal val involverteIdentitetsnummer = setOf(søker.identitetsnummer, barn.identitetsnummer).filterNotNull().toSet()
         internal constructor(node: ObjectNode) : this(
             saksnummer = node["saksnummer"].asText(),
             behandlingId = node["behandlingId"].asText(),
