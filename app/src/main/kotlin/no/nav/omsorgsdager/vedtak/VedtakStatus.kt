@@ -6,3 +6,5 @@ internal enum class VedtakStatus {
     AVSLÅTT,
     FORKASTET
 }
+
+internal fun Vedtak.harEnEndeligStatus() = status != VedtakStatus.FORESLÅTT

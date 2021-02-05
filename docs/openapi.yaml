@@ -41,7 +41,11 @@ paths:
         - Kronisk sykt barn - skriv
       summary: Registrere ny vedtak for kronisk sykt barn
       description: >
-        - `identitetsnummer` på barn er optional.
+        - `identitetsnummer` på barn er optional.</br>
+
+        - Om det allerede finnes et vedtak på samme `behandlingId` som fortsatt har status `FORESLÅTT`
+        vil det nye grunlaget erstatte det som lå der. Om den eksisterende har en annen status enn `FORESLÅTT`
+        vil det feile med HTTP 409.
       requestBody:
         content:
           application/json:
@@ -60,7 +64,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
         409:
-          description: Om det allerede er sendt inn et vedtak med samme behandlingId
+          description: Om det allerede er sendt inn et vedtak med samme behandlingId som har status != `FORESLÅTT`
     get:
       tags:
         - Kronisk sykt barn - les
