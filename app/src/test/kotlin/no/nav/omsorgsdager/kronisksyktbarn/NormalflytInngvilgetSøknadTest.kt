@@ -104,6 +104,14 @@ internal class NormalflytInngvilgetSøknadTest(
     @Test
     @Order(4)
     fun `Ikke mulig å endre vedtaket etter at det er innvilget`() {
+        @Language("JSON")
+        val forventetResponse = """
+        {
+            "status": "INNVILGET",
+            "potensielleStatuser": {},
+            "uløsteBehov": {}
+        }
+        """.trimIndent()
         with(testApplicationEngine) {
             forkast(
                 behandlingId = behandlingId,
@@ -111,7 +119,8 @@ internal class NormalflytInngvilgetSøknadTest(
             )
             innvilgelse(
                 behandlingId = behandlingId,
-                forventetStatusCode = HttpStatusCode.OK
+                forventetStatusCode = HttpStatusCode.OK,
+                forventetResponse = forventetResponse
             )
             avslag(
                 behandlingId = behandlingId,
