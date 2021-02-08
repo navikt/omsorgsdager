@@ -39,7 +39,6 @@ internal class MockedEnvironment(
         .stubAccessTokens()
         .stubTilgangApi()
         .stubPdlApi()
-    val a = WireMockServer.dyn
 
     internal val applicationContext = ApplicationContext.Builder(
         env = mapOf(
