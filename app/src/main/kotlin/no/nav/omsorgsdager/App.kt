@@ -78,6 +78,8 @@ internal fun Application.app(
         )
     }
 
+    applicationContext.configure(this)
+
     HealthReporter(
         app = "omsorgsdager",
         healthService = applicationContext.healthService
@@ -106,6 +108,5 @@ internal fun Application.app(
             }
         }
     }
-
 }
 

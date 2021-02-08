@@ -3,6 +3,7 @@ package no.nav.omsorgsdager
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.ktor.application.*
 import io.ktor.client.*
 import io.ktor.client.features.json.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
@@ -32,7 +33,8 @@ internal class ApplicationContext(
     internal val tokenResolver: TokenResolver,
     internal val tilgangsstyring: Tilgangsstyring,
     internal val kafkaProducer: KafkaProducer<String, String>,
-    internal val kroniskSyktBarnRepository: KroniskSyktBarnRepository) {
+    internal val kroniskSyktBarnRepository: KroniskSyktBarnRepository,
+    internal val configure: (application: Application) -> Unit) {
 
     internal fun start() {
         dataSource.migrate()
@@ -50,7 +52,8 @@ internal class ApplicationContext(
         var tokenResolver: TokenResolver? = null,
         var tilgangsstyring: Tilgangsstyring? = null,
         var kafkaProducer: KafkaProducer<String, String>? = null,
-        var kroniskSyktBarnRepository: KroniskSyktBarnRepository? = null) {
+        var kroniskSyktBarnRepository: KroniskSyktBarnRepository? = null,
+        var configure: (application: Application) -> Unit = {}) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
             val benyttetHttpClient = httpClient ?: HttpClient {
@@ -99,7 +102,8 @@ internal class ApplicationContext(
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
                 tokenResolver = benyttetTokenResolver,
                 tilgangsstyring = benyttetTilgangsstyring,
-                kroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryKroniskSyktBarnRespository()
+                kroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryKroniskSyktBarnRespository(),
+                configure = configure
             )
         }
 
