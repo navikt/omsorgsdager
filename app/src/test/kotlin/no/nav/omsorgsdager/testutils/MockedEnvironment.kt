@@ -1,7 +1,9 @@
 package no.nav.omsorgsdager.testutils
 
+import com.github.tomakehurst.wiremock.WireMockServer
+import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.response.*
 import io.ktor.server.engine.*
 import io.mockk.mockk
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
@@ -13,14 +15,13 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsJwksUrl
 import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.app
-import no.nav.omsorgsdager.testutils.wiremock.pdlApiBaseUrl
-import no.nav.omsorgsdager.testutils.wiremock.stubPdlApi
-import no.nav.omsorgsdager.testutils.wiremock.stubTilgangApi
-import no.nav.omsorgsdager.testutils.wiremock.tilgangApiBaseUrl
+import no.nav.omsorgsdager.testutils.wiremock.*
 import java.io.File
 import java.nio.file.Files
 
-internal class MockedEnvironment(applicationPort: Int = 8080) {
+internal class MockedEnvironment(
+    applicationPort: Int = 8080,
+    wireMockPort: Int? = null) {
     private fun embeddedPostgress(tempDir: File) = EmbeddedPostgres.builder()
         .setOverrideWorkingDirectory(tempDir)
         .setDataDirectory(tempDir.resolve("datadir"))
@@ -30,9 +31,15 @@ internal class MockedEnvironment(applicationPort: Int = 8080) {
     private val wireMockServer = WireMockBuilder()
         .withAzureSupport()
         .withNaisStsSupport()
+        .let { when (wireMockPort) {
+            null -> it
+            else -> it.withPort(wireMockPort)
+        }}
         .build()
+        .stubAccessTokens()
         .stubTilgangApi()
         .stubPdlApi()
+    val a = WireMockServer.dyn
 
     internal val applicationContext = ApplicationContext.Builder(
         env = mapOf(
@@ -56,8 +63,16 @@ internal class MockedEnvironment(applicationPort: Int = 8080) {
             "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak"
         ),
         kafkaProducer = mockk(),
-        apiResponseFilter = { call ->
-            call.response.header(HttpHeaders.AccessControlAllowOrigin, "*")
+        configure = { application ->
+            application.install(CORS) {
+                method(HttpMethod.Options)
+                method(HttpMethod.Get)
+                method(HttpMethod.Post)
+                method(HttpMethod.Patch)
+                allowNonSimpleContentTypes = true
+                header(HttpHeaders.Authorization)
+                anyHost()
+            }
         }
     ).build()
 

@@ -12,7 +12,7 @@ internal class DevApp(applicationContext: ApplicationContext) {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            val mockedEnvironment = MockedEnvironment(applicationPort = 8081).start()
+            val mockedEnvironment = MockedEnvironment(applicationPort = 8081, wireMockPort = 8082).start()
             val devApp = DevApp(mockedEnvironment.applicationContext)
 
             Runtime.getRuntime().addShutdownHook(object : Thread() {

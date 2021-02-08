@@ -34,7 +34,7 @@ internal class ApplicationContext(
     internal val tilgangsstyring: Tilgangsstyring,
     internal val kafkaProducer: KafkaProducer<String, String>,
     internal val kroniskSyktBarnRepository: KroniskSyktBarnRepository,
-    internal val apiResponseFilter: (call: ApplicationCall) -> Unit) {
+    internal val configure: (application: Application) -> Unit) {
 
     internal fun start() {
         dataSource.migrate()
@@ -53,7 +53,7 @@ internal class ApplicationContext(
         var tilgangsstyring: Tilgangsstyring? = null,
         var kafkaProducer: KafkaProducer<String, String>? = null,
         var kroniskSyktBarnRepository: KroniskSyktBarnRepository? = null,
-        var apiResponseFilter: (call: ApplicationCall) -> Unit = {}) {
+        var configure: (application: Application) -> Unit = {}) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
             val benyttetHttpClient = httpClient ?: HttpClient {
@@ -103,7 +103,7 @@ internal class ApplicationContext(
                 tokenResolver = benyttetTokenResolver,
                 tilgangsstyring = benyttetTilgangsstyring,
                 kroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryKroniskSyktBarnRespository(),
-                apiResponseFilter = apiResponseFilter
+                configure = configure
             )
         }
 

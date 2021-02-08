@@ -6,10 +6,8 @@ import io.ktor.features.*
 import io.ktor.http.auth.*
 import io.ktor.jackson.*
 import io.ktor.request.*
-import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
-import io.ktor.util.pipeline.*
 import no.nav.helse.dusseldorf.ktor.auth.AuthStatusPages
 import no.nav.helse.dusseldorf.ktor.auth.Issuer
 import no.nav.helse.dusseldorf.ktor.auth.allIssuers
@@ -80,10 +78,7 @@ internal fun Application.app(
         )
     }
 
-    intercept(ApplicationCallPipeline.Features) {
-        if (call.request.path().startsWith("/api")) { applicationContext.apiResponseFilter(call) }
-        proceed()
-    }
+    applicationContext.configure(this)
 
     HealthReporter(
         app = "omsorgsdager",
