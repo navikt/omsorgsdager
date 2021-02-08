@@ -32,7 +32,7 @@ internal fun Route.KroniskSyktBarnRoute(
     tilgangsstyring: Tilgangsstyring,
     kroniskSyktBarnRepository: KroniskSyktBarnRepository) {
 
-    route("/kroniskt-sykt-barn") {
+    route("/kronisk-sykt-barn") {
 
         post {
             val request = call.objectNode()

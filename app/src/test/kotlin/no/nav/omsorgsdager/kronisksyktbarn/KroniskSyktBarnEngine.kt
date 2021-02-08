@@ -26,7 +26,7 @@ internal fun TestApplicationEngine.nyttVedtak(
     requestBody: String,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.Created,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Post, "/api/kroniskt-sykt-barn") {
+    handleRequest(HttpMethod.Post, "/api/kronisk-sykt-barn") {
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         setBody(requestBody)
@@ -41,7 +41,7 @@ internal fun TestApplicationEngine.løs(
     requestBody: String,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/løst") {
+    handleRequest(HttpMethod.Patch, "/api/kronisk-sykt-barn/$behandlingId/løst") {
         addHeader(HttpHeaders.Cookie, cookieSaksbehandler)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         setBody(requestBody)
@@ -55,7 +55,7 @@ internal fun TestApplicationEngine.innvilgelse(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/innvilget") {
+    handleRequest(HttpMethod.Patch, "/api/kronisk-sykt-barn/$behandlingId/innvilget") {
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
     }.apply {
         assertEquals(forventetStatusCode, response.status())
@@ -67,7 +67,7 @@ internal fun TestApplicationEngine.avslag(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/avslått") {
+    handleRequest(HttpMethod.Patch, "/api/kronisk-sykt-barn/$behandlingId/avslått") {
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         setBody("""{"tidspunkt":"${ZonedDateTime.now()}"}""")
@@ -82,7 +82,7 @@ internal fun TestApplicationEngine.forkast(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Patch, "/api/kroniskt-sykt-barn/$behandlingId/forkastet") {
+    handleRequest(HttpMethod.Patch, "/api/kronisk-sykt-barn/$behandlingId/forkastet") {
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
     }.apply {
         assertEquals(forventetStatusCode, response.status())
@@ -94,7 +94,7 @@ internal fun TestApplicationEngine.hentBehandling(
     behandlingId: BehandlingId,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn?behandlingId=$behandlingId") {
+    handleRequest(HttpMethod.Get, "/api/kronisk-sykt-barn?behandlingId=$behandlingId") {
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
@@ -107,7 +107,7 @@ internal fun TestApplicationEngine.hentSak(
     saksnummer: Saksnummer,
     forventetStatusCode: HttpStatusCode = HttpStatusCode.OK,
     forventetResponse: String? = null) {
-    handleRequest(HttpMethod.Get, "/api/kroniskt-sykt-barn?saksnummer=$saksnummer") {
+    handleRequest(HttpMethod.Get, "/api/kronisk-sykt-barn?saksnummer=$saksnummer") {
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {

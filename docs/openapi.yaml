@@ -29,6 +29,7 @@ info:
 servers:
   - url: https://omsorgsdager.dev.intern.nav.no/api
   - url: https://omsorgsdager.intern.nav.no/api
+  - url: http://localhost:8081/api
 tags:
   - name: Kronisk sykt barn - skriv
     description: Skriveoperasjoner for kronisk sykt barn
