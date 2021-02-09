@@ -5,6 +5,8 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.server.engine.*
+import io.mockk.Answer
+import io.mockk.every
 import io.mockk.mockk
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
@@ -16,6 +18,7 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsJwksUrl
 import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.app
 import no.nav.omsorgsdager.testutils.wiremock.*
+import org.apache.kafka.clients.producer.KafkaProducer
 import java.io.File
 import java.nio.file.Files
 
@@ -40,6 +43,10 @@ internal class MockedEnvironment(
         .stubTilgangApi()
         .stubPdlApi()
 
+    private val kafkaProducerMock = mockk<KafkaProducer<String, String>>().also {
+        every { it.close() }.returns(Unit)
+    }
+
     internal val applicationContext = ApplicationContext.Builder(
         env = mapOf(
             "PORT" to "$applicationPort",
@@ -61,7 +68,7 @@ internal class MockedEnvironment(
             "OPEN_AM_JWKS_URI" to (wireMockServer.getNaisStsJwksUrl()),
             "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak"
         ),
-        kafkaProducer = mockk(),
+        kafkaProducer = kafkaProducerMock,
         configure = { application ->
             application.install(CORS) {
                 method(HttpMethod.Options)

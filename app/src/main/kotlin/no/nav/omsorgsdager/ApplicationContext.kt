@@ -40,7 +40,9 @@ internal class ApplicationContext(
         dataSource.migrate()
     }
 
-    internal fun stop() {}
+    internal fun stop() {
+        kafkaProducer.close()
+    }
 
     internal class Builder(
         var env: Environment? = null,

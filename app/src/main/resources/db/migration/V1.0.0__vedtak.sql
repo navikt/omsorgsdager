@@ -1,19 +1,18 @@
--- noinspection SqlNoDataSourceInspectionForFile
-
 CREATE TABLE vedtak
 (
     id                          BIGSERIAL PRIMARY KEY,
-    behandlingId                VARCHAR(50),
-    saksnummer                  VARCHAR(50),
-    mottatt                     TIMESTAMP WITH TIME ZONE NOT NULL,
-    statusSistEndret            TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() at time zone 'utc'),
-    status                      VARCHAR(50),
-    fom                         DATE NOT NULL,
-    tom                         DATE NOT NULL,
-
-    grunnlag                    JSONB NOT NULL,
-
-    legeerklaering              JSONB,
-    medlemskap                  JSONB,
-    yrkesaktivitet              JSONB
+    k9_saksnummer               VARCHAR(50) NOT NULL,
+    k9_behandling_id            VARCHAR(50) NOT NULL,
+    omsorgspenger_saksnummer    VARCHAR(50) NOT NULL,
+    soknad_mottatt              TIMESTAMP WITH TIME ZONE NOT NULL,
+    type                        VARCHAR(50) NOT NULL,
+    status                      VARCHAR(50) NOT NULL,
+    status_sist_endret          TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() at time zone 'utc'),
+    fom                         DATE,
+    tom                         DATE,
+    grunnlag                    JSONB NOT NULL
 );
+
+CREATE INDEX index_vedtak_k9_saksnummer ON vedtak(k9_saksnummer);
+CREATE INDEX index_vedtak_k9_behandling_id ON vedtak(k9_behandling_id);
+CREATE INDEX index_vedtak_omsorgsdager_saksnummer ON vedtak(omsorgspenger_saksnummer);

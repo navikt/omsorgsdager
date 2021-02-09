@@ -85,6 +85,13 @@ internal fun Application.app(
         healthService = applicationContext.healthService
     )
 
+    environment.monitor.subscribe(ApplicationStarted){
+        applicationContext.start()
+    }
+    environment.monitor.subscribe(ApplicationStopped){
+        applicationContext.stop()
+    }
+
     install(CallId) { retrieve { it.correlationId() } }
 
     install(CallLogging) {
