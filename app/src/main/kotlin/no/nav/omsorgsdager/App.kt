@@ -35,11 +35,6 @@ private val appLogger = LoggerFactory.getLogger("no.nav.omsorgsdager.App")
 internal fun Application.app(
     applicationContext: ApplicationContext = ApplicationContext.Builder().build()) {
 
-    /*Flyway.configure()
-        .dataSource(applicationContext.dataSource)
-        .load()
-        .migrate()
-    */
     install(ContentNegotiation) {
         jackson {
             configured()

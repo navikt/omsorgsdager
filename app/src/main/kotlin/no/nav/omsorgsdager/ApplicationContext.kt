@@ -38,7 +38,7 @@ internal class ApplicationContext(
     internal val configure: (application: Application) -> Unit) {
 
     internal fun start() {
-        dataSource.migrate()
+        //dataSource.migrate()
     }
 
     internal fun stop() {
