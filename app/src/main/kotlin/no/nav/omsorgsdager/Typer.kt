@@ -16,6 +16,7 @@ internal fun ApplicationCall.correlationId() = when {
     else -> "omsorgsdager-${UUID.randomUUID()}"
 }
 
+internal typealias VedtakId = Long
 internal typealias Saksnummer = String
 internal fun ApplicationCall.saksnummer() : Saksnummer = parameters.getOrFail("saksnummer")
 internal typealias BehandlingId = String
