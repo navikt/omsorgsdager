@@ -9,13 +9,13 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 
 internal interface Vedtak {
-    val søkersIdentitetsnummer: Identitetsnummer
     val saksnummer: Saksnummer
     val behandlingId: BehandlingId
     val status: VedtakStatus
     val statusSistEndret: ZonedDateTime
-    val barn: Any
     val periode: Periode
+    val etGjeldendeVedtakPer: Any
+    val involverteIdentitetsnummer: Set<Identitetsnummer>
     fun kopiMedNyPeriode(nyPeriode: Periode) : Vedtak
 
     @Suppress("UNCHECKED_CAST")
@@ -24,7 +24,7 @@ internal interface Vedtak {
         internal fun <V: Vedtak> List<V>.gjeldendeVedtak() : List<V> = asSequence()
             .filterNot { it.status in ignorerStatuser }
             .sortedByDescending { it.statusSistEndret }
-            .groupBy { it.barn }
+            .groupBy { it.etGjeldendeVedtakPer }
             .map { it.value.gjeldendeVedtakPerBarn() }
             .flatten()
             .toList()
@@ -43,7 +43,7 @@ internal interface Vedtak {
 
         private fun <V: Vedtak>List<V>.gjeldendeVedtakPerBarn() : List<V> {
             if (isEmpty()) return emptyList()
-            require(all { it.barn == first().barn }) { "Kan kun gjøres for samme barn" }
+            require(all { it.etGjeldendeVedtakPer == first().etGjeldendeVedtakPer }) { "Alle må være for ${first().etGjeldendeVedtakPer}" }
 
             val gjeldendeVedtak = mutableListOf<V>()
 

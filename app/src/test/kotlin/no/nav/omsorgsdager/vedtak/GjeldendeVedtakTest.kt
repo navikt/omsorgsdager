@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager.vedtak
 
 import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
@@ -22,13 +23,13 @@ internal class GjeldendeVedtakTest {
             TestVedtak(
                 status = VedtakStatus.FORESLÅTT,
                 statusSistEndret = nå,
-                barn = "2",
+                barn = 2,
                 periode = Periode("2021-01-01/2021-12-31")
             ),
             TestVedtak(
                 status = VedtakStatus.FORESLÅTT,
                 statusSistEndret = nå,
-                barn = "2",
+                barn = 2,
                 periode = Periode("2021-01-01/2021-12-31")
             ),
         ).gjeldendeVedtak()).isEmpty()
@@ -41,10 +42,10 @@ internal class GjeldendeVedtakTest {
         val vedtakBarn1 = TestVedtak(
             status = VedtakStatus.INNVILGET,
             statusSistEndret = nå,
-            barn = "1",
+            barn = 1,
             periode = periode
         )
-        val vedtakBarn2 = vedtakBarn1.copy(barn = "2")
+        val vedtakBarn2 = vedtakBarn1.copy(barn = 2)
         val vedtak = listOf(vedtakBarn1, vedtakBarn2)
         assertThat(vedtak.gjeldendeVedtak()).hasSameElementsAs(vedtak)
 
@@ -57,7 +58,7 @@ internal class GjeldendeVedtakTest {
         val vedtak1 = TestVedtak(
             status = VedtakStatus.FORKASTET,
             statusSistEndret = nå,
-            barn = "1",
+            barn = 1,
             periode = periode
         )
         val vedtak2 = vedtak1.copy(
@@ -74,7 +75,7 @@ internal class GjeldendeVedtakTest {
         val vedtak1 = TestVedtak(
             status = VedtakStatus.AVSLÅTT,
             statusSistEndret = nå,
-            barn = "1",
+            barn = 1,
             periode = Periode("2021-01-01/2021-12-31")
         )
         val vedtak2 = vedtak1.copy(
@@ -152,11 +153,13 @@ internal class GjeldendeVedtakTest {
         internal data class TestVedtak(
             override val saksnummer: Saksnummer = "1",
             override val behandlingId: BehandlingId = "1",
-            override val søkersIdentitetsnummer: Saksnummer = "1",
             override val status: VedtakStatus,
             override val statusSistEndret: ZonedDateTime,
-            override val barn: Any,
-            override val periode: Periode) : Vedtak {
+            override val periode: Periode,
+            internal val barn: Int) : Vedtak {
+            override val etGjeldendeVedtakPer: Int = barn
+            override val involverteIdentitetsnummer: Set<Identitetsnummer> = emptySet()
+
             override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
                 periode = nyPeriode
             )
