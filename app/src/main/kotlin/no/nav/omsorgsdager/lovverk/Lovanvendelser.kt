@@ -1,10 +1,16 @@
 package no.nav.omsorgsdager.lovverk
 
 import no.nav.omsorgsdager.Json
+import no.nav.omsorgsdager.Json.Companion.somJson
+import org.json.JSONObject
 
 internal data class Lovanvendelser (
-    internal val innvilget: Map<String, List<String>> = emptyMap(),
-    internal val avslått: Map<String, List<String>> = emptyMap()) {
+    internal val innvilget: Map<String, Set<String>> = emptyMap(),
+    internal val avslått: Map<String, Set<String>> = emptyMap()) {
+    internal val json = JSONObject(mapOf(
+        "innvilget" to innvilget,
+        "avslått" to avslått
+    )).somJson()
 
     // TODO
     internal constructor(json: Json) : this(
@@ -13,14 +19,15 @@ internal data class Lovanvendelser (
     )
 
     internal class Builder {
-        private val innvilget = mutableMapOf<String, MutableList<String>>()
-        private val avslått = mutableMapOf<String, MutableList<String>>()
+        private val innvilget = mutableMapOf<String, MutableSet<String>>()
+        private val avslått = mutableMapOf<String, MutableSet<String>>()
         internal fun innvilget(lovhenvisning: String, lovanvendelse: String) : Builder {
-            //innvilget.put(lovanvendelse, (innvilget[lovanvendelse]?: mutableListOf()).add(""))
+            innvilget[lovhenvisning] = (innvilget[lovhenvisning] ?: mutableSetOf()).plus(lovanvendelse).toMutableSet()
             return this
         }
 
         internal fun avslått(lovhenvisning: String, lovanvendelse: String) : Builder {
+            avslått[lovhenvisning] = (avslått[lovhenvisning] ?: mutableSetOf()).plus(lovanvendelse).toMutableSet()
             return this
         }
 

@@ -29,7 +29,8 @@ internal object BehovRepository {
                     "vedtakId" to vedtakId,
                     "versjon" to løstBehov.versjon,
                     "navn" to løstBehov.navn,
-                    "losning" to løstBehov.løsning.raw
+                    "losning" to løstBehov.løsning.raw,
+                    "lovanvendelser" to løstBehov.lovanvendelser.json.raw
                 )
             ))
         }
