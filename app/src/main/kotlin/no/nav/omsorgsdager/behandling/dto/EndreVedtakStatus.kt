@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager.vedtak.dto
+package no.nav.omsorgsdager.behandling.dto
 
 import io.ktor.application.*
 import io.ktor.request.*

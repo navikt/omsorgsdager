@@ -18,8 +18,10 @@ import no.nav.helse.dusseldorf.ktor.core.DefaultStatusPages
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.omsorgsdager.SerDes.configured
+import no.nav.omsorgsdager.behandling.BehandlingRoute
 import no.nav.omsorgsdager.config.hentRequiredEnv
-import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnRoute
+import no.nav.omsorgsdager.kronisksyktbarn.InMemoryKroniskSyktBarnOperasjoner
+import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver.Companion.token
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
@@ -108,9 +110,11 @@ internal fun Application.app(
         DefaultProbeRoutes()
         authenticate(*issuers.allIssuers()) {
             route("/api") {
-                KroniskSyktBarnRoute(
+                BehandlingRoute(
                     tilgangsstyring = applicationContext.tilgangsstyring,
-                    kroniskSyktBarnRepository = applicationContext.kroniskSyktBarnRepository
+                    path = "/kronisk-sykt-barn",
+                    vedtakType = KroniskSyktBarnVedtak::class,
+                    behandlingOperasjoner = InMemoryKroniskSyktBarnOperasjoner()
                 )
             }
         }

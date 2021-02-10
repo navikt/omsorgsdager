@@ -9,14 +9,15 @@ import io.ktor.client.features.json.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
+import no.nav.omsorgsdager.behandling.BehandlingOperasjoner
 import no.nav.omsorgsdager.config.*
 import no.nav.omsorgsdager.config.DataSourceBuilder
 import no.nav.omsorgsdager.config.Environment
 import no.nav.omsorgsdager.config.KafkaBuilder.kafkaProducer
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.config.migrate
-import no.nav.omsorgsdager.kronisksyktbarn.InMemoryKroniskSyktBarnRespository
-import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnRepository
+import no.nav.omsorgsdager.kronisksyktbarn.InMemoryKroniskSyktBarnOperasjoner
+import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
 import no.nav.omsorgsdager.pdl.PdlClient
 import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
@@ -33,7 +34,7 @@ internal class ApplicationContext(
     internal val tokenResolver: TokenResolver,
     internal val tilgangsstyring: Tilgangsstyring,
     internal val kafkaProducer: KafkaProducer<String, String>,
-    internal val kroniskSyktBarnRepository: KroniskSyktBarnRepository,
+    internal val kroniskSyktBarnOperasjoner: BehandlingOperasjoner<KroniskSyktBarnVedtak>,
     internal val configure: (application: Application) -> Unit) {
 
     internal fun start() {
@@ -54,7 +55,7 @@ internal class ApplicationContext(
         var tokenResolver: TokenResolver? = null,
         var tilgangsstyring: Tilgangsstyring? = null,
         var kafkaProducer: KafkaProducer<String, String>? = null,
-        var kroniskSyktBarnRepository: KroniskSyktBarnRepository? = null,
+        var kroniskSyktBarnOperasjoner: BehandlingOperasjoner<KroniskSyktBarnVedtak>? = null,
         var configure: (application: Application) -> Unit = {}) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
@@ -104,7 +105,7 @@ internal class ApplicationContext(
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
                 tokenResolver = benyttetTokenResolver,
                 tilgangsstyring = benyttetTilgangsstyring,
-                kroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryKroniskSyktBarnRespository(),
+                kroniskSyktBarnOperasjoner = kroniskSyktBarnOperasjoner ?: InMemoryKroniskSyktBarnOperasjoner(),
                 configure = configure
             )
         }

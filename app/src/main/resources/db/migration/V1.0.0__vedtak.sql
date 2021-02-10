@@ -3,7 +3,6 @@ CREATE TABLE vedtak
     id                          BIGSERIAL PRIMARY KEY,
     k9_saksnummer               VARCHAR(50) NOT NULL,
     k9_behandling_id            VARCHAR(50) NOT NULL,
-    omsorgspenger_saksnummer    VARCHAR(50) NOT NULL,
     soknad_mottatt              TIMESTAMP WITH TIME ZONE NOT NULL,
     type                        VARCHAR(50) NOT NULL,
     status                      VARCHAR(50) NOT NULL,
@@ -15,4 +14,3 @@ CREATE TABLE vedtak
 
 CREATE INDEX index_vedtak_k9_saksnummer ON vedtak(k9_saksnummer);
 CREATE INDEX index_vedtak_k9_behandling_id ON vedtak(k9_behandling_id);
-CREATE INDEX index_vedtak_omsorgsdager_saksnummer ON vedtak(omsorgspenger_saksnummer);

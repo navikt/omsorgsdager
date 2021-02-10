@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager.vedtak
 
 import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
@@ -157,6 +158,9 @@ internal class GjeldendeVedtakTest {
             override val statusSistEndret: ZonedDateTime,
             override val barn: Any,
             override val periode: Periode) : Vedtak {
+            override val involverteIdentitetsnummer: Set<Identitetsnummer>
+                get() = emptySet()
+
             override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
                 periode = nyPeriode
             )

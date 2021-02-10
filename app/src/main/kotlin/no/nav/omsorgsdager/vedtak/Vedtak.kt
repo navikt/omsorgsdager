@@ -16,6 +16,7 @@ internal interface Vedtak {
     val statusSistEndret: ZonedDateTime
     val barn: Any
     val periode: Periode
+    val involverteIdentitetsnummer: Set<Identitetsnummer>
     fun kopiMedNyPeriode(nyPeriode: Periode) : Vedtak
 
     @Suppress("UNCHECKED_CAST")

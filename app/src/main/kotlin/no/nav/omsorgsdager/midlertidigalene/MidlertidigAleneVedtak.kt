@@ -19,4 +19,5 @@ internal data class MidlertidigAleneVedtak(
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
         periode = nyPeriode
     )
+    override val involverteIdentitetsnummer: Set<Identitetsnummer> = emptySet()
 }
