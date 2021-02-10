@@ -9,13 +9,13 @@ import no.nav.omsorgsdager.vedtak.VedtakStatus
 import java.time.ZonedDateTime
 
 internal data class MidlertidigAleneVedtak(
-    override val søkersIdentitetsnummer: Identitetsnummer,
     override val saksnummer: Saksnummer,
     override val behandlingId: BehandlingId,
     override val status: VedtakStatus,
     override val statusSistEndret: ZonedDateTime,
-    override val barn: Any,
     override val periode: Periode) : Vedtak {
+    override val etGjeldendeVedtakPer: Saksnummer = saksnummer
+
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
         periode = nyPeriode
     )
