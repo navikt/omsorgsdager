@@ -10,4 +10,4 @@ CREATE TABLE parter
 );
 
 CREATE INDEX index_parter_vedtak_id ON parter(vedtak_id);
-CREATE INDEX index_parter_omsorgsdager_saksnummer ON parter(omsorgspenger_saksnummer);
+CREATE INDEX index_parter_omsorgspenger_saksnummer ON parter(omsorgspenger_saksnummer);

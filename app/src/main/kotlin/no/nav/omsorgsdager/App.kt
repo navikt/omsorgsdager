@@ -20,7 +20,6 @@ import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.omsorgsdager.SerDes.configured
 import no.nav.omsorgsdager.behandling.BehandlingRoute
 import no.nav.omsorgsdager.config.hentRequiredEnv
-import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnOperasjoner
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver.Companion.token
 import org.slf4j.LoggerFactory

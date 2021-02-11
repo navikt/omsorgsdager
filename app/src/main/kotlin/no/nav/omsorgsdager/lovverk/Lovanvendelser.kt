@@ -12,10 +12,10 @@ internal data class Lovanvendelser (
         "avslått" to avslått
     )).somJson()
 
-    // TODO
+    // TODO, gjøre dette på en smidigere måte...
     internal constructor(json: Json) : this(
-        innvilget = emptyMap(),
-        avslått = emptyMap()
+        innvilget = json.map["innvilget"] as Map<String, Set<String>>,
+        avslått = json.map["avslått"] as Map<String, Set<String>>
     )
 
     internal class Builder {

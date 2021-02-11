@@ -124,7 +124,7 @@ internal object VedtakRepository {
             periode = periode,
             grunnlag = string("grunnlag").somJson(),
             type = VedtakType.valueOf(string("type")),
-            status = VedtakStatus.valueOf("status"),
+            status = VedtakStatus.valueOf(string("status")),
             statusSistEndret = zonedDateTime("status_sist_endret")
         )
     }
@@ -142,12 +142,12 @@ internal object VedtakRepository {
 
     @Language("PostgreSQL")
     private const val LagreVedtakStatement = """
-        INSERT INTO vedtak (k9_saksnummer, k9_behanlding_id, grunnlag, type, status)
+        INSERT INTO vedtak (k9_saksnummer, k9_behandling_id, grunnlag, type, status)
         VALUES(:saksnummer, :behandlingId, :grunnlag ::jsonb, :type, 'FORESLÅTT')
-        ON CONFLICT (k9_behanlding_id) 
+        ON CONFLICT (k9_behandling_id) 
         DO 
            UPDATE SET grunnlag = :grunnlag :: jsonb 
-           WHERE status = 'FORESLÅTT'
+           WHERE vedtak.status = 'FORESLÅTT'
     """
 
     @Language("PostgreSQL")

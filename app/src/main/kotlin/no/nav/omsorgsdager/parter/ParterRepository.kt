@@ -14,6 +14,7 @@ internal object ParterRepository {
     interface Part
 
     internal data class Søker(
+        internal val fødselsdato: LocalDate,
         internal val identitetsnummer: Identitetsnummer,
         internal val omsorgspengerSaksnummer: Saksnummer) : Part
 
@@ -33,13 +34,13 @@ internal object ParterRepository {
             )
         )
 
-        val parter = mutableListOf<Part>()
-        run(query.map{ it }.asList).forEach { row ->
+        return run(query.map { row ->
             val type = row.string("type")
-            val part = when (type) {
+            when (type) {
                 "SØKER" -> Søker(
                     identitetsnummer = row.string("identitetsnummer"),
-                    omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer")
+                    omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer"),
+                    fødselsdato = row.localDate("fodselsdato")
                 )
                 "MOTPART" -> Motpart(
                     identitetsnummer = row.string("identitetsnummer"),
@@ -47,37 +48,35 @@ internal object ParterRepository {
                 )
                 "BARN" -> Barn(
                     fødselsdato = row.localDate("fodselsdato"),
-                    identitetsnummer = row.string("identitetsnummer")
+                    identitetsnummer = row.stringOrNull("identitetsnummer")
                 )
                 else -> throw IllegalStateException("Ukjent type $type på part")
             }
-            parter.add(part)
-        }
-        return parter
+        }.asList)
     }
 
-    internal fun TransactionalSession.leggTilParter(vedtakId: VedtakId, parter: List<Part>) {
+    internal fun TransactionalSession.leggTilParter(vedtakId: VedtakId, parter: List<Part>) : List<Part> {
         parter.forEach { part ->
             val paramMap = when (part) {
                 is Søker -> mapOf(
                     "vedtakId" to vedtakId,
                     "identitetsnummer" to part.identitetsnummer,
-                    "fodelsdato" to null,
+                    "fodelsdato" to part.fødselsdato,
                     "omsorgspengerSaksnummer" to part.identitetsnummer,
-                    "part" to "SØKER"
+                    "type" to "SØKER"
                 )
                 is Barn -> mapOf(
                     "vedtakId" to vedtakId,
                     "identitetsnummer" to part.identitetsnummer,
                     "fodelsdato" to part.fødselsdato,
-                    "part" to "BARN"
+                    "type" to "BARN"
                 )
                 is Motpart -> mapOf(
                     "vedtakId" to vedtakId,
                     "identitetsnummer" to part.identitetsnummer,
                     "fodelsdato" to null,
                     "omsorgspengerSaksnummer" to part.identitetsnummer,
-                    "part" to "MOTPART"
+                    "type" to "MOTPART"
                 )
                 else -> throw IllegalStateException("Uhåndtert part $part")
             }
@@ -86,9 +85,10 @@ internal object ParterRepository {
                 paramMap = paramMap
             ))
         }
+        return hentParter(vedtakId)
     }
 
-    private fun Session.lagre(query: Query) {
+    private fun TransactionalSession.lagre(query: Query) {
         update(query).also { affectedRows ->
             require(affectedRows == 1) {
                 "Oppdaterte $affectedRows rader, forventet å oppdatere 1."
@@ -98,13 +98,13 @@ internal object ParterRepository {
 
     @Language("PostgreSQL")
     private const val LeggTilPartStatement = """
-        INSERT INTO parter (vedtak_id, identitetsnummer, fodselsdato, type, omsorgsdager_saksnummer)
+        INSERT INTO parter (vedtak_id, identitetsnummer, fodselsdato, type, omsorgspenger_saksnummer)
         VALUES(:vedtakId, :identitetsnummer, :fodelsdato, :type, :omsorgspengerSaksnummer)
     """
 
     @Language("PostgreSQL")
     private const val HentParterStatement = """
-        SELECT * from part 
+        SELECT * from parter
         WHERE vedtak_id = :vedtakId
     """
 }

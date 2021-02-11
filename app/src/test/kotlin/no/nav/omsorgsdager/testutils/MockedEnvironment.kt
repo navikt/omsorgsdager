@@ -17,6 +17,8 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsJwksUrl
 import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.app
+import no.nav.omsorgsdager.config.DataSourceBuilder
+import no.nav.omsorgsdager.kronisksyktbarn.DbKroniskSyktBarnRepository
 import no.nav.omsorgsdager.testutils.wiremock.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.io.File
@@ -47,8 +49,8 @@ internal class MockedEnvironment(
         every { it.close() }.returns(Unit)
     }
 
-    internal val applicationContext = ApplicationContext.Builder(
-        env = mapOf(
+    internal val applicationContext : ApplicationContext = {
+        val env = mapOf(
             "PORT" to "$applicationPort",
             "DATABASE_HOST" to "localhost",
             "DATABASE_PORT" to "${embeddedPostgres.port}",
@@ -67,20 +69,26 @@ internal class MockedEnvironment(
             "OPEN_AM_ISSUER" to NaisSts.getIssuer(),
             "OPEN_AM_JWKS_URI" to (wireMockServer.getNaisStsJwksUrl()),
             "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak"
-        ),
-        kafkaProducer = kafkaProducerMock,
-        configure = { application ->
-            application.install(CORS) {
-                method(HttpMethod.Options)
-                method(HttpMethod.Get)
-                method(HttpMethod.Post)
-                method(HttpMethod.Patch)
-                allowNonSimpleContentTypes = true
-                header(HttpHeaders.Authorization)
-                anyHost()
+        )
+        ApplicationContext.Builder(
+            env = env,
+            kafkaProducer = kafkaProducerMock,
+            kroniskSyktBarnRepository = DbKroniskSyktBarnRepository(
+                dataSource = DataSourceBuilder(env).build()
+            ),
+            configure = { application ->
+                application.install(CORS) {
+                    method(HttpMethod.Options)
+                    method(HttpMethod.Get)
+                    method(HttpMethod.Post)
+                    method(HttpMethod.Patch)
+                    allowNonSimpleContentTypes = true
+                    header(HttpHeaders.Authorization)
+                    anyHost()
+                }
             }
-        }
-    ).build()
+        ).build()
+    }()
 
     internal fun start() = this
     internal fun stop() {

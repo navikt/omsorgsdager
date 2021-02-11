@@ -7,10 +7,18 @@ import kotliquery.queryOf
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.VedtakId
 import no.nav.omsorgsdager.lovverk.Lovanvendelser
+import no.nav.omsorgsdager.vedtak.VedtakRepository
+import no.nav.omsorgsdager.vedtak.VedtakRepository.hentVedtak
 import org.intellij.lang.annotations.Language
 
 internal object BehovRepository {
-    internal fun TransactionalSession.leggTilUløstBehov(vedtakId: VedtakId, uløsteBehov: Set<UløstBehov>) {
+    internal fun TransactionalSession.leggTilBehov(vedtakId: VedtakId, behov: Behov) : Behov {
+        leggTilUløstBehov(vedtakId, behov.uløsteBehov)
+        leggTilLøsteBehov(vedtakId, behov.løsteBehov)
+        return hentBehov(vedtakId)
+    }
+
+    private fun TransactionalSession.leggTilUløstBehov(vedtakId: VedtakId, uløsteBehov: Set<UløstBehov>) {
         uløsteBehov.forEach { uløstBehov ->
             update(queryOf(
                 statement = LeggTilUløstBehovStatement,
@@ -47,17 +55,26 @@ internal object BehovRepository {
 
         val uløsteBehov = mutableSetOf<UløstBehov>()
         val løsteBehov = mutableSetOf<LøstBehov>()
-        run(query.map{ it }.asList).forEach { row ->
-            val status = row.string("status")
+
+        run(query.map { row -> mapOf<String, Any?>(
+            "status" to row.string("status"),
+            "navn" to row.string("navn"),
+            "versjon" to row.intOrNull("versjon"),
+            "lovanvendelser" to row.stringOrNull("lovanvendelser"),
+            "losning" to row.stringOrNull("losning")
+        )}.asList).forEach { entry ->
+            val status = entry["status"] as String
             when (status) {
-                "ULØST" -> uløsteBehov.add(UløstBehov(navn = row.string("navn")))
                 "LØST" -> løsteBehov.add(TidligereLøstBehov(
-                    navn = row.string("navn"),
-                    versjon = row.int("versjon"),
-                    lovanvendelser = Lovanvendelser(row.string("lovanvendelser").somJson()),
-                    løsning = row.string("losning").somJson()
+                    navn = entry["navn"] as String,
+                    versjon = entry["versjon"] as Int,
+                    lovanvendelser = Lovanvendelser((entry["lovanvendelser"] as String).somJson()),
+                    løsning = (entry["losning"] as String).somJson()
                 ))
-                else -> throw IllegalStateException("Uventet status på behov $status")
+                "ULØST" -> uløsteBehov.add(UløstBehov(
+                    navn = entry["navn"] as String
+                ))
+                else -> throw IllegalStateException("Uventet status $status")
             }
         }
         return Behov(uløsteBehov = uløsteBehov, løsteBehov = løsteBehov)
@@ -81,7 +98,7 @@ internal object BehovRepository {
     @Language("PostgreSQL")
     private const val LeggTilLøsteBehovStatement = """
         UPDATE behov 
-        SET status = 'LØST', versjon = :versjon, losning = :losning ::jsonb, lovanvendeler = :lovanvendelser ::jsonb
+        SET status = 'LØST', versjon = :versjon, losning = :losning ::jsonb, lovanvendelser = :lovanvendelser ::jsonb
         WHERE vedtak_id = :vedtakId
         AND navn = :navn
     """
