@@ -153,8 +153,8 @@ internal class DbKroniskSyktBarnRepository(
                     status = status,
                     tidspunkt = tidspunkt
                 ))
-                val behov = session.hentBehov(vedtakId = vedtak.vedtakId)
-                val parter = session.hentParter(vedtakId = vedtak.vedtakId)
+                val behov = transactionalSession.hentBehov(vedtakId = vedtak.vedtakId)
+                val parter = transactionalSession.hentParter(vedtakId = vedtak.vedtakId)
                 Triple(vedtak, behov, parter).tilBehandling()
             }
         }
