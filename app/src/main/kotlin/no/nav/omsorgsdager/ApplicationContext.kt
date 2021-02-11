@@ -9,15 +9,15 @@ import io.ktor.client.features.json.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
-import no.nav.omsorgsdager.behandling.BehandlingOperasjoner
 import no.nav.omsorgsdager.config.*
 import no.nav.omsorgsdager.config.DataSourceBuilder
 import no.nav.omsorgsdager.config.Environment
 import no.nav.omsorgsdager.config.KafkaBuilder.kafkaProducer
 import no.nav.omsorgsdager.config.hentRequiredEnv
-import no.nav.omsorgsdager.config.migrate
-import no.nav.omsorgsdager.kronisksyktbarn.InMemoryKroniskSyktBarnOperasjoner
-import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
+import no.nav.omsorgsdager.kronisksyktbarn.DbKroniskSyktBarnRepository
+import no.nav.omsorgsdager.kronisksyktbarn.InMemoryKroniskSyktBarnRepository
+import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnOperasjoner
+import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnRepository
 import no.nav.omsorgsdager.pdl.PdlClient
 import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
@@ -34,11 +34,14 @@ internal class ApplicationContext(
     internal val tokenResolver: TokenResolver,
     internal val tilgangsstyring: Tilgangsstyring,
     internal val kafkaProducer: KafkaProducer<String, String>,
-    internal val kroniskSyktBarnOperasjoner: BehandlingOperasjoner<KroniskSyktBarnVedtak>,
+    internal val kroniskSyktBarnRepository: KroniskSyktBarnRepository,
+    internal val kroniskSyktBarnOperasjoner: KroniskSyktBarnOperasjoner,
     internal val configure: (application: Application) -> Unit) {
 
     internal fun start() {
-        //dataSource.migrate()
+        if (kroniskSyktBarnRepository is DbKroniskSyktBarnRepository) {
+            dataSource.migrate()
+        }
     }
 
     internal fun stop() {
@@ -55,7 +58,8 @@ internal class ApplicationContext(
         var tokenResolver: TokenResolver? = null,
         var tilgangsstyring: Tilgangsstyring? = null,
         var kafkaProducer: KafkaProducer<String, String>? = null,
-        var kroniskSyktBarnOperasjoner: BehandlingOperasjoner<KroniskSyktBarnVedtak>? = null,
+        var kroniskSyktBarnRepository: KroniskSyktBarnRepository? = null,
+        var kroniskSyktBarnOperasjoner: KroniskSyktBarnOperasjoner? = null,
         var configure: (application: Application) -> Unit = {}) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
@@ -92,6 +96,8 @@ internal class ApplicationContext(
 
             val benyttetKafkaProducer = kafkaProducer ?: benyttetEnv.kafkaProducer()
 
+            val benyttetKroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryKroniskSyktBarnRepository()
+
             return ApplicationContext(
                 env = benyttetEnv,
                 dataSource = benyttetDataSource,
@@ -105,7 +111,10 @@ internal class ApplicationContext(
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
                 tokenResolver = benyttetTokenResolver,
                 tilgangsstyring = benyttetTilgangsstyring,
-                kroniskSyktBarnOperasjoner = kroniskSyktBarnOperasjoner ?: InMemoryKroniskSyktBarnOperasjoner(),
+                kroniskSyktBarnRepository = benyttetKroniskSyktBarnRepository,
+                kroniskSyktBarnOperasjoner = kroniskSyktBarnOperasjoner ?: KroniskSyktBarnOperasjoner(
+                    kroniskSyktBarnRepository = benyttetKroniskSyktBarnRepository
+                ),
                 configure = configure
             )
         }

@@ -20,17 +20,13 @@ import no.nav.omsorgsdager.tid.Periode.Companion.utcNå
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import java.time.ZonedDateTime
 
-internal class InMemoryKroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBarnVedtak> {
+internal class KroniskSyktBarnOperasjoner(
+    private val kroniskSyktBarnRepository: KroniskSyktBarnRepository
+) : BehandlingOperasjoner<KroniskSyktBarnVedtak> {
 
-    private val map = mutableMapOf<BehandlingId, Behandling<KroniskSyktBarnVedtak>>()
+    override suspend fun hent(behandlingId: BehandlingId) = kroniskSyktBarnRepository.hent(behandlingId)
 
-    override suspend fun hent(behandlingId: BehandlingId): Behandling<KroniskSyktBarnVedtak>? {
-        return map[behandlingId]
-    }
-
-    override suspend fun hentAlle(saksnummer: Saksnummer): List<Behandling<KroniskSyktBarnVedtak>> {
-        return map.filterValues { it.vedtak.saksnummer == saksnummer }.values.toList()
-    }
+    override suspend fun hentAlle(saksnummer: Saksnummer) = kroniskSyktBarnRepository.hentAlle(saksnummer)
 
     override suspend fun preOpprett(request: ObjectNode): Set<Identitetsnummer> {
         val grunnlag = request.map<OpprettKroniskSyktBarn.Grunnlag>()
@@ -45,7 +41,7 @@ internal class InMemoryKroniskSyktBarnOperasjoner : BehandlingOperasjoner<Kronis
             grunnlag.søker.sisteDagSøkerHarRettTilOmsorgsdager
         )
 
-        map[grunnlag.behandlingId] = Behandling(
+        val behandling = Behandling(
             vedtak = KroniskSyktBarnVedtak(
                 saksnummer = grunnlag.saksnummer,
                 behandlingId = grunnlag.behandlingId,
@@ -64,59 +60,23 @@ internal class InMemoryKroniskSyktBarnOperasjoner : BehandlingOperasjoner<Kronis
             )
         )
 
-        return map.getValue(grunnlag.behandlingId)
+        return kroniskSyktBarnRepository.lagre(behandling)
     }
 
-
     override suspend fun løsninger(behandlingId: BehandlingId, request: ObjectNode): Behandling<KroniskSyktBarnVedtak> {
-        val behandling = map.getValue(behandlingId)
         val løsteBehov = request.map<LøsKroniskSyktBarnBehov.Request>().løsteBehov
-        val løsteBehovNavn = løsteBehov.map { it.navn }
-
-        val oppdaterteLøsteBehov = behandling.behov.løsteBehov.filterNot {
-            it.navn in løsteBehovNavn
-        }.plus(løsteBehov).toSet()
-
-        val alleLøsninger = oppdaterteLøsteBehov.map { it.navn }
-
-        val oppdaterteBehov = Behov(
-            løsteBehov = oppdaterteLøsteBehov,
-            uløsteBehov = behandling.behov.uløsteBehov.filterNot {
-                it.navn in alleLøsninger
-            }.toSet()
-        )
-        map[behandlingId] = behandling.copy(
-            behov = oppdaterteBehov
-        )
-        return map.getValue(behandlingId)
+        return kroniskSyktBarnRepository.leggTilLøsteBehov(behandlingId, løsteBehov)
     }
 
     override suspend fun innvilg(behandlingId: BehandlingId, tidspunkt: ZonedDateTime): Behandling<KroniskSyktBarnVedtak> =
-        endreStatus(behandlingId, VedtakStatus.INNVILGET, tidspunkt)
+        kroniskSyktBarnRepository.endreStatus(behandlingId, VedtakStatus.INNVILGET, tidspunkt)
 
     override suspend fun avslå(behandlingId: BehandlingId, tidspunkt: ZonedDateTime): Behandling<KroniskSyktBarnVedtak> =
-        endreStatus(behandlingId, VedtakStatus.AVSLÅTT, tidspunkt)
+        kroniskSyktBarnRepository.endreStatus(behandlingId, VedtakStatus.AVSLÅTT, tidspunkt)
 
     override suspend fun forkast(behandlingId: BehandlingId, tidspunkt: ZonedDateTime): Behandling<KroniskSyktBarnVedtak> =
-        endreStatus(behandlingId, VedtakStatus.FORKASTET, tidspunkt)
+        kroniskSyktBarnRepository.endreStatus(behandlingId, VedtakStatus.FORKASTET, tidspunkt)
 
     override fun behandlingDto(behandling: Behandling<KroniskSyktBarnVedtak>): HentKroniskSyktBarn.Response =
         HentKroniskSyktBarn.Response(behandling)
-
-    private fun endreStatus(behandlingId: BehandlingId, status: VedtakStatus, tidspunkt: ZonedDateTime): Behandling<KroniskSyktBarnVedtak> {
-        val behandling = map.getValue(behandlingId)
-        require(behandling.vedtak.status == VedtakStatus.FORESLÅTT) { "Må være i status FORESLÅTT for å kunne sette til $status" }
-        if (status == VedtakStatus.INNVILGET) {
-            require(behandling.kanInnvilges) { "Kan ikke ikke innvilges" }
-        }
-
-        map[behandlingId] = behandling.copy(
-            vedtak = behandling.vedtak.copy(
-                status = status,
-                statusSistEndret = tidspunkt
-            )
-        )
-
-        return map.getValue(behandlingId)
-    }
 }
