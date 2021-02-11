@@ -2,6 +2,7 @@ package no.nav.omsorgsdager.behov
 
 import kotliquery.Query
 import kotliquery.Session
+import kotliquery.TransactionalSession
 import kotliquery.queryOf
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.VedtakId
@@ -9,7 +10,7 @@ import no.nav.omsorgsdager.lovverk.Lovanvendelser
 import org.intellij.lang.annotations.Language
 
 internal object BehovRepository {
-    internal fun Session.leggTilUløstBehov(vedtakId: VedtakId, uløsteBehov: Set<UløstBehov>) {
+    internal fun TransactionalSession.leggTilUløstBehov(vedtakId: VedtakId, uløsteBehov: Set<UløstBehov>) {
         uløsteBehov.forEach { uløstBehov ->
             update(queryOf(
                 statement = LeggTilUløstBehovStatement,
@@ -21,7 +22,7 @@ internal object BehovRepository {
         }
     }
 
-    internal fun Session.leggTilLøsteBehov(vedtakId: VedtakId, løsteBehov: Set<LøstBehov>) {
+    internal fun TransactionalSession.leggTilLøsteBehov(vedtakId: VedtakId, løsteBehov: Set<LøstBehov>) {
         løsteBehov.forEach { løstBehov ->
             lagre(queryOf(
                 statement = LeggTilLøsteBehovStatement,
@@ -62,7 +63,7 @@ internal object BehovRepository {
         return Behov(uløsteBehov = uløsteBehov, løsteBehov = løsteBehov)
     }
 
-    private fun Session.lagre(query: Query) {
+    private fun TransactionalSession.lagre(query: Query) {
         update(query).also { affectedRows ->
             require(affectedRows == 1) {
                 "Oppdaterte $affectedRows rader, forventet å oppdatere 1."

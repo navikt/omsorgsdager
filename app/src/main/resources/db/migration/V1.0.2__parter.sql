@@ -4,7 +4,7 @@ CREATE TABLE parter
     vedtak_id                   BIGINT NOT NULL,
     identitetsnummer            VARCHAR(25),
     fodselsdato                 DATE,
-    part                        VARCHAR(50),
+    type                        VARCHAR(50),
     omsorgspenger_saksnummer    VARCHAR(50),
     CONSTRAINT foreign_key_vedtak FOREIGN KEY(vedtak_id) REFERENCES vedtak(id)
 );

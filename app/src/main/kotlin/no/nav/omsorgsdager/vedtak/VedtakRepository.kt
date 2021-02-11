@@ -1,9 +1,6 @@
 package no.nav.omsorgsdager.vedtak
 
-import kotliquery.Query
-import kotliquery.Row
-import kotliquery.Session
-import kotliquery.queryOf
+import kotliquery.*
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.Json.Companion.somJson
@@ -48,7 +45,7 @@ internal object VedtakRepository {
         internal val periode: Periode
     )
 
-    internal fun Session.lagreVedtak(lagreVedtak: LagreVedtak) : DbVedtak = lagreOgHent(
+    internal fun TransactionalSession.lagreVedtak(lagreVedtak: LagreVedtak) : DbVedtak = lagreOgHent(
         behandlingId = lagreVedtak.behandlingId,
         query = queryOf(
             statement = LagreVedtakStatement,
@@ -61,7 +58,7 @@ internal object VedtakRepository {
         )
     )
 
-    internal fun Session.endreVedtakStatus(endreStatus: EndreStatus) : DbVedtak = lagreOgHent(
+    internal fun TransactionalSession.endreVedtakStatus(endreStatus: EndreStatus) : DbVedtak = lagreOgHent(
         behandlingId = endreStatus.behandlingId,
         query = queryOf(
             statement = EndreStatusStatement,
@@ -73,7 +70,7 @@ internal object VedtakRepository {
         )
     )
 
-    internal fun Session.endreVedtakPeriode(endrePeriode: EndrePeriode) : DbVedtak = lagreOgHent(
+    internal fun TransactionalSession.endreVedtakPeriode(endrePeriode: EndrePeriode) : DbVedtak = lagreOgHent(
         behandlingId = endrePeriode.behandlingId,
         query = queryOf(
             statement = EndrePeriodeStatement,
@@ -132,7 +129,7 @@ internal object VedtakRepository {
         )
     }
 
-    private fun Session.lagreOgHent(behandlingId: BehandlingId, query: Query) : DbVedtak {
+    private fun TransactionalSession.lagreOgHent(behandlingId: BehandlingId, query: Query) : DbVedtak {
         update(query).also { affectedRows ->
             require(affectedRows == 1) {
                 "Oppdaterte $affectedRows rader, forventet å oppdatere 1."
