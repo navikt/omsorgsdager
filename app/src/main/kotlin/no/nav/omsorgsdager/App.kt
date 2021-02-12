@@ -15,6 +15,8 @@ import no.nav.helse.dusseldorf.ktor.auth.multipleJwtIssuers
 import no.nav.helse.dusseldorf.ktor.auth.withoutAdditionalClaimRules
 import no.nav.helse.dusseldorf.ktor.core.DefaultProbeRoutes
 import no.nav.helse.dusseldorf.ktor.core.DefaultStatusPages
+import no.nav.helse.dusseldorf.ktor.core.FullførAktiveRequester
+import no.nav.helse.dusseldorf.ktor.core.PreStopRoute
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
 import no.nav.omsorgsdager.Json.Companion.configured
@@ -99,9 +101,16 @@ internal fun Application.app(
         callIdMdc("callId")
     }
 
+    val fullførAktiveRequester = FullførAktiveRequester(
+        application = this
+    )
+
     install(Routing) {
         HealthRoute(healthService = applicationContext.healthService)
         DefaultProbeRoutes()
+        PreStopRoute(
+            preStopActions = listOf(fullførAktiveRequester)
+        )
         authenticate(*issuers.allIssuers()) {
             route("/api") {
                 BehandlingRoute(
