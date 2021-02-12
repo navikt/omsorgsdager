@@ -99,7 +99,6 @@ internal fun TestApplicationEngine.hentBehandling(
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
         assertEquals(forventetStatusCode, response.status())
-        println(response.content)
         assertForventetResponse(forventetResponse)
     }
 }

@@ -96,6 +96,7 @@ internal class ApplicationContext(
 
             val benyttetKafkaProducer = kafkaProducer ?: benyttetEnv.kafkaProducer()
 
+            // TODO: Bytte til DbRepository når det er klart.
             val benyttetKroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryKroniskSyktBarnRepository()
 
             return ApplicationContext(
