@@ -12,14 +12,19 @@ import java.io.FileNotFoundException
 import java.net.InetAddress
 import java.util.*
 
-object KafkaBuilder {
+internal object KafkaBuilder {
 
-    fun Environment.kafkaProducer() : KafkaProducer<String, String> {
+    internal fun Environment.kafkaProducer() : KafkaProducer<String, String> {
+        val username = usernameFraFil() ?: hentOptionalEnv("KAFKA_USERNAME")
+        val password = passwordFraFil() ?: hentOptionalEnv("KAFKA_PASSWORD")
+        val credentials = when (username != null && password != null) {
+            true -> username to password
+            false -> null
+        }
+
         val producerConfig = kafkaBaseConfig(
             bootstrapServers = hentRequiredEnv("KAFKA_BOOTSTRAP_SERVERS"),
-            credentials = username()?.let { username ->
-                username to password()
-            },
+            credentials = credentials,
             truststore = hentOptionalEnv("NAV_TRUSTSTORE_PATH")?.let { truststore ->
                 truststore to hentRequiredEnv("NAV_TRUSTSTORE_PASSWORD")
             }
@@ -75,10 +80,8 @@ object KafkaBuilder {
         return UUID.randomUUID().toString()
     }
 
-    private fun username() = "/var/run/secrets/nais.io/service_user/username".readFile()
-    private fun password() = requireNotNull("/var/run/secrets/nais.io/service_user/password".readFile()) {
-        "Mangler passord på path '/var/run/secrets/nais.io/service_user/password'"
-    }
+    private fun usernameFraFil() = "/var/run/secrets/nais.io/service_user/username".readFile()
+    private fun passwordFraFil() = "/var/run/secrets/nais.io/service_user/password".readFile()
 
     private fun String.readFile() =
         try {

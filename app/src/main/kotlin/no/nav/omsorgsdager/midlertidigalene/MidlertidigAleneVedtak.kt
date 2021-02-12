@@ -2,6 +2,7 @@ package no.nav.omsorgsdager.midlertidigalene
 
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Identitetsnummer
+import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.Vedtak
@@ -13,7 +14,8 @@ internal data class MidlertidigAleneVedtak(
     override val behandlingId: BehandlingId,
     override val status: VedtakStatus,
     override val statusSistEndret: ZonedDateTime,
-    override val periode: Periode) : Vedtak {
+    override val periode: Periode,
+    override val grunnlag: Json) : Vedtak {
     override val etGjeldendeVedtakPer: Saksnummer = saksnummer
 
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(

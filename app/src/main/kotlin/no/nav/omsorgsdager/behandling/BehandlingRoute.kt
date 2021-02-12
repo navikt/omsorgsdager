@@ -4,8 +4,9 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Identitetsnummer
-import no.nav.omsorgsdager.SerDes.objectNode
+import no.nav.omsorgsdager.Json.Companion.json
 import no.nav.omsorgsdager.behandlingId
 import no.nav.omsorgsdager.correlationId
 import no.nav.omsorgsdager.tilgangsstyring.Operasjon
@@ -32,10 +33,10 @@ internal fun <V: Vedtak> Route.BehandlingRoute(
             Operasjon(type = Operasjon.Type.Endring, identitetsnummer = this, beskrivelse = "Opprette vedtak om ${vedtakType.simpleName}")
 
         post {
-            val request = call.objectNode()
-            val behandlingId = request.get("behandlingId").asText()
+            val grunnlag = call.json()
+            val behandlingId = grunnlag.map.getValue("behandlingId") as BehandlingId
 
-            tilgangsstyring.verifiserTilgang(call, behandlingOperasjoner.preOpprett(request).opprettOperasjon())
+            tilgangsstyring.verifiserTilgang(call, behandlingOperasjoner.preOpprett(grunnlag).opprettOperasjon())
 
             val eksisterendeBehandling = behandlingOperasjoner.hent(
                 behandlingId = behandlingId
@@ -47,7 +48,7 @@ internal fun <V: Vedtak> Route.BehandlingRoute(
             }
 
             val behandling = behandlingOperasjoner.opprett(
-                request = request,
+                grunnlag = grunnlag,
                 correlationId = call.correlationId()
             )
 
@@ -76,7 +77,7 @@ internal fun <V: Vedtak> Route.BehandlingRoute(
 
             val behandling = behandlingOperasjoner.løsninger(
                 behandlingId = call.behandlingId(),
-                request = call.objectNode()
+                grunnlag = call.json()
             )
 
             call.respond(HttpStatusCode.OK, HentBehandling.NøkkelinformasjonResponse(behandling))

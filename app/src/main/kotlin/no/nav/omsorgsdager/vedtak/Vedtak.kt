@@ -2,6 +2,7 @@ package no.nav.omsorgsdager.vedtak
 
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Identitetsnummer
+import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.tid.Tidslinje
@@ -16,6 +17,7 @@ internal interface Vedtak {
     val periode: Periode
     val etGjeldendeVedtakPer: Any
     val involverteIdentitetsnummer: Set<Identitetsnummer>
+    val grunnlag: Json
     fun kopiMedNyPeriode(nyPeriode: Periode) : Vedtak
 
     @Suppress("UNCHECKED_CAST")

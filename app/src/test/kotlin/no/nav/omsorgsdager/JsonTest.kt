@@ -12,6 +12,13 @@ import org.junit.jupiter.api.Test
 internal class JsonTest {
 
     @Test
+    fun `Tom json`() {
+        val json = Json.tomJson()
+        assertEquals(0, json.map.size)
+
+    }
+
+    @Test
     fun `Teste sammenligning av Json - ignorerer rekkefølge men må ellers være full match`() {
         @Language("JSON")
         val fraString = """

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.omsorgsdager.Fritekst
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.behov.LøstBehov
+import no.nav.omsorgsdager.lovverk.Lovanvendelser
 
 internal object LøsKroniskSyktBarnBehov {
 
@@ -17,10 +18,20 @@ internal object LøsKroniskSyktBarnBehov {
         val vurdering: String
     ) : LøstBehov {
         override val navn = "LEGEERKLÆRING"
-        override val versjon = "0.0.1"
-        override val kanInnvilges =
+        override val versjon = 1
+        private val kanInnvilges =
             requireNotNull(barnetErKroniskSyktEllerHarEnFunksjonshemning) { "barnetErKroniskSyktEllerHarEnFunksjonshemning må settes" } &&
             requireNotNull(erSammenhengMedSøkersRisikoForFraværFraArbeid) { "erSammenhengMedSøkersRisikoForFraværFraArbeid må settes" }
+        override val lovanvendelser = {
+           Lovanvendelser.Builder()
+               // TODO
+               .let { when (kanInnvilges) {
+                   true -> it.innvilget("Foo", "Bar")
+                   false -> it.avslått("Foo", "Bar")
+               }}
+               .build()
+        }()
+
         override val løsning = """
         {
             "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,

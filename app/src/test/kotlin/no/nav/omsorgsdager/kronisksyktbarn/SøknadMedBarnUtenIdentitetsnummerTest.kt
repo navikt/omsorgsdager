@@ -17,24 +17,6 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
     fun `Oppretter nytt vedtak`() {
 
         @Language("JSON")
-        val request = """
-            {
-                "saksnummer": "$saksnummer",
-                "behandlingId": "$behandlingId",
-                "søknadMottatt": "2020-12-31T23:59:59.000Z",
-                "tidspunkt": "2021-01-01T12:00:00.000Z",
-                "søker": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "1990-01-01"
-                },
-                "barn": {
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                }
-            }
-        """.trimIndent()
-
-        @Language("JSON")
         val forventetResponse = """
         {
             "status": "FORESLÅTT",
@@ -50,7 +32,7 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
 
         with(testApplicationEngine) {
             nyttVedtak(
-                requestBody = request,
+                requestBody = opprettRequest,
                 forventetResponse = forventetResponse
             )
         }
@@ -116,6 +98,24 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
         private val behandlingId = UUID.randomUUID().toString()
 
         @Language("JSON")
+        private val opprettRequest = """
+            {
+                "saksnummer": "$saksnummer",
+                "behandlingId": "$behandlingId",
+                "søknadMottatt": "2020-12-31T23:59:59.000Z",
+                "tidspunkt": "2021-01-01T12:00:00.000Z",
+                "søker": {
+                    "identitetsnummer": "123",
+                    "fødselsdato": "1990-01-01"
+                },
+                "barn": {
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
+                }
+            }
+        """.trimIndent()
+
+        @Language("JSON")
         private val løseBehovForLegeerklæringRequest = """
             {
               "LEGEERKLÆRING": {
@@ -130,11 +130,6 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
         val forventetResponseHentVedtak = """
             {
               "vedtak": [{
-                  "barn": {
-                    "identitetsnummer": null,
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                  },
                   "behandlingId": "$behandlingId",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
@@ -146,7 +141,8 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
                         "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
-                  }
+                  },
+                  "grunnlag": $opprettRequest
               }]
             }
         """.trimIndent()

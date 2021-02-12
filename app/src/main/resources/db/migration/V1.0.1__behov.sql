@@ -7,7 +7,8 @@ CREATE TABLE behov
     versjon                     SMALLINT,
     losning                     JSONB,
     lovanvendelser              JSONB,
-    CONSTRAINT foreign_key_vedtak FOREIGN KEY(vedtak_id) REFERENCES vedtak(id)
+    CONSTRAINT foreign_key_vedtak FOREIGN KEY(vedtak_id) REFERENCES vedtak(id),
+    UNIQUE (vedtak_id, navn)
 );
 
 CREATE INDEX index_behov_vedtak_id ON behov(vedtak_id);

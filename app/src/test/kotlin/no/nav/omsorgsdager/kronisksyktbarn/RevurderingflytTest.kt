@@ -34,7 +34,7 @@ internal class RevurderingflytTest(
 
         with(testApplicationEngine) {
             nyttVedtak(
-                requestBody = request(behandlingId = behandlingId1),
+                requestBody = opprettRequest1,
                 forventetResponse = forventetResponse
             )
         }
@@ -80,7 +80,7 @@ internal class RevurderingflytTest(
 
         with(testApplicationEngine) {
             nyttVedtak(
-                requestBody = request(behandlingId = behandlingId2),
+                requestBody = opprettRequest2,
                 forventetResponse = forventetResponse
             )
         }
@@ -152,10 +152,7 @@ internal class RevurderingflytTest(
 
         with(testApplicationEngine) {
             nyttVedtak(
-                requestBody = request(
-                    mottatt = "2021-03-30T12:00:00.000+02",
-                    behandlingId = behandlingId3
-                ),
+                requestBody = opprettRequest3,
                 forventetResponse = forventetResponse
             )
         }
@@ -216,11 +213,6 @@ internal class RevurderingflytTest(
                 forventetResponse = """
                 {
                     "vedtak": [{
-                        "barn": {
-                            "identitetsnummer": "123",
-                            "fødselsdato": "2020-01-01",
-                            "harSammeBosted": true
-                        },
                         "behandlingId": "$behandlingId1",
                         "gyldigFraOgMed": "2021-01-01",
                         "gyldigTilOgMed": "2038-12-31",
@@ -228,7 +220,8 @@ internal class RevurderingflytTest(
                         "uløsteBehov": {
                             "LEGEERKLÆRING": {}
                         },
-                        "løsteBehov": {}
+                        "løsteBehov": {},
+                        "grunnlag": $opprettRequest1
                     }]
                 }
                 """.trimIndent()
@@ -238,11 +231,6 @@ internal class RevurderingflytTest(
                 forventetResponse = """
                 {
                     "vedtak": [{
-                        "barn": {
-                            "identitetsnummer": "123",
-                            "fødselsdato": "2020-01-01",
-                            "harSammeBosted": true
-                        },
                         "behandlingId": "$behandlingId2",
                         "gyldigFraOgMed": "2021-01-01",
                         "gyldigTilOgMed": "2038-12-31",
@@ -254,7 +242,8 @@ internal class RevurderingflytTest(
                                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
                                 "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                             }
-                        }
+                        },
+                        "grunnlag": $opprettRequest2
                     }]
                 }
                 """.trimIndent()
@@ -264,11 +253,6 @@ internal class RevurderingflytTest(
                 forventetResponse = """
                 {
                     "vedtak": [{
-                        "barn": {
-                            "identitetsnummer": "123",
-                            "fødselsdato": "2020-01-01",
-                            "harSammeBosted": true
-                        },
                         "behandlingId": "$behandlingId3",
                         "gyldigFraOgMed": "2021-03-30",
                         "gyldigTilOgMed": "2038-12-31",
@@ -280,7 +264,8 @@ internal class RevurderingflytTest(
                                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
                                 "erSammenhengMedSøkersRisikoForFraværFraArbeid": false
                             }
-                        }
+                        },
+                        "grunnlag": $opprettRequest3
                     }]
                 }
                 """.trimIndent()
@@ -296,11 +281,6 @@ internal class RevurderingflytTest(
         val forventetResponse = """
         {
             "vedtak": [{
-                "barn": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                },
                 "behandlingId": "$behandlingId3",
                 "gyldigFraOgMed": "2021-03-30",
                 "gyldigTilOgMed": "2038-12-31",
@@ -312,13 +292,9 @@ internal class RevurderingflytTest(
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
                         "erSammenhengMedSøkersRisikoForFraværFraArbeid": false
                     }
-                }
-            }, {
-                "barn": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
                 },
+                "grunnlag": $opprettRequest3
+            }, {
                 "behandlingId": "$behandlingId2",
                 "gyldigFraOgMed": "2021-01-01",
                 "gyldigTilOgMed": "2021-03-29",
@@ -330,7 +306,8 @@ internal class RevurderingflytTest(
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
                         "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
-                }
+                },
+                "grunnlag": $opprettRequest2
             }]
         }
         """.trimIndent()
@@ -343,13 +320,21 @@ internal class RevurderingflytTest(
     }
 
     private companion object {
-        val saksnummer = "S-1"
-        val behandlingId1 = "B-1"
-        val behandlingId2 = "B-2"
-        val behandlingId3 = "B-3"
+        private val saksnummer = "S-1"
+        private val behandlingId1 = "B-1"
+        private val behandlingId2 = "B-2"
+        private val behandlingId3 = "B-3"
+
+        private val opprettRequest1 = opprettRequest(behandlingId = behandlingId1)
+        private val opprettRequest2 = opprettRequest(behandlingId = behandlingId2)
+        private val opprettRequest3 = opprettRequest(
+            mottatt = "2021-03-30T12:00:00.000+02",
+            behandlingId = behandlingId3
+        )
+
 
         @Language("JSON")
-        fun request(
+        private fun opprettRequest(
             mottatt: String = "2020-12-31T23:59:59.000Z",
             behandlingId: String) = """
             {
