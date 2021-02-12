@@ -2,6 +2,8 @@ package no.nav.omsorgsdager.vedtak
 
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Identitetsnummer
+import no.nav.omsorgsdager.Json
+import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.Vedtak.Companion.gjeldendeVedtak
@@ -156,7 +158,8 @@ internal class GjeldendeVedtakTest {
             override val status: VedtakStatus,
             override val statusSistEndret: ZonedDateTime,
             override val periode: Periode,
-            internal val barn: Int) : Vedtak {
+            internal val barn: Int,
+            override val grunnlag: Json = "{}".somJson()) : Vedtak {
             override val etGjeldendeVedtakPer: Int = barn
             override val involverteIdentitetsnummer: Set<Identitetsnummer> = emptySet()
 

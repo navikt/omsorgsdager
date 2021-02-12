@@ -17,25 +17,6 @@ internal class NormalflytInngvilgetSøknadTest(
     fun `Oppretter nytt vedtak`() {
 
         @Language("JSON")
-        val request = """
-            {
-                "saksnummer": "$saksnummer",
-                "behandlingId": "$behandlingId",
-                "søknadMottatt": "2020-12-31T23:59:59.000Z",
-                "tidspunkt": "2021-01-01T12:00:00.000Z",
-                "søker": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "1990-01-01"
-                },
-                "barn": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                }
-            }
-        """.trimIndent()
-
-        @Language("JSON")
         val forventetResponse = """
         {
             "status": "FORESLÅTT",
@@ -51,7 +32,7 @@ internal class NormalflytInngvilgetSøknadTest(
 
         with(testApplicationEngine) {
             nyttVedtak(
-                requestBody = request,
+                requestBody = oppprettRequest,
                 forventetResponse = forventetResponse
             )
         }
@@ -159,28 +140,9 @@ internal class NormalflytInngvilgetSøknadTest(
     @Test
     @Order(7)
     fun `Send in søknad med brukt behandlingsId forvent 409`() {
-        @Language("JSON")
-        val request = """
-            {
-                "saksnummer": "123",
-                "behandlingId": "$behandlingId",
-                "søknadMottatt": "2021-02-01T23:59:59.000Z",
-                "tidspunkt": "2021-03-01T12:00:00.000Z",
-                "søker": {
-                    "identitetsnummer": "456",
-                    "fødselsdato": "1990-01-01"
-                },
-                "barn": {
-                    "identitetsnummer": "456",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                }
-            }
-        """.trimIndent()
-
         with(testApplicationEngine) {
             nyttVedtak(
-                requestBody = request,
+                requestBody = oppprettRequest,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
         }
@@ -189,6 +151,25 @@ internal class NormalflytInngvilgetSøknadTest(
     private companion object {
         private const val saksnummer = "123"
         private const val behandlingId = "456"
+
+        @Language("JSON")
+        private val oppprettRequest = """
+            {
+                "saksnummer": "$saksnummer",
+                "behandlingId": "$behandlingId",
+                "søknadMottatt": "2020-12-31T23:59:59.000Z",
+                "tidspunkt": "2021-01-01T12:00:00.000Z",
+                "søker": {
+                    "identitetsnummer": "123",
+                    "fødselsdato": "1990-01-01"
+                },
+                "barn": {
+                    "identitetsnummer": "123",
+                    "fødselsdato": "2020-01-01",
+                    "harSammeBosted": true
+                }
+            }
+        """.trimIndent()
 
         @Language("JSON")
         private val løseBehovForLegeerklæringRequest = """
@@ -205,11 +186,6 @@ internal class NormalflytInngvilgetSøknadTest(
         val forventetResponseHentVedtak = """
             {
               "vedtak": [{
-                  "barn": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                  },
                   "behandlingId": "$behandlingId",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
@@ -221,7 +197,8 @@ internal class NormalflytInngvilgetSøknadTest(
                         "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
                         "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
-                  }
+                  },
+                  "grunnlag": $oppprettRequest
               }]
             }
         """.trimIndent()

@@ -15,24 +15,7 @@ internal class SøkerOver70ÅrTest(
     @Order(1)
     fun `Sende inn vedtak der søker fyller 70 år 2025, barnet fyller 18 år 2038`() {
 
-        @Language("JSON")
-        val request = """
-            {
-                "saksnummer": "$saksnummer",
-                "behandlingId": "$behandlingId",
-                "søknadMottatt": "2020-12-31T23:59:59.000Z",
-                "tidspunkt": "2021-01-01T12:00:00.000Z",
-                "søker": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "1955-01-01"
-                },
-                "barn": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                }
-            }
-        """.trimIndent()
+
 
         @Language("JSON")
         val forventetResponse = """
@@ -50,7 +33,7 @@ internal class SøkerOver70ÅrTest(
 
         with(testApplicationEngine) {
             nyttVedtak(
-                requestBody = request,
+                requestBody = opprettRequest,
                 forventetResponse = forventetResponse
             )
         }
@@ -72,14 +55,28 @@ internal class SøkerOver70ÅrTest(
         private const val behandlingId = "456789"
 
         @Language("JSON")
-        val forventetResponseHentVedtak = """
+        val opprettRequest = """
             {
-              "vedtak": [{
-                  "barn": {
+                "saksnummer": "$saksnummer",
+                "behandlingId": "$behandlingId",
+                "søknadMottatt": "2020-12-31T23:59:59.000Z",
+                "tidspunkt": "2021-01-01T12:00:00.000Z",
+                "søker": {
+                    "identitetsnummer": "123",
+                    "fødselsdato": "1955-01-01"
+                },
+                "barn": {
                     "identitetsnummer": "123",
                     "fødselsdato": "2020-01-01",
                     "harSammeBosted": true
-                  },
+                }
+            }
+        """.trimIndent()
+
+        @Language("JSON")
+        val forventetResponseHentVedtak = """
+            {
+              "vedtak": [{
                   "behandlingId": "$behandlingId",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2024-12-31",
@@ -87,8 +84,9 @@ internal class SøkerOver70ÅrTest(
                   "uløsteBehov": {
                     "LEGEERKLÆRING": {}
                   },
-                  "løsteBehov": {}
-                  }]
+                  "løsteBehov": {},
+                  "grunnlag": $opprettRequest
+              }]
             }
         """.trimIndent()
     }

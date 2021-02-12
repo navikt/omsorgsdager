@@ -35,10 +35,7 @@ internal class SøknadMedFlereBarnTest(
 
         with(testApplicationEngine) {
             nyttVedtak(
-                requestBody = request(
-                    behandlingId = behandlingId1,
-                    barnIdentitetsnummer = "123"
-                ),
+                requestBody = opprettRequest1,
                 forventetResponse = forventetResponse
             )
         }
@@ -63,10 +60,7 @@ internal class SøknadMedFlereBarnTest(
 
         with(testApplicationEngine) {
             nyttVedtak(
-                requestBody = request(
-                    behandlingId = behandlingId2,
-                    barnIdentitetsnummer = "456"
-                ),
+                requestBody = opprettRequest2,
                 forventetResponse = forventetResponse
             )
         }
@@ -139,11 +133,6 @@ internal class SøknadMedFlereBarnTest(
             {
               "vedtak": [
                 {
-                  "barn": {
-                    "identitetsnummer": "456",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                  },
                   "behandlingId": "$behandlingId2",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
@@ -155,14 +144,10 @@ internal class SøknadMedFlereBarnTest(
                       "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
                       "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
-                  }
+                  },
+                  "grunnlag": $opprettRequest2
                 },
                 {
-                  "barn": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
-                  },
                   "behandlingId": "$behandlingId1",
                   "gyldigFraOgMed": "2021-01-01",
                   "gyldigTilOgMed": "2038-12-31",
@@ -174,7 +159,8 @@ internal class SøknadMedFlereBarnTest(
                       "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
                       "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
                     }
-                  }
+                  },
+                  "grunnlag": $opprettRequest1
                 }
               ]
             }
@@ -193,8 +179,18 @@ internal class SøknadMedFlereBarnTest(
         val behandlingId1 = UUID.randomUUID().toString()
         val behandlingId2 = UUID.randomUUID().toString()
 
+        private val opprettRequest1 = opprettRequest(
+            behandlingId = behandlingId1,
+            barnIdentitetsnummer = "123"
+        )
+
+        private val opprettRequest2 = opprettRequest(
+            behandlingId = behandlingId2,
+            barnIdentitetsnummer = "456"
+        )
+
         @Language("JSON")
-        fun request(
+        private fun opprettRequest(
             mottatt: String = "2020-12-31T23:59:59.000Z",
             barnIdentitetsnummer: String = "123",
             behandlingId: String) = """

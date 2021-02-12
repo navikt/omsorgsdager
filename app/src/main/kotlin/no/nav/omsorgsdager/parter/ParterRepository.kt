@@ -14,7 +14,6 @@ internal object ParterRepository {
     interface Part
 
     internal data class Søker(
-        internal val fødselsdato: LocalDate,
         internal val identitetsnummer: Identitetsnummer,
         internal val omsorgspengerSaksnummer: Saksnummer) : Part
 
@@ -39,8 +38,7 @@ internal object ParterRepository {
             when (type) {
                 "SØKER" -> Søker(
                     identitetsnummer = row.string("identitetsnummer"),
-                    omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer"),
-                    fødselsdato = row.localDate("fodselsdato")
+                    omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer")
                 )
                 "MOTPART" -> Motpart(
                     identitetsnummer = row.string("identitetsnummer"),
@@ -61,8 +59,8 @@ internal object ParterRepository {
                 is Søker -> mapOf(
                     "vedtakId" to vedtakId,
                     "identitetsnummer" to part.identitetsnummer,
-                    "fodelsdato" to part.fødselsdato,
-                    "omsorgspengerSaksnummer" to part.identitetsnummer,
+                    "fodelsdato" to null,
+                    "omsorgspengerSaksnummer" to part.omsorgspengerSaksnummer,
                     "type" to "SØKER"
                 )
                 is Barn -> mapOf(
@@ -75,7 +73,7 @@ internal object ParterRepository {
                     "vedtakId" to vedtakId,
                     "identitetsnummer" to part.identitetsnummer,
                     "fodelsdato" to null,
-                    "omsorgspengerSaksnummer" to part.identitetsnummer,
+                    "omsorgspengerSaksnummer" to part.omsorgspengerSaksnummer,
                     "type" to "MOTPART"
                 )
                 else -> throw IllegalStateException("Uhåndtert part $part")
@@ -96,6 +94,7 @@ internal object ParterRepository {
         }
     }
 
+    // TODO: Legge til contraint på at det må være FORESLÅTT?
     @Language("PostgreSQL")
     private const val LeggTilPartStatement = """
         INSERT INTO parter (vedtak_id, identitetsnummer, fodselsdato, type, omsorgspenger_saksnummer)

@@ -10,21 +10,21 @@ import java.time.LocalDate
 
 internal object HentKroniskSyktBarn {
     internal data class Response private constructor(
-        val barn: Barn,
         val behandlingId: BehandlingId,
         val gyldigFraOgMed: LocalDate,
         val gyldigTilOgMed: LocalDate,
         val status: VedtakStatus,
         val uløsteBehov: Map<String, Any>,
-        val løsteBehov: Map<String, Any>) {
+        val løsteBehov: Map<String, Any>,
+        val grunnlag: Map<String, Any?>) {
         internal constructor(behandling: Behandling<KroniskSyktBarnVedtak>) : this(
-            barn = behandling.vedtak.barn,
             behandlingId = behandling.vedtak.behandlingId,
             gyldigFraOgMed = behandling.vedtak.periode.fom,
             gyldigTilOgMed = behandling.vedtak.periode.tom,
             status = behandling.vedtak.status,
             uløsteBehov = behandling.behov.uløsteBehov.uløsteDto(),
-            løsteBehov = behandling.behov.løsteBehov.løsteDto()
+            løsteBehov = behandling.behov.løsteBehov.løsteDto(),
+            grunnlag = behandling.vedtak.grunnlag.map
         )
     }
 }

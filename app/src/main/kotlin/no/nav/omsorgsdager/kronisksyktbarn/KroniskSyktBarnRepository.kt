@@ -3,7 +3,6 @@ package no.nav.omsorgsdager.kronisksyktbarn
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.omsorgsdager.BehandlingId
-import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.behandling.Behandling
 import no.nav.omsorgsdager.behov.Behov
@@ -11,8 +10,6 @@ import no.nav.omsorgsdager.behov.BehovRepository.hentBehov
 import no.nav.omsorgsdager.behov.BehovRepository.leggTilBehov
 import no.nav.omsorgsdager.behov.BehovRepository.leggTilLøsteBehov
 import no.nav.omsorgsdager.behov.LøstBehov
-import no.nav.omsorgsdager.kronisksyktbarn.dto.Barn
-import no.nav.omsorgsdager.kronisksyktbarn.dto.Søker
 import no.nav.omsorgsdager.parter.ParterRepository
 import no.nav.omsorgsdager.parter.ParterRepository.hentParter
 import no.nav.omsorgsdager.parter.ParterRepository.leggTilParter
@@ -29,7 +26,7 @@ import javax.sql.DataSource
 internal interface KroniskSyktBarnRepository {
     fun hent(behandlingId: BehandlingId): Behandling<KroniskSyktBarnVedtak>?
     fun hentAlle(saksnummer: Saksnummer) : List<Behandling<KroniskSyktBarnVedtak>>
-    fun lagre(behandling: Behandling<KroniskSyktBarnVedtak>) : Behandling<KroniskSyktBarnVedtak>
+    fun lagre(behandling: Behandling<KroniskSyktBarnVedtak>, omsorgspengerSaksnummer: Saksnummer) : Behandling<KroniskSyktBarnVedtak>
     fun endreStatus(behandlingId: BehandlingId, status: VedtakStatus, tidspunkt: ZonedDateTime): Behandling<KroniskSyktBarnVedtak>
     fun leggTilLøsteBehov(behandlingId: BehandlingId, løsteBehov: Set<LøstBehov>): Behandling<KroniskSyktBarnVedtak>
 }
@@ -44,7 +41,7 @@ internal class InMemoryKroniskSyktBarnRepository : KroniskSyktBarnRepository {
         map.filterValues { it.vedtak.saksnummer == saksnummer }.values.toList()
 
 
-    override fun lagre(behandling: Behandling<KroniskSyktBarnVedtak>): Behandling<KroniskSyktBarnVedtak> {
+    override fun lagre(behandling: Behandling<KroniskSyktBarnVedtak>, omsorgspengerSaksnummer: Saksnummer): Behandling<KroniskSyktBarnVedtak> {
         map[behandling.vedtak.behandlingId] = behandling
         return map.getValue(behandling.vedtak.behandlingId)
     }
@@ -109,13 +106,13 @@ internal class DbKroniskSyktBarnRepository(
         }
     }
 
-    override fun lagre(behandling: Behandling<KroniskSyktBarnVedtak>): Behandling<KroniskSyktBarnVedtak> {
+    override fun lagre(behandling: Behandling<KroniskSyktBarnVedtak>, omsorgspengerSaksnummer: Saksnummer): Behandling<KroniskSyktBarnVedtak> {
         return using(sessionOf(dataSource)) { session ->
             session.transaction { transactionalSession ->
                 transactionalSession.lagreVedtak(VedtakRepository.LagreVedtak(
                     saksnummer = behandling.vedtak.saksnummer,
                     behandlingId = behandling.vedtak.behandlingId,
-                    grunnlag = "{}".somJson(), // TODO
+                    grunnlag = behandling.vedtak.grunnlag,
                     type = VedtakRepository.VedtakType.KRONISK_SYKT_BARN
                 ))
                 val vedtak = transactionalSession.endreVedtakPeriode(VedtakRepository.EndrePeriode(
@@ -126,9 +123,8 @@ internal class DbKroniskSyktBarnRepository(
                     vedtakId = vedtak.vedtakId,
                     parter = listOf(
                         ParterRepository.Søker(
-                            fødselsdato = behandling.vedtak.søker.fødselsdato,
-                            identitetsnummer = behandling.vedtak.søker.identitetsnummer,
-                            omsorgspengerSaksnummer = "TODO"
+                            identitetsnummer = behandling.vedtak.søkersIdentitetsnummer,
+                            omsorgspengerSaksnummer = omsorgspengerSaksnummer
                         ),
                         ParterRepository.Barn(
                             fødselsdato = behandling.vedtak.barn.fødselsdato,
@@ -175,15 +171,11 @@ internal class DbKroniskSyktBarnRepository(
     }
 
     private fun Triple<VedtakRepository.DbVedtak, Behov, List<ParterRepository.Part>>.tilBehandling() : Behandling<KroniskSyktBarnVedtak> {
-        val søker = third.first { it is ParterRepository.Søker }.let { it as ParterRepository.Søker }.let { Søker(
+        val søkersIdentitetsnummer = third.first { it is ParterRepository.Søker }.let { it as ParterRepository.Søker }.identitetsnummer
+
+        val barn = third.first { it is ParterRepository.Barn }.let { it as ParterRepository.Barn }.let { KroniskSyktBarnVedtak.Barn(
             identitetsnummer = it.identitetsnummer,
             fødselsdato = it.fødselsdato
-        )}
-
-        val barn = third.first { it is ParterRepository.Barn }.let { it as ParterRepository.Barn }.let { Barn(
-            identitetsnummer = it.identitetsnummer,
-            fødselsdato = it.fødselsdato,
-            harSammeBosted = true // TODO
         )}
 
         val vedtak = KroniskSyktBarnVedtak(
@@ -194,8 +186,9 @@ internal class DbKroniskSyktBarnRepository(
             periode = requireNotNull(first.periode) {
                 "KroniskSyktBarnVedtak må alltid ha en periode."
             },
+            søkersIdentitetsnummer = søkersIdentitetsnummer,
             barn = barn,
-            søker = søker
+            grunnlag = first.grunnlag
         )
 
         return Behandling(
