@@ -7,11 +7,11 @@ import kotliquery.queryOf
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.VedtakId
-import no.nav.omsorgsdager.vedtak.VedtakRepository.VedtakIdForVedtakForsikretIStatusForeslått
+import no.nav.omsorgsdager.vedtak.VedtakDbOperasjoner.VedtakIdForVedtakForsikretIStatusForeslått
 import org.intellij.lang.annotations.Language
 import java.time.LocalDate
 
-internal object ParterRepository {
+internal object ParterDbOperasjoner {
     interface Part
 
     internal data class Søker(

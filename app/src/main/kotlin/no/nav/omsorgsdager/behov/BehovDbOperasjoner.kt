@@ -7,10 +7,10 @@ import kotliquery.queryOf
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.VedtakId
 import no.nav.omsorgsdager.lovverk.Lovanvendelser
-import no.nav.omsorgsdager.vedtak.VedtakRepository.VedtakIdForVedtakForsikretIStatusForeslått
+import no.nav.omsorgsdager.vedtak.VedtakDbOperasjoner.VedtakIdForVedtakForsikretIStatusForeslått
 import org.intellij.lang.annotations.Language
 
-internal object BehovRepository {
+internal object BehovDbOperasjoner {
     internal fun TransactionalSession.leggTilBehov(vedtakId: VedtakId, behov: Behov) : Behov {
         leggTilUløstBehov(vedtakId, behov.alleBehovNavn)
         leggTilLøsteBehov(vedtakId, behov.løsteBehov)

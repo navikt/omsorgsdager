@@ -15,13 +15,14 @@ import no.nav.omsorgsdager.config.Environment
 import no.nav.omsorgsdager.config.KafkaBuilder.kafkaProducer
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.kronisksyktbarn.DbKroniskSyktBarnRepository
-import no.nav.omsorgsdager.kronisksyktbarn.InMemoryKroniskSyktBarnRepository
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnOperasjoner
-import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnRepository
+import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
 import no.nav.omsorgsdager.pdl.PdlClient
 import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver
+import no.nav.omsorgsdager.vedtak.InMemoryVedtakRepository
+import no.nav.omsorgsdager.vedtak.VedtakRepository
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource
@@ -34,7 +35,7 @@ internal class ApplicationContext(
     internal val tokenResolver: TokenResolver,
     internal val tilgangsstyring: Tilgangsstyring,
     internal val kafkaProducer: KafkaProducer<String, String>,
-    internal val kroniskSyktBarnRepository: KroniskSyktBarnRepository,
+    internal val kroniskSyktBarnRepository: VedtakRepository<KroniskSyktBarnVedtak>,
     internal val kroniskSyktBarnOperasjoner: KroniskSyktBarnOperasjoner,
     internal val configure: (application: Application) -> Unit) {
 
@@ -58,7 +59,7 @@ internal class ApplicationContext(
         var tokenResolver: TokenResolver? = null,
         var tilgangsstyring: Tilgangsstyring? = null,
         var kafkaProducer: KafkaProducer<String, String>? = null,
-        var kroniskSyktBarnRepository: KroniskSyktBarnRepository? = null,
+        var kroniskSyktBarnRepository: VedtakRepository<KroniskSyktBarnVedtak>? = null,
         var kroniskSyktBarnOperasjoner: KroniskSyktBarnOperasjoner? = null,
         var configure: (application: Application) -> Unit = {}) {
         internal fun build(): ApplicationContext {
@@ -97,7 +98,7 @@ internal class ApplicationContext(
             val benyttetKafkaProducer = kafkaProducer ?: benyttetEnv.kafkaProducer()
 
             // TODO: Bytte til DbRepository når det er klart.
-            val benyttetKroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryKroniskSyktBarnRepository()
+            val benyttetKroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryVedtakRepository()
 
             return ApplicationContext(
                 env = benyttetEnv,
