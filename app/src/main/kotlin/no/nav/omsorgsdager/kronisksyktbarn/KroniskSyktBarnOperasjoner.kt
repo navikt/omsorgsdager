@@ -22,8 +22,8 @@ internal class KroniskSyktBarnOperasjoner(
 
     override suspend fun hentAlle(saksnummer: Saksnummer) = kroniskSyktBarnRepository.hentAlle(saksnummer)
 
-    override suspend fun preOpprett(grunlag: Json): Set<Identitetsnummer> {
-        return grunlag.deserialize<OpprettKroniskSyktBarn.Grunnlag>().involverteIdentitetsnummer
+    override suspend fun preOpprett(grunnlag: Json): Set<Identitetsnummer> {
+        return grunnlag.deserialize<OpprettKroniskSyktBarn.Grunnlag>().involverteIdentitetsnummer
     }
 
     override suspend fun opprett(grunnlag: Json, correlationId: CorrelationId): Behandling<KroniskSyktBarnVedtak> {
