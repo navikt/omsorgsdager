@@ -67,9 +67,12 @@ internal data class KroniskSyktBarnVedtak(
                 navn = "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN",
                 versjon = 1,
                 lovanvendelser = lovanvendelseBuilder.build(),
+                grunnlag = """
+                    { "søknadMottatt": "$søknadMottatt", "sisteDagIÅretBarnetFyller18": "$sisteDagIÅretBarnetFyller18" }
+                """.somJson(),
                 løsning = """
                     { "fom": "${periode.fom}", "tom": "${periode.tom}" }
-                """.trimIndent().somJson()
+                """.somJson()
             )
 
             val uløsteBehov = setOf("VURDERE_KRONISK_SYKT_BARN".somUløstBehov())

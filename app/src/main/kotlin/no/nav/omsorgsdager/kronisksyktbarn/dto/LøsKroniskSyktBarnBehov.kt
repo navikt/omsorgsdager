@@ -2,6 +2,7 @@ package no.nav.omsorgsdager.kronisksyktbarn.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.omsorgsdager.Fritekst
+import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.behov.LøstBehov
 import no.nav.omsorgsdager.lovverk.Lovanvendelser
@@ -34,6 +35,8 @@ internal object LøsKroniskSyktBarnBehov {
             }
             builder.build()
         }()
+
+        override val grunnlag = Json.tomJson()
 
         override val løsning = """
         {

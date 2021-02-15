@@ -139,6 +139,10 @@ internal class SøknadMedFlereBarnTest(
                 "uløsteBehov": {},
                 "løsteBehov": {
                     "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
+                        "grunnlag": {
+                          "søknadMottatt": "2021-01-01",
+                          "sisteDagIÅretBarnetFyller18": "2038-12-31"
+                        },
                         "løsning": {
                             "fom": "2021-01-01",
                             "tom": "2038-12-31"
@@ -151,6 +155,7 @@ internal class SøknadMedFlereBarnTest(
                         }
                     },
                     "VURDERE_KRONISK_SYKT_BARN": {
+                        "grunnlag": {},
                         "løsning": {
                             "vurdering": "foo bar",
                             "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
@@ -173,6 +178,10 @@ internal class SøknadMedFlereBarnTest(
                 "uløsteBehov": {},
                 "løsteBehov": {
                     "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
+                        "grunnlag": {
+                          "søknadMottatt": "2021-01-01",
+                          "sisteDagIÅretBarnetFyller18": "2038-12-31"
+                        },
                         "løsning": {
                             "fom": "2021-01-01",
                             "tom": "2038-12-31"
@@ -185,6 +194,7 @@ internal class SøknadMedFlereBarnTest(
                         }
                     },
                     "VURDERE_KRONISK_SYKT_BARN": {
+                        "grunnlag": {},
                         "løsning": {
                             "vurdering": "foo bar",
                             "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
