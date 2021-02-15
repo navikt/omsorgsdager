@@ -37,7 +37,7 @@ internal object BehovRepository {
                     "versjon" to løstBehov.versjon,
                     "navn" to løstBehov.navn,
                     "losning" to løstBehov.løsning.raw,
-                    "lovanvendelser" to løstBehov.lovanvendelser.json.raw
+                    "lovanvendelser" to løstBehov.lovanvendelser.somJson().raw
                 )
             ))
         }
@@ -66,7 +66,7 @@ internal object BehovRepository {
                 "LØST" -> løsteBehov.add(TidligereLøstBehov(
                     navn = entry["navn"] as String,
                     versjon = entry["versjon"] as Int,
-                    lovanvendelser = Lovanvendelser((entry["lovanvendelser"] as String).somJson()),
+                    lovanvendelser = (entry["lovanvendelser"] as String).somJson().let { Lovanvendelser.fraJson(it) },
                     løsning = (entry["losning"] as String).somJson()
                 ))
                 "ULØST" -> uløsteBehov.add(UløstBehov(
