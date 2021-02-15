@@ -7,6 +7,7 @@ import kotliquery.queryOf
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.VedtakId
 import no.nav.omsorgsdager.lovverk.Lovanvendelser
+import no.nav.omsorgsdager.vedtak.VedtakRepository.VedtakIdForVedtakForsikretIStatusForeslått
 import org.intellij.lang.annotations.Language
 
 internal object BehovRepository {
@@ -89,16 +90,6 @@ internal object BehovRepository {
         }
     }
 
-    /**
-     * Skal kun være mulig å endre på behov gitt at vedtaket har
-     * status = 'FORESLÅTT'.
-     * Om det har en annen status får vi ingen vedtakId og det kommer ut som en feil
-     * `org.postgresql.util.PSQLException: ERROR: null value in column "vedtak_id" violates not-null constraint`
-     */
-    @Language("PostgreSQL")
-    private const val VedtakIdForVedtakForsikretIStatusForeslått = """
-        (SELECT id from vedtak WHERE id = :vedtakId AND status = 'FORESLÅTT')
-    """
     @Language("PostgreSQL")
     private const val LeggTilUløstBehovStatement = """
         INSERT into behov (vedtak_id, navn)

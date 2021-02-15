@@ -140,6 +140,17 @@ internal object VedtakRepository {
         }
     }
 
+    /**
+     * Skal kun være mulig å endre på behov gitt at vedtaket har
+     * status = 'FORESLÅTT'.
+     * Om det har en annen status får vi ingen vedtakId og det kommer ut som en feil
+     * `org.postgresql.util.PSQLException: ERROR: null value in column "vedtak_id" violates not-null constraint`
+     */
+    @Language("PostgreSQL")
+    internal const val VedtakIdForVedtakForsikretIStatusForeslått = """
+        (SELECT id from vedtak WHERE id = :vedtakId AND status = 'FORESLÅTT')
+    """
+
     @Language("PostgreSQL")
     private const val LagreVedtakStatement = """
         INSERT INTO vedtak (k9_saksnummer, k9_behandling_id, grunnlag, type, status)
