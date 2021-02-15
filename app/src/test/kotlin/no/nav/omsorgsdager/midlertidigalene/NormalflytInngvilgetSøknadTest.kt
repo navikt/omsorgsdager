@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager.kronisksyktbarn
+package no.nav.omsorgsdager.midlertidigalene
 
 import io.ktor.http.*
 import io.ktor.server.testing.*
@@ -6,6 +6,7 @@ import no.nav.omsorgsdager.testutils.TestApplicationExtension
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
+import java.util.*
 
 @ExtendWith(TestApplicationExtension::class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
@@ -26,12 +27,12 @@ internal class NormalflytInngvilgetSøknadTest(
               "AVSLÅTT": {}
             },
             "uløsteBehov": {
-                "VURDERE_KRONISK_SYKT_BARN": {}
+                "VURDERE_MIDLERTIDIG_ALENE": {}
             }
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nyttKroniskSyktBarnVedtak(
+            nyttMidlertidigAleneVedtak(
                 requestBody = oppprettRequest,
                 forventetResponse = forventetResponse
             )
@@ -55,9 +56,9 @@ internal class NormalflytInngvilgetSøknadTest(
       """.trimIndent()
 
         with(testApplicationEngine) {
-            løsBehovKroniskSyktBarn(
+            løsBehovMidlertidigAlene(
                 behandlingId = behandlingId,
-                requestBody = løseBehovForLegeerklæringRequest,
+                requestBody = løseVurdereMidlertidigAleneBehov,
                 forventetResponse = forventetResponse
             )
         }
@@ -75,7 +76,7 @@ internal class NormalflytInngvilgetSøknadTest(
         }
         """.trimIndent()
         with(testApplicationEngine) {
-            innvilgelseKroniskSyktBarn(
+            innvilgelseMidlertidigAlene(
                 behandlingId = behandlingId,
                 forventetResponse = forventetResponse
             )
@@ -94,22 +95,22 @@ internal class NormalflytInngvilgetSøknadTest(
         }
         """.trimIndent()
         with(testApplicationEngine) {
-            forkastKroniskSyktBarn(
+            forkastMidlertidigAlene(
                 behandlingId = behandlingId,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
-            innvilgelseKroniskSyktBarn(
+            innvilgelseMidlertidigAlene(
                 behandlingId = behandlingId,
                 forventetStatusCode = HttpStatusCode.OK,
                 forventetResponse = forventetResponse
             )
-            avslagKroniskSyktBarn(
+            avslagMidlertidigAlene(
                 behandlingId = behandlingId,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
-            løsBehovKroniskSyktBarn(
+            løsBehovMidlertidigAlene(
                 behandlingId = behandlingId,
-                requestBody = løseBehovForLegeerklæringRequest,
+                requestBody = løseVurdereMidlertidigAleneBehov,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
         }
@@ -119,7 +120,7 @@ internal class NormalflytInngvilgetSøknadTest(
     @Order(5)
     fun `Hente behandlingen`() {
         with(testApplicationEngine) {
-            hentBehandlingKroniskSyktBarn(
+            hentBehandlingMidlertidigAlene(
                 behandlingId = behandlingId,
                 forventetResponse = forventetResponseHentVedtak
             )
@@ -130,7 +131,7 @@ internal class NormalflytInngvilgetSøknadTest(
     @Order(6)
     fun `Hente saken`() {
         with(testApplicationEngine) {
-            hentSakKroniskSyktBarn(
+            hentSakMidlertidigAlene(
                 saksnummer = saksnummer,
                 forventetResponse = forventetResponseHentVedtak
             )
@@ -141,7 +142,7 @@ internal class NormalflytInngvilgetSøknadTest(
     @Order(7)
     fun `Send in søknad med brukt behandlingsId forvent 409`() {
         with(testApplicationEngine) {
-            nyttKroniskSyktBarnVedtak(
+            nyttMidlertidigAleneVedtak(
                 requestBody = oppprettRequest,
                 forventetStatusCode = HttpStatusCode.Conflict
             )
@@ -149,8 +150,8 @@ internal class NormalflytInngvilgetSøknadTest(
     }
 
     private companion object {
-        private const val saksnummer = "123"
-        private const val behandlingId = "456"
+        private val saksnummer = UUID.randomUUID().toString()
+        private val behandlingId = UUID.randomUUID().toString()
 
         @Language("JSON")
         private val oppprettRequest = """
@@ -159,71 +160,55 @@ internal class NormalflytInngvilgetSøknadTest(
                 "behandlingId": "$behandlingId",
                 "søknadMottatt": "2020-12-31T23:59:59.000Z",
                 "søker": {
-                    "identitetsnummer": "123"
+                    "identitetsnummer": "29099011111"
                 },
-                "barn": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "2020-01-01",
-                    "harSammeBosted": true
+                "motpart": {
+                    "identitetsnummer": "29099022222"
                 }
             }
         """.trimIndent()
 
         @Language("JSON")
-        private val løseBehovForLegeerklæringRequest = """
+        private val løseVurdereMidlertidigAleneBehov = """
             {
-              "VURDERE_KRONISK_SYKT_BARN": {
+              "VURDERE_MIDLERTIDIG_ALENE": {
                 "vurdering": "foo bar",
-                "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+                "erSøkerenMidlertidigAleneOmOmsorgen": true,
+                "gyldigFraOgMed": "2020-01-01",
+                "gyldigTilOgMed": "2025-01-12"
               }
             }
             """.trimIndent()
 
         @Language("JSON")
         val forventetResponseHentVedtak = """
-            {
-              "vedtak": [{
-                  "behandlingId": "$behandlingId",
-                  "gyldigFraOgMed": "2021-01-01",
-                  "gyldigTilOgMed": "2038-12-31",
-                  "status": "INNVILGET",
-                  "uløsteBehov": {},
-                  "løsteBehov": {
-                    "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
-                        "grunnlag": {
-                          "søknadMottatt": "2021-01-01",
-                          "sisteDagIÅretBarnetFyller18": "2038-12-31"
-                        },
-                        "løsning": {
-                            "fom": "2021-01-01",
-                            "tom": "2038-12-31"
-                        },
-                        "lovanvendelser": {
-                            "innvilget": {
-                                "Ftrl. § 9-5 fjerde ledd andre punktum": ["Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år."]
-                            },
-                            "avslått": {}
-                        }
-                    },
-                    "VURDERE_KRONISK_SYKT_BARN": {
+        {
+            "vedtak": [{
+                "behandlingId": "$behandlingId",
+                "gyldigFraOgMed": "2020-01-01",
+                "gyldigTilOgMed": "2025-01-12",
+                "status": "INNVILGET",
+                "uløsteBehov": {},
+                "løsteBehov": {
+                    "VURDERE_MIDLERTIDIG_ALENE": {
                         "grunnlag": {},
                         "løsning": {
-                            "vurdering": "foo bar",
-                            "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                            "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+                            "erSøkerenMidlertidigAleneOmOmsorgen": true,
+                            "gyldigFraOgMed": "2020-01-01",
+                            "gyldigTilOgMed": "2025-01-12",
+                            "vurdering": "foo bar"
                         },
                         "lovanvendelser": {
                             "innvilget": {
-                                "Ftrl. § 9-6 andre ledd": ["Barnet er kronisk sykt eller har en funksjonshemning.", "Er sammenheng med søkers risiko for fravær fra arbeidet."]
+                                "Ftrl. § 9-6 tredje ledd": ["Søkeren er midlertidig alene om omsorgen."]
                             },
                             "avslått": {}
                         }
                     }
-                  },
-                  "grunnlag": $oppprettRequest
-              }]
-            }
+                },
+                "grunnlag": $oppprettRequest
+            }]
+        }
         """.trimIndent()
     }
 }

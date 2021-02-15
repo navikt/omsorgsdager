@@ -34,7 +34,7 @@ internal class SøknadMedFlereBarnTest(
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nyttVedtak(
+            nyttKroniskSyktBarnVedtak(
                 requestBody = opprettRequest1,
                 forventetResponse = forventetResponse
             )
@@ -59,7 +59,7 @@ internal class SøknadMedFlereBarnTest(
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nyttVedtak(
+            nyttKroniskSyktBarnVedtak(
                 requestBody = opprettRequest2,
                 forventetResponse = forventetResponse
             )
@@ -83,7 +83,7 @@ internal class SøknadMedFlereBarnTest(
           """.trimIndent()
 
         with(testApplicationEngine) {
-            løs(
+            løsBehovKroniskSyktBarn(
                 behandlingId = behandlingId1,
                 requestBody = løseBehovForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
@@ -91,7 +91,7 @@ internal class SøknadMedFlereBarnTest(
                 ),
                 forventetResponse = forventetResponse
             )
-            løs(
+            løsBehovKroniskSyktBarn(
                 behandlingId = behandlingId2,
                 requestBody = løseBehovForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
@@ -114,11 +114,11 @@ internal class SøknadMedFlereBarnTest(
             }
             """.trimIndent()
         with(testApplicationEngine) {
-            innvilgelse(
+            innvilgelseKroniskSyktBarn(
                 behandlingId = behandlingId1,
                 forventetResponse = forventetResponse
             )
-            innvilgelse(
+            innvilgelseKroniskSyktBarn(
                 behandlingId = behandlingId2,
                 forventetResponse = forventetResponse
             )
@@ -213,7 +213,7 @@ internal class SøknadMedFlereBarnTest(
         }
         """.trimIndent()
         with(testApplicationEngine) {
-            hentSak(
+            hentSakKroniskSyktBarn(
                 saksnummer = saksnummer,
                 forventetStatusCode = HttpStatusCode.OK,
                 forventetResponse = forventetResponse

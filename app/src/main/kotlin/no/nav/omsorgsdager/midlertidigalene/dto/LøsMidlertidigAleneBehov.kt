@@ -20,7 +20,7 @@ internal object LøsMidlertidigAleneBehov {
     ) : LøstBehov {
         override val navn = "VURDERE_MIDLERTIDIG_ALENE"
         override val versjon = 1
-        private val periode: Periode? = (gyldigFraOgMed to gyldigTilOgMed).periodeOrNull()
+        internal val periode: Periode? = (gyldigFraOgMed to gyldigTilOgMed).periodeOrNull()
         override val lovanvendelser = {
             val builder = Lovanvendelser.Builder()
             if (requireNotNull(erSøkerenMidlertidigAleneOmOmsorgen) { "erSøkerenMidlertidigAleneOmOmsorgen må settes" }) {

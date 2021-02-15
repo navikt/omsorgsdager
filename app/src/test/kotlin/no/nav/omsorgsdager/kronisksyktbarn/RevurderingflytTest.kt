@@ -33,7 +33,7 @@ internal class RevurderingflytTest(
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nyttVedtak(
+            nyttKroniskSyktBarnVedtak(
                 requestBody = opprettRequest1,
                 forventetResponse = forventetResponse
             )
@@ -54,7 +54,7 @@ internal class RevurderingflytTest(
             }
             """.trimIndent()
         with(testApplicationEngine) {
-            avslag(
+            avslagKroniskSyktBarn(
                 behandlingId = behandlingId1,
                 forventetResponse = forventetResponse
             )
@@ -79,7 +79,7 @@ internal class RevurderingflytTest(
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nyttVedtak(
+            nyttKroniskSyktBarnVedtak(
                 requestBody = opprettRequest2,
                 forventetResponse = forventetResponse
             )
@@ -103,7 +103,7 @@ internal class RevurderingflytTest(
           """.trimIndent()
 
         with(testApplicationEngine) {
-            løs(
+            løsBehovKroniskSyktBarn(
                 behandlingId = behandlingId2,
                 requestBody = løseBehovForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
@@ -126,7 +126,7 @@ internal class RevurderingflytTest(
             }
             """.trimIndent()
         with(testApplicationEngine) {
-            innvilgelse(
+            innvilgelseKroniskSyktBarn(
                 behandlingId = behandlingId2,
                 forventetResponse = forventetResponse
             )
@@ -151,7 +151,7 @@ internal class RevurderingflytTest(
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nyttVedtak(
+            nyttKroniskSyktBarnVedtak(
                 requestBody = opprettRequest3,
                 forventetResponse = forventetResponse
             )
@@ -174,7 +174,7 @@ internal class RevurderingflytTest(
           """.trimIndent()
 
         with(testApplicationEngine) {
-            løs(
+            løsBehovKroniskSyktBarn(
                 behandlingId = behandlingId3,
                 requestBody = løseBehovForLegeerklæringRequest(
                     barnetErKroniskSyktEllerHarEnFunksjonshemning = true,
@@ -197,7 +197,7 @@ internal class RevurderingflytTest(
             }
             """.trimIndent()
         with(testApplicationEngine) {
-            avslag(
+            avslagKroniskSyktBarn(
                 behandlingId = behandlingId3,
                 forventetResponse = forventetResponse
             )
@@ -208,7 +208,7 @@ internal class RevurderingflytTest(
     @Order(9)
     fun `Henter hvert enkelt vedtak`() {
         with(testApplicationEngine) {
-            hentBehandling(
+            hentBehandlingKroniskSyktBarn(
                 behandlingId = behandlingId1,
                 forventetResponse = """
                 {
@@ -243,7 +243,7 @@ internal class RevurderingflytTest(
                 }
                 """.trimIndent()
             )
-            hentBehandling(
+            hentBehandlingKroniskSyktBarn(
                 behandlingId = behandlingId2,
                 forventetResponse = """
                 {
@@ -290,7 +290,7 @@ internal class RevurderingflytTest(
                 }
                 """.trimIndent()
             )
-            hentBehandling(
+            hentBehandlingKroniskSyktBarn(
                 behandlingId = behandlingId3,
                 forventetResponse = """
                 {
@@ -433,7 +433,7 @@ internal class RevurderingflytTest(
         }
         """.trimIndent()
         with(testApplicationEngine) {
-            hentSak(
+            hentSakKroniskSyktBarn(
                 saksnummer = saksnummer,
                 forventetResponse = forventetResponse
             )

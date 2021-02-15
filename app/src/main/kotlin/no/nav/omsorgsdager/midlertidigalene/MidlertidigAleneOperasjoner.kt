@@ -41,11 +41,23 @@ internal class MidlertidigAleneOperasjoner(
     }
 
     override suspend fun løsninger(behandlingId: BehandlingId, grunnlag: Json): Behandling<MidlertidigAleneVedtak> {
-        val løsteBehov = grunnlag.deserialize<LøsMidlertidigAleneBehov.Request>().løsteBehov
-        return midlertidigAleneRepository.leggTilLøsteBehov(
+        val løsteBehov = grunnlag.deserialize<LøsMidlertidigAleneBehov.Request>()
+
+        val behandling = midlertidigAleneRepository.leggTilLøsteBehov(
             behandlingId = behandlingId,
-            løsteBehov = løsteBehov
+            løsteBehov = løsteBehov.løsteBehov
         )
+
+        // TODO: Denne logikken må flyttes til repository
+        return when (løsteBehov.VURDERE_MIDLERTIDIG_ALENE?.periode != null) {
+            true -> midlertidigAleneRepository.lagre(
+                omsorgspengerSaksnummer = "${UUID.randomUUID()}", // TODO: Integrasjon for å hente saksnummeret
+                behandling = behandling.copy(
+                    vedtak = behandling.vedtak.copy(periode = løsteBehov.VURDERE_MIDLERTIDIG_ALENE!!.periode!!)
+                )
+            )
+            false -> behandling
+        }
     }
 
     override suspend fun innvilg(behandlingId: BehandlingId, tidspunkt: ZonedDateTime): Behandling<MidlertidigAleneVedtak> =
