@@ -7,15 +7,15 @@ import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.behandling.Behandling
 import no.nav.omsorgsdager.behandling.BehandlingOperasjoner
-import no.nav.omsorgsdager.kronisksyktbarn.dto.HentKroniskSyktBarn
 import no.nav.omsorgsdager.kronisksyktbarn.dto.LøsKroniskSyktBarnBehov
 import no.nav.omsorgsdager.kronisksyktbarn.dto.OpprettKroniskSyktBarn
+import no.nav.omsorgsdager.vedtak.VedtakRepository
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import java.time.ZonedDateTime
 import java.util.*
 
 internal class KroniskSyktBarnOperasjoner(
-    private val kroniskSyktBarnRepository: KroniskSyktBarnRepository
+    private val kroniskSyktBarnRepository: VedtakRepository<KroniskSyktBarnVedtak>
 ) : BehandlingOperasjoner<KroniskSyktBarnVedtak> {
 
     override suspend fun hent(behandlingId: BehandlingId) = kroniskSyktBarnRepository.hent(behandlingId)
@@ -53,7 +53,4 @@ internal class KroniskSyktBarnOperasjoner(
 
     override suspend fun forkast(behandlingId: BehandlingId, tidspunkt: ZonedDateTime): Behandling<KroniskSyktBarnVedtak> =
         kroniskSyktBarnRepository.endreStatus(behandlingId, VedtakStatus.FORKASTET, tidspunkt)
-
-    override fun behandlingDto(behandling: Behandling<KroniskSyktBarnVedtak>): HentKroniskSyktBarn.Response =
-        HentKroniskSyktBarn.Response(behandling)
 }

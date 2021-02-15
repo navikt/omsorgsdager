@@ -11,7 +11,6 @@ import java.time.ZonedDateTime
 internal interface BehandlingOperasjoner<V: Vedtak> {
     suspend fun hent(behandlingId: BehandlingId): Behandling<V>?
     suspend fun hentAlle(saksnummer: Saksnummer): List<Behandling<V>>
-    fun behandlingDto(behandling: Behandling<V>) : Any
 
     suspend fun preOpprett(grunnlag: Json) : Set<Identitetsnummer>
     suspend fun opprett(grunnlag: Json, correlationId: CorrelationId): Behandling<V>

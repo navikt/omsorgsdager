@@ -7,10 +7,11 @@ import kotliquery.queryOf
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.VedtakId
+import no.nav.omsorgsdager.vedtak.VedtakDbOperasjoner.VedtakIdForVedtakForsikretIStatusForeslått
 import org.intellij.lang.annotations.Language
 import java.time.LocalDate
 
-internal object ParterRepository {
+internal object ParterDbOperasjoner {
     interface Part
 
     internal data class Søker(
@@ -94,11 +95,10 @@ internal object ParterRepository {
         }
     }
 
-    // TODO: Legge til contraint på at det må være FORESLÅTT?
     @Language("PostgreSQL")
     private const val LeggTilPartStatement = """
         INSERT INTO parter (vedtak_id, identitetsnummer, fodselsdato, type, omsorgspenger_saksnummer)
-        VALUES(:vedtakId, :identitetsnummer, :fodelsdato, :type, :omsorgspengerSaksnummer)
+        VALUES($VedtakIdForVedtakForsikretIStatusForeslått, :identitetsnummer, :fodelsdato, :type, :omsorgspengerSaksnummer)
     """
 
     @Language("PostgreSQL")

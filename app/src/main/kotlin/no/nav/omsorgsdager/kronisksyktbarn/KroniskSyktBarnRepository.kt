@@ -6,81 +6,27 @@ import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.behandling.Behandling
 import no.nav.omsorgsdager.behov.Behov
-import no.nav.omsorgsdager.behov.BehovRepository.hentBehov
-import no.nav.omsorgsdager.behov.BehovRepository.leggTilBehov
-import no.nav.omsorgsdager.behov.BehovRepository.leggTilLøsteBehov
+import no.nav.omsorgsdager.behov.BehovDbOperasjoner.hentBehov
+import no.nav.omsorgsdager.behov.BehovDbOperasjoner.leggTilBehov
+import no.nav.omsorgsdager.behov.BehovDbOperasjoner.leggTilLøsteBehov
 import no.nav.omsorgsdager.behov.LøstBehov
-import no.nav.omsorgsdager.parter.ParterRepository
-import no.nav.omsorgsdager.parter.ParterRepository.hentParter
-import no.nav.omsorgsdager.parter.ParterRepository.leggTilParter
+import no.nav.omsorgsdager.parter.ParterDbOperasjoner
+import no.nav.omsorgsdager.parter.ParterDbOperasjoner.hentParter
+import no.nav.omsorgsdager.parter.ParterDbOperasjoner.leggTilParter
+import no.nav.omsorgsdager.vedtak.VedtakDbOperasjoner
+import no.nav.omsorgsdager.vedtak.VedtakDbOperasjoner.endreVedtakPeriode
+import no.nav.omsorgsdager.vedtak.VedtakDbOperasjoner.endreVedtakStatus
+import no.nav.omsorgsdager.vedtak.VedtakDbOperasjoner.hentAlleVedtak
+import no.nav.omsorgsdager.vedtak.VedtakDbOperasjoner.hentVedtak
+import no.nav.omsorgsdager.vedtak.VedtakDbOperasjoner.lagreVedtak
 import no.nav.omsorgsdager.vedtak.VedtakRepository
-import no.nav.omsorgsdager.vedtak.VedtakRepository.endreVedtakPeriode
-import no.nav.omsorgsdager.vedtak.VedtakRepository.endreVedtakStatus
-import no.nav.omsorgsdager.vedtak.VedtakRepository.hentAlleVedtak
-import no.nav.omsorgsdager.vedtak.VedtakRepository.hentVedtak
-import no.nav.omsorgsdager.vedtak.VedtakRepository.lagreVedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import java.time.ZonedDateTime
 import javax.sql.DataSource
 
-internal interface KroniskSyktBarnRepository {
-    fun hent(behandlingId: BehandlingId): Behandling<KroniskSyktBarnVedtak>?
-    fun hentAlle(saksnummer: Saksnummer) : List<Behandling<KroniskSyktBarnVedtak>>
-    fun lagre(behandling: Behandling<KroniskSyktBarnVedtak>, omsorgspengerSaksnummer: Saksnummer) : Behandling<KroniskSyktBarnVedtak>
-    fun endreStatus(behandlingId: BehandlingId, status: VedtakStatus, tidspunkt: ZonedDateTime): Behandling<KroniskSyktBarnVedtak>
-    fun leggTilLøsteBehov(behandlingId: BehandlingId, løsteBehov: Set<LøstBehov>): Behandling<KroniskSyktBarnVedtak>
-}
-
-internal class InMemoryKroniskSyktBarnRepository : KroniskSyktBarnRepository {
-    private val map = mutableMapOf<BehandlingId, Behandling<KroniskSyktBarnVedtak>>()
-
-    override fun hent(behandlingId: BehandlingId): Behandling<KroniskSyktBarnVedtak>? =
-        map[behandlingId]
-
-    override fun hentAlle(saksnummer: Saksnummer): List<Behandling<KroniskSyktBarnVedtak>> =
-        map.filterValues { it.vedtak.saksnummer == saksnummer }.values.toList()
-
-
-    override fun lagre(behandling: Behandling<KroniskSyktBarnVedtak>, omsorgspengerSaksnummer: Saksnummer): Behandling<KroniskSyktBarnVedtak> {
-        map[behandling.vedtak.behandlingId] = behandling
-        return map.getValue(behandling.vedtak.behandlingId)
-    }
-
-    override fun endreStatus(behandlingId: BehandlingId, status: VedtakStatus, tidspunkt: ZonedDateTime): Behandling<KroniskSyktBarnVedtak> {
-        val current = map.getValue(behandlingId)
-        map[behandlingId] = current.copy(
-            vedtak = current.vedtak.copy(status = status, statusSistEndret = tidspunkt)
-        )
-        return map.getValue(behandlingId)
-    }
-
-    override fun leggTilLøsteBehov(behandlingId: BehandlingId, løsteBehov: Set<LøstBehov>): Behandling<KroniskSyktBarnVedtak> {
-        val behandling = map.getValue(behandlingId)
-
-        val løsteBehovNavn = løsteBehov.map { it.navn }
-
-        val oppdaterteLøsteBehov = behandling.behov.løsteBehov.filterNot {
-            it.navn in løsteBehovNavn
-        }.plus(løsteBehov).toSet()
-
-        val alleLøsninger = oppdaterteLøsteBehov.map { it.navn }
-
-        val oppdaterteBehov = Behov(
-            løsteBehov = oppdaterteLøsteBehov,
-            uløsteBehov = behandling.behov.uløsteBehov.filterNot {
-                it.navn in alleLøsninger
-            }.toSet()
-        )
-        map[behandlingId] = behandling.copy(
-            behov = oppdaterteBehov
-        )
-        return map.getValue(behandlingId)
-    }
-}
-
 internal class DbKroniskSyktBarnRepository(
     private val dataSource: DataSource
-) : KroniskSyktBarnRepository {
+) : VedtakRepository<KroniskSyktBarnVedtak> {
     override fun hent(behandlingId: BehandlingId): Behandling<KroniskSyktBarnVedtak>? {
          return using(sessionOf(dataSource)) { session ->
              val vedtak = session.hentVedtak(behandlingId)
@@ -109,24 +55,24 @@ internal class DbKroniskSyktBarnRepository(
     override fun lagre(behandling: Behandling<KroniskSyktBarnVedtak>, omsorgspengerSaksnummer: Saksnummer): Behandling<KroniskSyktBarnVedtak> {
         return using(sessionOf(dataSource)) { session ->
             session.transaction { transactionalSession ->
-                transactionalSession.lagreVedtak(VedtakRepository.LagreVedtak(
+                transactionalSession.lagreVedtak(VedtakDbOperasjoner.LagreVedtak(
                     saksnummer = behandling.vedtak.saksnummer,
                     behandlingId = behandling.vedtak.behandlingId,
                     grunnlag = behandling.vedtak.grunnlag,
-                    type = VedtakRepository.VedtakType.KRONISK_SYKT_BARN
+                    type = VedtakDbOperasjoner.VedtakType.KRONISK_SYKT_BARN
                 ))
-                val vedtak = transactionalSession.endreVedtakPeriode(VedtakRepository.EndrePeriode(
+                val vedtak = transactionalSession.endreVedtakPeriode(VedtakDbOperasjoner.EndrePeriode(
                     behandlingId = behandling.vedtak.behandlingId,
                     periode = behandling.vedtak.periode
                 ))
                 val parter = transactionalSession.leggTilParter(
                     vedtakId = vedtak.vedtakId,
                     parter = listOf(
-                        ParterRepository.Søker(
+                        ParterDbOperasjoner.Søker(
                             identitetsnummer = behandling.vedtak.søkersIdentitetsnummer,
                             omsorgspengerSaksnummer = omsorgspengerSaksnummer
                         ),
-                        ParterRepository.Barn(
+                        ParterDbOperasjoner.Barn(
                             fødselsdato = behandling.vedtak.barn.fødselsdato,
                             identitetsnummer = behandling.vedtak.barn.identitetsnummer
                         )
@@ -144,7 +90,7 @@ internal class DbKroniskSyktBarnRepository(
     override fun endreStatus(behandlingId: BehandlingId, status: VedtakStatus, tidspunkt: ZonedDateTime): Behandling<KroniskSyktBarnVedtak> {
         return using(sessionOf(dataSource)) { session ->
             session.transaction { transactionalSession ->
-                val vedtak = transactionalSession.endreVedtakStatus(VedtakRepository.EndreStatus(
+                val vedtak = transactionalSession.endreVedtakStatus(VedtakDbOperasjoner.EndreStatus(
                     behandlingId = behandlingId,
                     status = status,
                     tidspunkt = tidspunkt
@@ -170,10 +116,10 @@ internal class DbKroniskSyktBarnRepository(
         }
     }
 
-    private fun Triple<VedtakRepository.DbVedtak, Behov, List<ParterRepository.Part>>.tilBehandling() : Behandling<KroniskSyktBarnVedtak> {
-        val søkersIdentitetsnummer = third.first { it is ParterRepository.Søker }.let { it as ParterRepository.Søker }.identitetsnummer
+    private fun Triple<VedtakDbOperasjoner.DbVedtak, Behov, List<ParterDbOperasjoner.Part>>.tilBehandling() : Behandling<KroniskSyktBarnVedtak> {
+        val søkersIdentitetsnummer = third.first { it is ParterDbOperasjoner.Søker }.let { it as ParterDbOperasjoner.Søker }.identitetsnummer
 
-        val barn = third.first { it is ParterRepository.Barn }.let { it as ParterRepository.Barn }.let { KroniskSyktBarnVedtak.Barn(
+        val barn = third.first { it is ParterDbOperasjoner.Barn }.let { it as ParterDbOperasjoner.Barn }.let { KroniskSyktBarnVedtak.Barn(
             identitetsnummer = it.identitetsnummer,
             fødselsdato = it.fødselsdato
         )}

@@ -37,8 +37,8 @@ internal data class Periode(
         internal fun LocalDate.erEtterEllerLik(annen: LocalDate) = isAfter(annen) || isEqual(annen)
         internal fun LocalDate.nesteDag() = plusDays(1)
         internal fun LocalDate.forrigeDag() = minusDays(1)
-        internal fun Pair<LocalDate, LocalDate>.periodeOrNull() = kotlin.runCatching {
-            Periode(fom = first, tom = second)
+        internal fun Pair<LocalDate?, LocalDate?>.periodeOrNull() = kotlin.runCatching {
+            Periode(fom = first!!, tom = second!!)
         }.fold(onSuccess = {it}, onFailure = {null})
     }
 }

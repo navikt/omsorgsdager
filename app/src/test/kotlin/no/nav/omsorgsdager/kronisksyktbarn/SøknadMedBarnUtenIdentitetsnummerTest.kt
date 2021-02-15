@@ -31,7 +31,7 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
         }""".trimIndent()
 
         with(testApplicationEngine) {
-            nyttVedtak(
+            nyttKroniskSyktBarnVedtak(
                 requestBody = opprettRequest,
                 forventetResponse = forventetResponse
             )
@@ -55,7 +55,7 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
       """.trimIndent()
 
         with(testApplicationEngine) {
-            løs(
+            løsBehovKroniskSyktBarn(
                 behandlingId = behandlingId,
                 requestBody = løseBehovForLegeerklæringRequest,
                 forventetResponse = forventetResponse
@@ -75,7 +75,7 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
         }
         """.trimIndent()
         with(testApplicationEngine) {
-            innvilgelse(
+            innvilgelseKroniskSyktBarn(
                 behandlingId = behandlingId,
                 forventetResponse = forventetResponse
             )
@@ -86,7 +86,7 @@ internal class SøknadMedBarnUtenIdentitetsnummerTest(
     @Order(5)
     fun `Hente behandlingen`() {
         with(testApplicationEngine) {
-            hentBehandling(
+            hentBehandlingKroniskSyktBarn(
                 behandlingId = behandlingId,
                 forventetResponse = forventetResponseHentVedtak
             )
