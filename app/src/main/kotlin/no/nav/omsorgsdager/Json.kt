@@ -19,8 +19,8 @@ internal class Json private constructor(
     private val objectNode: ObjectNode) {
     internal val map: Map<String, Any?> = ObjectMapper.convertValue(objectNode)
     internal val raw = requireNotNull(objectNode.toString())
-
     private constructor(jsonString: String) : this(ObjectMapper.readTree(jsonString) as ObjectNode)
+    internal constructor(any: Any) : this(ObjectMapper.valueToTree(any))
 
     override fun equals(other: Any?) = when (other) {
         !is Json -> false

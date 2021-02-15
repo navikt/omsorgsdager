@@ -47,12 +47,14 @@ paths:
 
         - Om det allerede finnes et vedtak på samme `behandlingId` som fortsatt har status `FORESLÅTT`
         vil det nye grunlaget erstatte det som lå der. Om den eksisterende har en annen status enn `FORESLÅTT`
-        vil det feile med HTTP 409.
+        vil det feile med HTTP 409.</br>
+
+        - `tidspunkt` er optional, defaulter til utc now
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/KroniskSyktBarnSoknadRequest'
+              $ref: '#/components/schemas/OpprettKroniskSyktBarnRequest'
         required: true
       security:
         - accessToken: []
@@ -66,7 +68,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+                $ref: '#/components/schemas/OpprettKroniskSyktBarnResponse'
         409:
           description: Om det allerede er sendt inn et vedtak med samme behandlingId som har status != `FORESLÅTT`
     get:
@@ -138,7 +140,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BehovRequest'
+              $ref: '#/components/schemas/LostBehovRequest'
         required: true
       security:
         - accessToken: []
@@ -151,7 +153,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+                $ref: '#/components/schemas/OpprettKroniskSyktBarnResponse'
         409:
           description: >
             - Om vedtaket har en annen status enn `FORESLÅTT`<br/>
@@ -167,7 +169,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EndreVedtakStatus'
+              $ref: '#/components/schemas/EndreVedtakStatusRequest'
       parameters:
         - name: behandlingId
           in: path
@@ -184,7 +186,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+                $ref: '#/components/schemas/OpprettKroniskSyktBarnResponse'
         409:
           description: >
             - Om det er uløste behov<br/>
@@ -203,7 +205,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EndreVedtakStatus'
+              $ref: '#/components/schemas/EndreVedtakStatusRequest'
       parameters:
         - name: behandlingId
           in: path
@@ -220,7 +222,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+                $ref: '#/components/schemas/OpprettKroniskSyktBarnResponse'
         409:
           description: >
             - Om vedtaket før avslag har en annen status enn `FORESLÅTT`
@@ -235,7 +237,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EndreVedtakStatus'
+              $ref: '#/components/schemas/EndreVedtakStatusRequest'
       parameters:
         - name: behandlingId
           in: path
@@ -252,13 +254,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/KroniskSyktBarnSoknadResponse'
+                $ref: '#/components/schemas/OpprettKroniskSyktBarnResponse'
         409:
           description: >
             - Om vedtaket før forkasting har en annen status enn `FORESLÅTT`
 components:
   schemas:
-    KroniskSyktBarnSoknadRequest:
+    OpprettKroniskSyktBarnRequest:
       type: object
       properties:
         saksnummer:
@@ -286,9 +288,6 @@ components:
           type: string
           format: string
           example: '29099011112'
-        fødselsdato:
-          type: string
-          format: date
     Barn:
       type: object
       properties:
@@ -302,7 +301,7 @@ components:
         harSammeBosted:
           type: boolean
           example: true
-    KroniskSyktBarnSoknadResponse:
+    OpprettKroniskSyktBarnResponse:
       type: object
       properties:
         status:
@@ -328,16 +327,16 @@ components:
         uløsteBehov:
           type: object
           properties:
-            LEGEERKLÆRING:
+            VURDERE_KRONISK_SYKT_BARN:
               type: object
               properties: {}
-            OMSORGEN_FOR:
+            VURDERE_OMSORGEN_FOR:
               type: object
               properties: {}
-    BehovRequest:
+    LostBehovRequest:
       type: object
       properties:
-        LEGEERKLÆRING:
+        VURDERE_KRONISK_SYKT_BARN:
           type: object
           properties:
             vurdering:
@@ -349,14 +348,55 @@ components:
             erSammenhengMedSøkersRisikoForFraværFraArbeid:
               type: boolean
               example: true
-        OMSORGEN_FOR:
+        VURDERE_OMSORGEN_FOR:
           type: object
           properties: {}
+    Lovhenvisninger:
+      type: object
+      properties:
+        innvilget:
+          type: object
+          properties:
+            "Ftrl. § 9-6 andre ledd":
+              type: array
+              items:
+                type: string
+                example: "Barnet er kronisk sykt eller har en funksjonshemning."
+            "Ftrl. § 9-5 fjerde ledd andre punktum":
+              type: array
+              items:
+                type: string
+                example: "Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år."
+        avslått:
+          type: object
+          properties:
+            "Ftrl. § 9-6 andre ledd":
+              type: array
+              items:
+                type: string
+                example: "Er ikke sammenheng med søkers risiko for fravær fra arbeidet."
+    VurdereKroniskSyktBarnLostBehov:
+      type: object
+      properties:
+        grunnlag:
+          type: object
+        lovhenvisninger:
+          $ref: '#/components/schemas/Lovhenvisninger'
+        løsning:
+          type: object
+          properties:
+            vurdering:
+              type: string
+              example: Dette er saksbehandlers vurdering
+            barnetErKroniskSyktEllerHarEnFunksjonshemning:
+              type: boolean
+              example: true
+            erSammenhengMedSøkersRisikoForFraværFraArbeid:
+              type: boolean
+              example: true
     HentKroniskSyktBarnResponse:
       type: object
       properties:
-        barn:
-          $ref: '#/components/schemas/Barn'
         behandlingId:
           type: string
           format: string
@@ -375,36 +415,19 @@ components:
             - INNVILGET
             - AVSLÅTT
             - FORKASTET
+        grunnlag:
+          $ref: '#/components/schemas/OpprettKroniskSyktBarnRequest'
         uløsteBehov:
           type: object
           properties:
-            OMSORGEN_FOR:
+            VURDERE_OMSORGEN_FOR:
               type: object
               properties: {}
         løsteBehov:
           type: object
           properties:
-            LEGEERKLÆRING:
-              type: object
-              properties:
-                vurdering:
-                  type: string
-                  example: Dette er saksbehandlers vurdering
-                barnetErKroniskSyktEllerHarEnFunksjonshemning:
-                  type: boolean
-                  example: true
-                erSammenhengMedSøkersRisikoForFraværFraArbeid:
-                  type: boolean
-                  example: true
-        lovhenvisnigner:
-          type: object
-          properties:
-            FTL 9-5 3.ledd:
-              type: string
-              example: "søkeren bor ikke i norge"
-            FTL 9-5 2.ledd:
-              type: string
-              example: "ikke omsorgen for barnet"
+            VURDERE_KRONISK_SYKT_BARN:
+              $ref: '#/components/schemas/VurdereKroniskSyktBarnLostBehov'
     HentGjeldendeKroniskSyktBarnResponse:
       type: object
       properties:
@@ -412,7 +435,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HentKroniskSyktBarnResponse'
-    EndreVedtakStatus:
+    EndreVedtakStatusRequest:
       type: object
       properties:
         tidspunkt:
