@@ -158,10 +158,8 @@ internal class NormalflytInngvilgetSøknadTest(
                 "saksnummer": "$saksnummer",
                 "behandlingId": "$behandlingId",
                 "søknadMottatt": "2020-12-31T23:59:59.000Z",
-                "tidspunkt": "2021-01-01T12:00:00.000Z",
                 "søker": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "1990-01-01"
+                    "identitetsnummer": "123"
                 },
                 "barn": {
                     "identitetsnummer": "123",

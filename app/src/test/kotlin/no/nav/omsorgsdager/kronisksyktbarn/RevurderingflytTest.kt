@@ -440,8 +440,7 @@ internal class RevurderingflytTest(
                 "søknadMottatt": "$mottatt",
                 "tidspunkt": "${ZonedDateTime.parse(mottatt).plusMinutes(10)}",
                 "søker": {
-                    "identitetsnummer": "123",
-                    "fødselsdato": "1990-01-01"
+                    "identitetsnummer": "123"
                 },
                 "barn": {
                     "identitetsnummer": "123",
