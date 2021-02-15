@@ -180,25 +180,25 @@ internal fun <V: Vedtak> Route.BehandlingRoute(
             Operasjon(type = Operasjon.Type.Endring, identitetsnummer = this, beskrivelse = "Hente vedtak om ${vedtakType.simpleName}")
 
         suspend fun ApplicationCall.hentForBehandling(
-            request: HentBehandling.Request) : HentBehandling.Response {
+            request: HentBehandling.Request) : HentBehandling.ListResponse {
 
             val behandling = behandlingOperasjoner.hent(
                 behandlingId = request.behandlingId!!
-            ) ?: return HentBehandling.Response()
+            ) ?: return HentBehandling.ListResponse()
 
             if (!behandling.vedtak.erInnenforDatoer(fom = request.gyldigFraOgMed, tom = request.gyldigTilOgMed)) {
-                return HentBehandling.Response()
+                return HentBehandling.ListResponse()
             }
 
             tilgangsstyring.verifiserTilgang(this, behandling.vedtak.involverteIdentitetsnummer.henteOperasjon())
 
-            return HentBehandling.Response(
-                vedtak = listOf(behandlingOperasjoner.behandlingDto(behandling))
+            return HentBehandling.ListResponse(
+                vedtak = listOf(HentBehandling.Response(behandling))
             )
         }
 
         suspend fun ApplicationCall.hentForSak(
-            request: HentBehandling.Request) : HentBehandling.Response {
+            request: HentBehandling.Request) : HentBehandling.ListResponse {
             val alle = behandlingOperasjoner.hentAlle(
                 saksnummer = request.saksnummer!!
             )
@@ -213,9 +213,9 @@ internal fun <V: Vedtak> Route.BehandlingRoute(
                 tom = request.gyldigTilOgMed
             ).map { gv -> alle.first { it.vedtak.behandlingId == gv.behandlingId }.copy(
                 vedtak = gv
-            )}.map { behandlingOperasjoner.behandlingDto(it) }
+            )}.map { HentBehandling.Response(it)}
 
-            return HentBehandling.Response(vedtak)
+            return HentBehandling.ListResponse(vedtak)
         }
 
         get {

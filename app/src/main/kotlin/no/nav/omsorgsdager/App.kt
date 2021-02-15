@@ -23,6 +23,7 @@ import no.nav.omsorgsdager.Json.Companion.configured
 import no.nav.omsorgsdager.behandling.BehandlingRoute
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
+import no.nav.omsorgsdager.midlertidigalene.MidlertidigAleneVedtak
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver.Companion.token
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
@@ -118,6 +119,12 @@ internal fun Application.app(
                     path = "/kronisk-sykt-barn",
                     vedtakType = KroniskSyktBarnVedtak::class,
                     behandlingOperasjoner = applicationContext.kroniskSyktBarnOperasjoner
+                )
+                BehandlingRoute(
+                    tilgangsstyring = applicationContext.tilgangsstyring,
+                    path = "/midlertidig-alene",
+                    vedtakType = MidlertidigAleneVedtak::class,
+                    behandlingOperasjoner = applicationContext.midlertidigAleneOperasjoner
                 )
             }
         }
