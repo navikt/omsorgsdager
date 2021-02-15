@@ -47,26 +47,21 @@ internal data class KroniskSyktBarnVedtak(
             val deserialized = grunnlag.deserialize<OpprettKroniskSyktBarn.Grunnlag>()
             val lovanvendelseBuilder = Lovanvendelser.Builder()
 
+            val søknadMottatt = deserialized.søknadMottatt.toLocalDateOslo()
             val sisteDagIÅretBarnetFyller18 = deserialized.barn.fødselsdato.sisteDagIÅretOm18År()
-            val dagenFørSøkerenFyller70 = deserialized.søker.sisteDagSøkerHarRettTilOmsorgsdager
 
-            if (dagenFørSøkerenFyller70.isBefore(sisteDagIÅretBarnetFyller18)) {
-                lovanvendelseBuilder.innvilget(Folketrygdeloven.DagenFørSøkerenFyller70,
-                    "Perioden gjelder fra dagen søknaden ble mottatt til dagen før søkeren fyller 70 år.")
-            } else {
-                lovanvendelseBuilder.innvilget(Folketrygdeloven.UtÅretBarnetFyller18,
-                    "Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år.")
+            val periode = when (søknadMottatt.isAfter(sisteDagIÅretBarnetFyller18)) {
+                true -> {
+                    lovanvendelseBuilder.avslått(Folketrygdeloven.UtÅretBarnetFyller18,
+                        "Barnet har allerede fylt 18 år.")
+                    Periode(enkeltdag = søknadMottatt)
+                }
+                false -> {
+                    lovanvendelseBuilder.innvilget(Folketrygdeloven.UtÅretBarnetFyller18,
+                        "Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år.")
+                    Periode(fom = søknadMottatt, tom = sisteDagIÅretBarnetFyller18)
+                }
             }
-
-            val periode = Periode(
-                fom = deserialized.søknadMottatt.toLocalDateOslo(),
-                tom = minOf(
-                    deserialized.barn.fødselsdato.sisteDagIÅretOm18År(),
-                    deserialized.søker.sisteDagSøkerHarRettTilOmsorgsdager
-                )
-            )
-
-            // TODO: Om perioden blir ugyldig (fom etter tom)
 
             val vurdertPeriode = AutomatiskLøstBehov(
                 navn = "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN",

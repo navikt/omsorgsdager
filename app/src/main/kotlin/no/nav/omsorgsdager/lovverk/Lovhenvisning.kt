@@ -21,11 +21,5 @@ internal enum class Folketrygdeloven(
         beskrivelse = "Dersom barnet er kronisk sykt eller funksjonshemmet, gjelder retten til og med det året barnet fyller 18 år.",
         lovhenvisning = "Ftrl. § 9-5 fjerde ledd andre punktum",
         link = URI("https://lovdata.no/nav/folketrygdloven/kap9/%C2%A79-5")
-    ),
-
-    DagenFørSøkerenFyller70(
-        beskrivelse = "Det ytes ikke stønad til medlem som er fylt 70 år.",
-        lovhenvisning = "Ftrl. § 9-3 første ledd andre punktum",
-        link = URI("https://lovdata.no/lov/1997-02-28-19/§9-3")
     )
 }

@@ -9,8 +9,8 @@ internal object OpprettKroniskSyktBarn {
     internal data class Grunnlag private constructor(
         val saksnummer: Saksnummer,
         val behandlingId: BehandlingId,
-        val tidspunkt: ZonedDateTime,
         val søknadMottatt: ZonedDateTime,
+        val tidspunkt: ZonedDateTime = søknadMottatt,
         val søker: Søker,
         val barn: Barn) {
         @get:JsonIgnore
