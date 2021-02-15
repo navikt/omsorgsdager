@@ -16,4 +16,6 @@ internal data class TidligereLøstBehov(
     override val lovanvendelser: Lovanvendelser,
     override val løsning: Json) : LøstBehov
 
+internal typealias AutomatiskLøstBehov = TidligereLøstBehov
+
 internal fun Collection<LøstBehov>.kanInnvilges() = all { it.lovanvendelser.avslått.isEmpty() }

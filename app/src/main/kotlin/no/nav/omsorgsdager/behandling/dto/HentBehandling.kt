@@ -4,7 +4,7 @@ import io.ktor.application.*
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Saksnummer
 import no.nav.omsorgsdager.behandling.Behandling
-import no.nav.omsorgsdager.behov.uløsteDto
+import no.nav.omsorgsdager.behov.dto.HentBehov.uløsteDto
 import no.nav.omsorgsdager.vedtak.Vedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import no.nav.omsorgsdager.vedtak.statusDto

@@ -14,13 +14,13 @@ internal data class Lovanvendelser (
     internal class Builder {
         private val innvilget = mutableMapOf<String, MutableSet<String>>()
         private val avslått = mutableMapOf<String, MutableSet<String>>()
-        internal fun innvilget(lovhenvisning: String, lovanvendelse: String) : Builder {
-            innvilget[lovhenvisning] = (innvilget[lovhenvisning] ?: mutableSetOf()).plus(lovanvendelse).toMutableSet()
+        internal fun innvilget(lovhenvisning: Lovhenvisning, lovanvendelse: String) : Builder {
+            innvilget[lovhenvisning.lovhenvisning] = (innvilget[lovhenvisning.lovhenvisning] ?: mutableSetOf()).plus(lovanvendelse).toMutableSet()
             return this
         }
 
-        internal fun avslått(lovhenvisning: String, lovanvendelse: String) : Builder {
-            avslått[lovhenvisning] = (avslått[lovhenvisning] ?: mutableSetOf()).plus(lovanvendelse).toMutableSet()
+        internal fun avslått(lovhenvisning: Lovhenvisning, lovanvendelse: String) : Builder {
+            avslått[lovhenvisning.lovhenvisning] = (avslått[lovhenvisning.lovhenvisning] ?: mutableSetOf()).plus(lovanvendelse).toMutableSet()
             return this
         }
 

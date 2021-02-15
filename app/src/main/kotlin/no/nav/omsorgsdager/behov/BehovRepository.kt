@@ -11,18 +11,18 @@ import org.intellij.lang.annotations.Language
 
 internal object BehovRepository {
     internal fun TransactionalSession.leggTilBehov(vedtakId: VedtakId, behov: Behov) : Behov {
-        leggTilUløstBehov(vedtakId, behov.uløsteBehov)
+        leggTilUløstBehov(vedtakId, behov.alleBehovNavn)
         leggTilLøsteBehov(vedtakId, behov.løsteBehov)
         return hentBehov(vedtakId)
     }
 
-    private fun TransactionalSession.leggTilUløstBehov(vedtakId: VedtakId, uløsteBehov: Set<UløstBehov>) {
+    private fun TransactionalSession.leggTilUløstBehov(vedtakId: VedtakId, uløsteBehov: Set<String>) {
         uløsteBehov.forEach { uløstBehov ->
             update(queryOf(
                 statement = LeggTilUløstBehovStatement,
                 paramMap = mapOf(
                     "vedtakId" to vedtakId,
-                    "navn" to uløstBehov.navn
+                    "navn" to uløstBehov
                 )
             ))
         }

@@ -98,6 +98,7 @@ internal fun TestApplicationEngine.hentBehandling(
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
+        println(response.content)
         assertEquals(forventetStatusCode, response.status())
         assertForventetResponse(forventetResponse)
     }
@@ -111,6 +112,7 @@ internal fun TestApplicationEngine.hentSak(
         addHeader(HttpHeaders.Authorization, authorizationHeaderSystem)
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     }.apply {
+        println(response.content)
         assertEquals(forventetStatusCode, response.status())
         assertForventetResponse(forventetResponse)
     }

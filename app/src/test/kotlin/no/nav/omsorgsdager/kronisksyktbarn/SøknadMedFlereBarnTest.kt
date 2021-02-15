@@ -29,7 +29,7 @@ internal class SøknadMedFlereBarnTest(
               "AVSLÅTT": {}
             },
             "uløsteBehov": {
-                "LEGEERKLÆRING": {}
+                "VURDERE_KRONISK_SYKT_BARN": {}
             }
         }""".trimIndent()
 
@@ -54,7 +54,7 @@ internal class SøknadMedFlereBarnTest(
               "FORKASTET": {}
             },
             "uløsteBehov": {
-                "LEGEERKLÆRING": {}
+                "VURDERE_KRONISK_SYKT_BARN": {}
             }
         }""".trimIndent()
 
@@ -130,40 +130,77 @@ internal class SøknadMedFlereBarnTest(
     fun `Henter allt knyttet till saksnummer, forventer två barn`() {
         @Language("JSON")
         val forventetResponse = """
-            {
-              "vedtak": [
-                {
-                  "behandlingId": "$behandlingId2",
-                  "gyldigFraOgMed": "2021-01-01",
-                  "gyldigTilOgMed": "2038-12-31",
-                  "status": "INNVILGET",
-                  "uløsteBehov": {},
-                  "løsteBehov": {
-                    "LEGEERKLÆRING": {
-                      "vurdering": "foo bar",
-                      "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                      "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+        {
+            "vedtak": [{
+                "behandlingId": "$behandlingId2",
+                "gyldigFraOgMed": "2021-01-01",
+                "gyldigTilOgMed": "2038-12-31",
+                "status": "INNVILGET",
+                "uløsteBehov": {},
+                "løsteBehov": {
+                    "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
+                        "løsning": {
+                            "fom": "2021-01-01",
+                            "tom": "2038-12-31"
+                        },
+                        "lovanvendelser": {
+                            "innvilget": {
+                                "Ftrl. § 9-5 fjerde ledd andre punktum": ["Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år."]
+                            },
+                            "avslått": {}
+                        }
+                    },
+                    "VURDERE_KRONISK_SYKT_BARN": {
+                        "løsning": {
+                            "vurdering": "foo bar",
+                            "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                            "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+                        },
+                        "lovanvendelser": {
+                            "innvilget": {
+                                "Ftrl. § 9-6 andre ledd": ["Barnet er kronisk sykt eller har en funksjonshemning.", "Er sammenheng med søkers risiko for fravær fra arbeidet."]
+                            },
+                            "avslått": {}
+                        }
                     }
-                  },
-                  "grunnlag": $opprettRequest2
                 },
-                {
-                  "behandlingId": "$behandlingId1",
-                  "gyldigFraOgMed": "2021-01-01",
-                  "gyldigTilOgMed": "2038-12-31",
-                  "status": "INNVILGET",
-                  "uløsteBehov": {},
-                  "løsteBehov": {
-                    "LEGEERKLÆRING": {
-                      "vurdering": "foo bar",
-                      "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                      "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+                "grunnlag": $opprettRequest2
+            }, {
+                "behandlingId": "$behandlingId1",
+                "gyldigFraOgMed": "2021-01-01",
+                "gyldigTilOgMed": "2038-12-31",
+                "status": "INNVILGET",
+                "uløsteBehov": {},
+                "løsteBehov": {
+                    "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
+                        "løsning": {
+                            "fom": "2021-01-01",
+                            "tom": "2038-12-31"
+                        },
+                        "lovanvendelser": {
+                            "innvilget": {
+                                "Ftrl. § 9-5 fjerde ledd andre punktum": ["Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år."]
+                            },
+                            "avslått": {}
+                        }
+                    },
+                    "VURDERE_KRONISK_SYKT_BARN": {
+                        "løsning": {
+                            "vurdering": "foo bar",
+                            "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                            "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+                        },
+                        "lovanvendelser": {
+                            "innvilget": {
+                                "Ftrl. § 9-6 andre ledd": ["Barnet er kronisk sykt eller har en funksjonshemning.", "Er sammenheng med søkers risiko for fravær fra arbeidet."]
+                            },
+                            "avslått": {}
+                        }
                     }
-                  },
-                  "grunnlag": $opprettRequest1
-                }
-              ]
-            }
+                },
+                "grunnlag": $opprettRequest1
+            }]
+        }
         """.trimIndent()
         with(testApplicationEngine) {
             hentSak(
@@ -217,7 +254,7 @@ internal class SøknadMedFlereBarnTest(
             erSammenhengMedSøkersRisikoForFraværFraArbeid: Boolean
         ) = """
             {
-              "LEGEERKLÆRING": {
+              "VURDERE_KRONISK_SYKT_BARN": {
                 "vurdering": "foo bar",
                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,
                 "erSammenhengMedSøkersRisikoForFraværFraArbeid": $erSammenhengMedSøkersRisikoForFraværFraArbeid

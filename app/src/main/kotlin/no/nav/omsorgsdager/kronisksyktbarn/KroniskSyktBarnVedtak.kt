@@ -5,11 +5,12 @@ import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.Saksnummer
+import no.nav.omsorgsdager.behov.AutomatiskLøstBehov
 import no.nav.omsorgsdager.behov.Behov
-import no.nav.omsorgsdager.behov.TidligereLøstBehov
 import no.nav.omsorgsdager.behov.somUløstBehov
 import no.nav.omsorgsdager.kronisksyktbarn.dto.OpprettKroniskSyktBarn
 import no.nav.omsorgsdager.lovverk.Lovanvendelser
+import no.nav.omsorgsdager.lovverk.Folketrygdeloven
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm18År
 import no.nav.omsorgsdager.tid.Periode.Companion.toLocalDateOslo
@@ -44,29 +45,50 @@ internal data class KroniskSyktBarnVedtak(
     internal companion object {
         internal fun fraGrunnlag(grunnlag: Json) : Pair<KroniskSyktBarnVedtak, Behov> {
             val deserialized = grunnlag.deserialize<OpprettKroniskSyktBarn.Grunnlag>()
-            val tilOgMed = minOf(
-                deserialized.barn.fødselsdato.sisteDagIÅretOm18År(),
-                deserialized.søker.sisteDagSøkerHarRettTilOmsorgsdager
+            val lovanvendelseBuilder = Lovanvendelser.Builder()
+
+            val sisteDagIÅretBarnetFyller18 = deserialized.barn.fødselsdato.sisteDagIÅretOm18År()
+            val dagenFørSøkerenFyller70 = deserialized.søker.sisteDagSøkerHarRettTilOmsorgsdager
+
+            if (dagenFørSøkerenFyller70.isBefore(sisteDagIÅretBarnetFyller18)) {
+                lovanvendelseBuilder.innvilget(Folketrygdeloven.DagenFørSøkerenFyller70,
+                    "Perioden gjelder fra dagen søknaden ble mottatt til dagen før søkeren fyller 70 år.")
+            } else {
+                lovanvendelseBuilder.innvilget(Folketrygdeloven.UtÅretBarnetFyller18,
+                    "Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år.")
+            }
+
+            val periode = Periode(
+                fom = deserialized.søknadMottatt.toLocalDateOslo(),
+                tom = minOf(
+                    deserialized.barn.fødselsdato.sisteDagIÅretOm18År(),
+                    deserialized.søker.sisteDagSøkerHarRettTilOmsorgsdager
+                )
             )
-            // TODO
-            val løsteBehov = setOf(TidligereLøstBehov(
-                navn = "VURDERE_PERIODE",
+
+            // TODO: Om perioden blir ugyldig (fom etter tom)
+
+            val vurdertPeriode = AutomatiskLøstBehov(
+                navn = "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN",
                 versjon = 1,
-                lovanvendelser = Lovanvendelser.Builder().innvilget("foo-bar", "Satt lengden utifra a eller b").build(),
-                løsning = "{}".somJson()
-            ))
-            val uløsteBehov = setOf("LEGEERKLÆRING".somUløstBehov())
+                lovanvendelser = lovanvendelseBuilder.build(),
+                løsning = """
+                    { "fom": "${periode.fom}", "tom": "${periode.tom}" }
+                """.trimIndent().somJson()
+            )
+
+            val uløsteBehov = setOf("VURDERE_KRONISK_SYKT_BARN".somUløstBehov())
 
             return KroniskSyktBarnVedtak(
                 saksnummer = deserialized.saksnummer,
                 behandlingId = deserialized.behandlingId,
                 status = VedtakStatus.FORESLÅTT,
                 statusSistEndret = deserialized.tidspunkt,
-                periode = Periode(fom = deserialized.søknadMottatt.toLocalDateOslo(), tom = tilOgMed),
+                periode = periode,
                 grunnlag = grunnlag,
                 barn = Barn(fødselsdato = deserialized.barn.fødselsdato, identitetsnummer = deserialized.barn.identitetsnummer),
                 søkersIdentitetsnummer = deserialized.søker.identitetsnummer
-            ) to Behov(uløsteBehov = uløsteBehov, løsteBehov = setOf())
+            ) to Behov(uløsteBehov = uløsteBehov, løsteBehov = setOf(vurdertPeriode))
         }
     }
 }

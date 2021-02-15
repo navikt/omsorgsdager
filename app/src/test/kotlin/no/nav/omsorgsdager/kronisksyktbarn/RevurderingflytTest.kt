@@ -28,7 +28,7 @@ internal class RevurderingflytTest(
               "AVSLÅTT": {}
             }, 
             "uløsteBehov": {
-                "LEGEERKLÆRING": {}
+                "VURDERE_KRONISK_SYKT_BARN": {}
             }
         }""".trimIndent()
 
@@ -49,7 +49,7 @@ internal class RevurderingflytTest(
                 "status": "AVSLÅTT",
                 "potensielleStatuser": {},
                 "uløsteBehov": {
-                  "LEGEERKLÆRING": {}
+                  "VURDERE_KRONISK_SYKT_BARN": {}
                 }
             }
             """.trimIndent()
@@ -74,7 +74,7 @@ internal class RevurderingflytTest(
               "AVSLÅTT": {}
             },
             "uløsteBehov": {
-                "LEGEERKLÆRING": {}
+                "VURDERE_KRONISK_SYKT_BARN": {}
             }
         }""".trimIndent()
 
@@ -146,7 +146,7 @@ internal class RevurderingflytTest(
               "AVSLÅTT": {}
             },
             "uløsteBehov": {
-                "LEGEERKLÆRING": {}
+                "VURDERE_KRONISK_SYKT_BARN": {}
             }
         }""".trimIndent()
 
@@ -218,9 +218,22 @@ internal class RevurderingflytTest(
                         "gyldigTilOgMed": "2038-12-31",
                         "status": "AVSLÅTT",
                         "uløsteBehov": {
-                            "LEGEERKLÆRING": {}
+                            "VURDERE_KRONISK_SYKT_BARN": {}
                         },
-                        "løsteBehov": {},
+                        "løsteBehov": {
+                            "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
+                                "løsning": {
+                                    "fom": "2021-01-01",
+                                    "tom": "2038-12-31"
+                                },
+                                "lovanvendelser": {
+                                    "innvilget": {
+                                        "Ftrl. § 9-5 fjerde ledd andre punktum": ["Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år."]
+                                    },
+                                    "avslått": {}
+                                }
+                            }
+                        },
                         "grunnlag": $opprettRequest1
                     }]
                 }
@@ -237,10 +250,30 @@ internal class RevurderingflytTest(
                         "status": "INNVILGET",
                         "uløsteBehov": {},
                         "løsteBehov": {
-                            "LEGEERKLÆRING": {
-                                "vurdering": "foo bar",
-                                "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                                "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+                            "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
+                                "løsning": {
+                                    "fom": "2021-01-01",
+                                    "tom": "2038-12-31"
+                                },
+                                "lovanvendelser": {
+                                    "innvilget": {
+                                        "Ftrl. § 9-5 fjerde ledd andre punktum": ["Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år."]
+                                    },
+                                    "avslått": {}
+                                }
+                            },
+                            "VURDERE_KRONISK_SYKT_BARN": {
+                                "løsning": {
+                                    "vurdering": "foo bar",
+                                    "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                                    "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+                                },
+                                "lovanvendelser": {
+                                    "innvilget": {
+                                        "Ftrl. § 9-6 andre ledd": ["Barnet er kronisk sykt eller har en funksjonshemning.", "Er sammenheng med søkers risiko for fravær fra arbeidet."]
+                                    },
+                                    "avslått": {}
+                                }
                             }
                         },
                         "grunnlag": $opprettRequest2
@@ -259,10 +292,32 @@ internal class RevurderingflytTest(
                         "status": "AVSLÅTT",
                         "uløsteBehov": {},
                         "løsteBehov": {
-                            "LEGEERKLÆRING": {
-                                "vurdering": "foo bar",
-                                "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                                "erSammenhengMedSøkersRisikoForFraværFraArbeid": false
+                            "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
+                                "løsning": {
+                                    "fom": "2021-03-30",
+                                    "tom": "2038-12-31"
+                                },
+                                "lovanvendelser": {
+                                    "innvilget": {
+                                        "Ftrl. § 9-5 fjerde ledd andre punktum": ["Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år."]
+                                    },
+                                    "avslått": {}
+                                }
+                            },
+                            "VURDERE_KRONISK_SYKT_BARN": {
+                                "løsning": {
+                                    "vurdering": "foo bar",
+                                    "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                                    "erSammenhengMedSøkersRisikoForFraværFraArbeid": false
+                                },
+                                "lovanvendelser": {
+                                    "innvilget": {
+                                        "Ftrl. § 9-6 andre ledd": ["Barnet er kronisk sykt eller har en funksjonshemning."]
+                                    },
+                                    "avslått": {
+                                        "Ftrl. § 9-6 andre ledd": ["Er ikke sammenheng med søkers risiko for fravær fra arbeidet."]
+                                    }
+                                }
                             }
                         },
                         "grunnlag": $opprettRequest3
@@ -287,10 +342,32 @@ internal class RevurderingflytTest(
                 "status": "AVSLÅTT",
                 "uløsteBehov": {},
                 "løsteBehov": {
-                    "LEGEERKLÆRING": {
-                        "vurdering": "foo bar",
-                        "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                        "erSammenhengMedSøkersRisikoForFraværFraArbeid": false
+                    "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
+                        "løsning": {
+                            "fom": "2021-03-30",
+                            "tom": "2038-12-31"
+                        },
+                        "lovanvendelser": {
+                            "innvilget": {
+                                "Ftrl. § 9-5 fjerde ledd andre punktum": ["Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år."]
+                            },
+                            "avslått": {}
+                        }
+                    },
+                    "VURDERE_KRONISK_SYKT_BARN": {
+                        "løsning": {
+                            "vurdering": "foo bar",
+                            "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                            "erSammenhengMedSøkersRisikoForFraværFraArbeid": false
+                        },
+                        "lovanvendelser": {
+                            "innvilget": {
+                                "Ftrl. § 9-6 andre ledd": ["Barnet er kronisk sykt eller har en funksjonshemning."]
+                            },
+                            "avslått": {
+                                "Ftrl. § 9-6 andre ledd": ["Er ikke sammenheng med søkers risiko for fravær fra arbeidet."]
+                            }
+                        }
                     }
                 },
                 "grunnlag": $opprettRequest3
@@ -301,10 +378,30 @@ internal class RevurderingflytTest(
                 "status": "INNVILGET",
                 "uløsteBehov": {},
                 "løsteBehov": {
-                    "LEGEERKLÆRING": {
-                        "vurdering": "foo bar",
-                        "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
-                        "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+                    "VURDERE_PERIODE_FOR_KRONISK_SYKT_BARN": {
+                        "løsning": {
+                            "fom": "2021-01-01",
+                            "tom": "2038-12-31"
+                        },
+                        "lovanvendelser": {
+                            "innvilget": {
+                                "Ftrl. § 9-5 fjerde ledd andre punktum": ["Perioden gjelder fra dagen søknaden ble mottatt ut året barnet fyller 18 år."]
+                            },
+                            "avslått": {}
+                        }
+                    },
+                    "VURDERE_KRONISK_SYKT_BARN": {
+                        "løsning": {
+                            "vurdering": "foo bar",
+                            "barnetErKroniskSyktEllerHarEnFunksjonshemning": true,
+                            "erSammenhengMedSøkersRisikoForFraværFraArbeid": true
+                        },
+                        "lovanvendelser": {
+                            "innvilget": {
+                                "Ftrl. § 9-6 andre ledd": ["Barnet er kronisk sykt eller har en funksjonshemning.", "Er sammenheng med søkers risiko for fravær fra arbeidet."]
+                            },
+                            "avslått": {}
+                        }
                     }
                 },
                 "grunnlag": $opprettRequest2
@@ -360,7 +457,7 @@ internal class RevurderingflytTest(
             erSammenhengMedSøkersRisikoForFraværFraArbeid: Boolean
         ) = """
             {
-              "LEGEERKLÆRING": {
+              "VURDERE_KRONISK_SYKT_BARN": {
                 "vurdering": "foo bar",
                 "barnetErKroniskSyktEllerHarEnFunksjonshemning": $barnetErKroniskSyktEllerHarEnFunksjonshemning,
                 "erSammenhengMedSøkersRisikoForFraværFraArbeid": $erSammenhengMedSøkersRisikoForFraværFraArbeid

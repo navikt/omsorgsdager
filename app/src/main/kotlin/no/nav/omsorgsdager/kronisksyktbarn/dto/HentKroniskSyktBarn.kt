@@ -2,12 +2,13 @@ package no.nav.omsorgsdager.kronisksyktbarn.dto
 
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.behandling.Behandling
-import no.nav.omsorgsdager.behov.løsteDto
-import no.nav.omsorgsdager.behov.uløsteDto
+import no.nav.omsorgsdager.behov.dto.HentBehov.løsteDto
+import no.nav.omsorgsdager.behov.dto.HentBehov.uløsteDto
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
 import no.nav.omsorgsdager.vedtak.VedtakStatus
 import java.time.LocalDate
 
+// TODO: Må denne være unik for kronisk sykt barn?
 internal object HentKroniskSyktBarn {
     internal data class Response private constructor(
         val behandlingId: BehandlingId,
