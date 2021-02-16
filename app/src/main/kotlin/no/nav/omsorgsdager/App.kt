@@ -83,9 +83,11 @@ internal fun Application.app(
 
     environment.monitor.subscribe(ApplicationStarted){
         applicationContext.start()
+        appLogger.info("ApplicationContext Startet")
     }
     environment.monitor.subscribe(ApplicationStopped){
         applicationContext.stop()
+        appLogger.info("ApplicationContext Stoppet")
     }
     preStopOnApplicationStopPreparing(preStopActions = listOf(
         FullførAktiveRequester(this)
