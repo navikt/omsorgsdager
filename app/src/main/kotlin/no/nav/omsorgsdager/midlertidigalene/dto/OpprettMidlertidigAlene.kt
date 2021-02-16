@@ -13,8 +13,8 @@ internal object OpprettMidlertidigAlene {
         val søknadMottatt: ZonedDateTime,
         val tidspunkt: ZonedDateTime = Periode.utcNå(),
         val søker: Søker,
-        val motpart: Motpart) {
+        val annenForelder: AnnenForelder) {
         @get:JsonIgnore
-        internal val involverteIdentitetsnummer = setOf(søker.identitetsnummer, motpart.identitetsnummer)
+        internal val involverteIdentitetsnummer = setOf(søker.identitetsnummer, annenForelder.identitetsnummer)
     }
 }

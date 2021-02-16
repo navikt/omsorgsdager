@@ -162,7 +162,7 @@ internal class NormalflytInngvilgetSøknadTest(
                 "søker": {
                     "identitetsnummer": "29099011111"
                 },
-                "motpart": {
+                "annenForelder": {
                     "identitetsnummer": "29099022222"
                 }
             }

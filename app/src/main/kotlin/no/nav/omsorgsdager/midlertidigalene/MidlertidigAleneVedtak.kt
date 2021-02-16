@@ -42,7 +42,7 @@ internal data class MidlertidigAleneVedtak(
                 statusSistEndret = deserialized.tidspunkt,
                 periode = null, // For midlertidig alene er periode en av de tingene som skal løses manuelt
                 grunnlag = grunnlag,
-                motpartsIdentitetsnummer = deserialized.motpart.identitetsnummer,
+                motpartsIdentitetsnummer = deserialized.annenForelder.identitetsnummer,
                 søkersIdentitetsnummer = deserialized.søker.identitetsnummer
             ) to Behov(uløsteBehov = uløsteBehov, løsteBehov = emptySet())
         }
