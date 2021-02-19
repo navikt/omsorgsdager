@@ -100,7 +100,6 @@ internal fun Application.app(
         callIdMdc("callId")
     }
 
-
     install(Routing) {
         HealthRoute(healthService = applicationContext.healthService)
         DefaultProbeRoutes()

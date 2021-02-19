@@ -3,7 +3,7 @@ CREATE TABLE behandling
     id                          BIGSERIAL PRIMARY KEY,
     k9_saksnummer               VARCHAR(50) NOT NULL,
     k9_behandling_id            VARCHAR(50) NOT NULL,
-    status                      VARCHAR(50) NOT NULL DEFAULT 'IN_FLIGHT',
+    status                      VARCHAR(50) NOT NULL,
     type                        VARCHAR(50) NOT NULL,
     tidspunkt                   TIMESTAMP WITH TIME ZONE NOT NULL,
     fom                         DATE NOT NULL,

@@ -29,11 +29,10 @@ internal class ApplicationContext(
     internal val configure: (application: Application) -> Unit) {
 
     internal fun start() {
-        // dataSource.migrate()
+        //dataSource.migrate()
     }
 
-    internal fun stop() {
-    }
+    internal fun stop() {}
 
     internal class Builder(
         var env: Environment? = null,

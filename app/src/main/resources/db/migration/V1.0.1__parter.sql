@@ -11,3 +11,5 @@ CREATE TABLE parter
 
 CREATE INDEX index_parter_behandling_id ON parter(behandling_id);
 CREATE INDEX index_parter_omsorgspenger_saksnummer ON parter(omsorgspenger_saksnummer);
+CREATE INDEX index_parter_identitetsnummer ON parter(identitetsnummer);
+
