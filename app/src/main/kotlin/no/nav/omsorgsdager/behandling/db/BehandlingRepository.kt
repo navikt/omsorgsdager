@@ -1,0 +1,19 @@
+package no.nav.omsorgsdager.behandling.db
+
+import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.K9BehandlingId
+import no.nav.omsorgsdager.K9Saksnummer
+
+internal class BehandlingRepository {
+    internal fun hentEn(behandlingId: K9BehandlingId) : DbBehandling? {
+        return null
+    }
+
+    internal fun hentAlle(saksnummer: K9Saksnummer) : List<DbBehandling> {
+        return emptyList()
+    }
+
+    internal fun hentAlle(behandlingIder: List<BehandlingId>) : List<DbBehandling> {
+        return emptyList()
+    }
+}

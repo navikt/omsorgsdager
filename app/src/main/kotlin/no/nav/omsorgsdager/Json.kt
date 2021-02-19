@@ -43,6 +43,7 @@ internal class Json private constructor(
         internal fun String.somJson() = Json(jsonString = this)
         internal fun JSONObject.somJson() = Json(jsonString = toString())
         internal fun ObjectNode.somJson() = Json(objectNode = this)
+        internal fun Json.kopi(append: Map<String, Any?> = emptyMap()) = Json(map.plus(append))
 
         internal suspend fun ApplicationCall.json() = kotlin.runCatching {
             receive<ObjectNode>().somJson()

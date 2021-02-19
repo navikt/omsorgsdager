@@ -1,11 +1,9 @@
 package no.nav.omsorgsdager.testutils
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.server.engine.*
-import io.mockk.Answer
 import io.mockk.every
 import io.mockk.mockk
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
@@ -18,7 +16,6 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsJwksUrl
 import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.app
 import no.nav.omsorgsdager.config.DataSourceBuilder
-import no.nav.omsorgsdager.kronisksyktbarn.DbKroniskSyktBarnRepository
 import no.nav.omsorgsdager.testutils.wiremock.*
 import org.apache.kafka.clients.producer.KafkaProducer
 import java.io.File
@@ -43,11 +40,6 @@ internal class MockedEnvironment(
         .build()
         .stubAccessTokens()
         .stubTilgangApi()
-        .stubPdlApi()
-
-    private val kafkaProducerMock = mockk<KafkaProducer<String, String>>().also {
-        every { it.close() }.returns(Unit)
-    }
 
     internal val applicationContext : ApplicationContext = {
         val env = mapOf(
@@ -57,7 +49,6 @@ internal class MockedEnvironment(
             "DATABASE_DATABASE" to "postgres",
             "DATABASE_USERNAME" to "postgres",
             "DATABASE_PASSWORD" to "postgres",
-            "PDL_BASE_URL" to wireMockServer.pdlApiBaseUrl(),
             "PROXY_SCOPES" to "/.default",
             "TILGANGSSTYRING_URL" to wireMockServer.tilgangApiBaseUrl(),
             "KAFKA_BOOTSTRAP_SERVERS" to "test",
@@ -72,10 +63,6 @@ internal class MockedEnvironment(
         )
         ApplicationContext.Builder(
             env = env,
-            kafkaProducer = kafkaProducerMock,
-            kroniskSyktBarnRepository = DbKroniskSyktBarnRepository(
-                dataSource = DataSourceBuilder(env).build()
-            ),
             configure = { application ->
                 application.install(CORS) {
                     method(HttpMethod.Options)
