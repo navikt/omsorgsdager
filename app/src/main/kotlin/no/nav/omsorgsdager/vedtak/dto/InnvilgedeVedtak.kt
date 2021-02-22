@@ -15,6 +15,7 @@ import java.time.ZonedDateTime
 internal data class InnvilgedeVedtak(
     @get:JsonProperty("kronisk-sykt-barn") val kroniskSyktBarn: List<KroniskSyktBarnInnvilgetVedtak>,
     @get:JsonProperty("midlertidig-alene") val midlertidigAlene: List<MidlertidigAleneInnvilgetVedtak>) {
+    @get:JsonIgnore val isEmpty = kroniskSyktBarn.isEmpty() && midlertidigAlene.isEmpty()
     internal companion object {
         internal fun gjeldendeBehandlingerSomInnvilgedeVedtak(gjeldendeBehandlinger: GjeldendeBehandlinger?)  = when (gjeldendeBehandlinger) {
             null -> InnvilgedeVedtak(
@@ -35,6 +36,7 @@ internal data class InnvilgedeVedtak(
                 )}
             )
         }
+        internal fun ingenInnvilgedeVedtak() = InnvilgedeVedtak(kroniskSyktBarn = emptyList(), midlertidigAlene = emptyList())
     }
 }
 
