@@ -3,7 +3,7 @@ package no.nav.omsorgsdager.tilgangsstyring
 import io.ktor.application.*
 import no.nav.helse.dusseldorf.ktor.core.DefaultProblemDetails
 import no.nav.helse.dusseldorf.ktor.core.Throwblem
-import no.nav.omsorgsdager.correlationId
+import no.nav.omsorgsdager.CorrelationId.Companion.correlationId
 import org.slf4j.LoggerFactory
 
 internal class Tilgangsstyring(
@@ -20,7 +20,7 @@ internal class Tilgangsstyring(
                 if (!omsorgspengerTilgangsstyringGateway.harTilgang(
                         token = token,
                         operasjon = operasjon,
-                        correlationId= correlationId)) {
+                        correlationId = correlationId)) {
                     logger.warn("Personen kan ikke gjøre operasjonen $operasjon")
                     throw Throwblem(problemDetails)
                 }

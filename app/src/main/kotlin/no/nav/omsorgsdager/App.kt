@@ -8,16 +8,15 @@ import io.ktor.jackson.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import io.ktor.util.*
-import no.nav.helse.dusseldorf.ktor.auth.AuthStatusPages
-import no.nav.helse.dusseldorf.ktor.auth.Issuer
-import no.nav.helse.dusseldorf.ktor.auth.multipleJwtIssuers
-import no.nav.helse.dusseldorf.ktor.auth.withoutAdditionalClaimRules
+import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
+import no.nav.omsorgsdager.CorrelationId.Companion.correlationId
 import no.nav.omsorgsdager.Json.Companion.configured
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver.Companion.token
+import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakApis
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import java.net.URI
@@ -89,7 +88,7 @@ internal fun Application.app(
         FullførAktiveRequester(this)
     ))
 
-    install(CallId) { retrieve { it.correlationId() } }
+    install(CallId) { retrieve { it.correlationId().toString() } }
 
     install(CallLogging) {
         val ignorePaths = setOf("/isalive", "/isready", "/metrics")
@@ -103,12 +102,14 @@ internal fun Application.app(
     install(Routing) {
         HealthRoute(healthService = applicationContext.healthService)
         DefaultProbeRoutes()
-        /*
         authenticate(*issuers.allIssuers()) {
             route("/api") {
+                InnvilgedeVedtakApis(
+                    tilgangsstyring = applicationContext.tilgangsstyring,
+                    innvilgedeVedtakService = applicationContext.innvilgedeVedtakService
+                )
             }
         }
-         */
     }
 }
 

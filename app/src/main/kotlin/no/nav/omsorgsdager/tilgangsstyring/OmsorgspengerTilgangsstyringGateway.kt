@@ -33,9 +33,9 @@ internal class OmsorgspengerTilgangsstyringGateway(
             httpClient.post<HttpStatement>(personTilgangUri) {
                 header(HttpHeaders.Authorization, token.authorizationHeader)
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
-                header(HttpHeaders.XCorrelationId, correlationId)
+                header(HttpHeaders.XCorrelationId, correlationId.toString())
                 body = PersonerRequestBody(
-                    identitetsnummer = operasjon.identitetsnummer,
+                    identitetsnummer = operasjon.identitetsnummer.map { it.toString() },
                     beskrivelse = operasjon.beskrivelse,
                     operasjon = operasjon.type.name
                 )
@@ -82,7 +82,7 @@ internal class OmsorgspengerTilgangsstyringGateway(
         private const val Navn = "OmsorgspengerTilgangsstyringGateway"
         private val logger = LoggerFactory.getLogger(OmsorgspengerTilgangsstyringGateway::class.java)
         private class PersonerRequestBody(
-            val identitetsnummer: Set<String>,
+            val identitetsnummer: List<String>,
             val operasjon: String,
             val beskrivelse: String
         )

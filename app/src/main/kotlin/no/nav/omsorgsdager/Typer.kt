@@ -4,15 +4,21 @@ import io.ktor.application.*
 import io.ktor.http.*
 import java.util.*
 
-internal typealias CorrelationId = String
-internal fun ApplicationCall.correlationId() = when {
-    request.headers.contains(HttpHeaders.XCorrelationId) -> request.headers[HttpHeaders.XCorrelationId]!!
-    request.headers.contains("Nav-Call-Id") -> request.headers["Nav-Call-Id"]!!
-    else -> "omsorgsdager-${UUID.randomUUID()}"
-}
-
-
 internal typealias BehandlingId = Long
+
+internal data class CorrelationId private constructor(private val value: String) {
+    init {
+        // TODO: Valider
+    }
+    override fun toString() = value
+    internal companion object {
+        internal fun ApplicationCall.correlationId() = when {
+            request.headers.contains(HttpHeaders.XCorrelationId) -> request.headers[HttpHeaders.XCorrelationId]!!
+            request.headers.contains("Nav-Call-Id") -> request.headers["Nav-Call-Id"]!!
+            else -> "omsorgsdager-${UUID.randomUUID()}"
+        }.let { CorrelationId(it) }
+    }
+}
 
 
 internal data class Identitetsnummer private constructor(private val value: String) {

@@ -1,7 +1,6 @@
 package no.nav.omsorgsdager.vedtak.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.omsorgsdager.K9BehandlingId
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.GjeldendeBehandlinger
@@ -13,8 +12,9 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 
 internal data class InnvilgedeVedtak(
-    @get:JsonProperty("kronisk-sykt-barn") val kroniskSyktBarn: List<KroniskSyktBarnInnvilgetVedtak>,
-    @get:JsonProperty("midlertidig-alene") val midlertidigAlene: List<MidlertidigAleneInnvilgetVedtak>) {
+    val kroniskSyktBarn: List<KroniskSyktBarnInnvilgetVedtak>,
+    val midlertidigAlene: List<MidlertidigAleneInnvilgetVedtak>) {
+    @get:JsonIgnore val isEmpty = kroniskSyktBarn.isEmpty() && midlertidigAlene.isEmpty()
     internal companion object {
         internal fun gjeldendeBehandlingerSomInnvilgedeVedtak(gjeldendeBehandlinger: GjeldendeBehandlinger?)  = when (gjeldendeBehandlinger) {
             null -> InnvilgedeVedtak(
@@ -35,6 +35,7 @@ internal data class InnvilgedeVedtak(
                 )}
             )
         }
+        internal fun ingenInnvilgedeVedtak() = InnvilgedeVedtak(kroniskSyktBarn = emptyList(), midlertidigAlene = emptyList())
     }
 }
 

@@ -1,15 +1,22 @@
 package no.nav.omsorgsdager.parter.db
 
 import no.nav.omsorgsdager.BehandlingId
+import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.OmsorgspengerSaksnummer
 import no.nav.omsorgsdager.parter.Involvering
+import javax.sql.DataSource
 
-internal class PartRepository {
+internal class PartRepository(
+    private val dataSource: DataSource) {
     internal fun hentParter(behandlingIder: List<BehandlingId>) : List<DbPart> {
         return emptyList()
     }
 
     internal fun hentInvolveringer(omsorgspengerSaksnummer: OmsorgspengerSaksnummer) : Map<Involvering, List<BehandlingId>> {
         return emptyMap()
+    }
+
+    internal fun hentOmsorgspengerSaksnummer(identitetsnummer: Identitetsnummer) : OmsorgspengerSaksnummer? {
+        return null
     }
 }

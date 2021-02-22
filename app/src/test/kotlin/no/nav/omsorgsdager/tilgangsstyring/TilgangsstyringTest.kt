@@ -6,6 +6,7 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.jws.NaisSts
+import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -204,13 +205,13 @@ internal class TilgangsstyringTest {
         private val VisningOperasjon = Operasjon(
             type = Operasjon.Type.Visning,
             beskrivelse = "Tester tilgangsstyring",
-            identitetsnummer = setOf("123")
+            identitetsnummer = setOf("123".somIdentitetsnummer())
         )
 
         private val EndringOperasjon = Operasjon(
             type = Operasjon.Type.Endring,
             beskrivelse = "Tester tilgangsstyring",
-            identitetsnummer = setOf("123")
+            identitetsnummer = setOf("123".somIdentitetsnummer())
         )
 
         internal fun azureSystemToken(medTilgang: Boolean) = Azure.V2_0.generateJwt(
