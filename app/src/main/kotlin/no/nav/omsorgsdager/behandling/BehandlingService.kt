@@ -13,6 +13,10 @@ internal class BehandlingService(
     private val behandlingRepository: BehandlingRepository,
     private val partRepository: PartRepository) {
 
+    internal fun lagre(behandling: NyBehandling) {
+        val behandlingId = behandlingRepository.lagre(behandling)
+    }
+
     /**
      * Hente en enkeltbehandling i k9-sak
      */
