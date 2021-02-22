@@ -7,13 +7,14 @@ import no.nav.omsorgsdager.behandling.db.BehandlingRepository
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnBehandling
 import no.nav.omsorgsdager.midlertidigalene.MidlertidigAleneBehandling
 import no.nav.omsorgsdager.parter.Involvering
+import no.nav.omsorgsdager.parter.Part
 import no.nav.omsorgsdager.parter.db.PartRepository
 
 internal class BehandlingService(
     private val behandlingRepository: BehandlingRepository,
     private val partRepository: PartRepository) {
 
-    internal fun lagre(behandling: NyBehandling) {
+    internal fun lagre(behandling: NyBehandling, parter: List<Part>) {
         val behandlingId = behandlingRepository.lagre(behandling)
     }
 
@@ -24,7 +25,7 @@ internal class BehandlingService(
         val dbBehandling = behandlingRepository.hentEn(behandlingId) ?: return null
         val parter = partRepository.hentParter(listOf(dbBehandling.id)).map { it.part }
 
-        return dbBehandling.type.operasjoner.map(
+        return dbBehandling.type.operasjoner.mapTilEksisterendeBehandling(
             dbBehandling = dbBehandling,
             parter = parter
         )
@@ -40,7 +41,7 @@ internal class BehandlingService(
             .groupBy { it.behandlingId }
             .mapValues { it -> it.value.map { it.part } }
 
-        return dbBehandlinger.map { it.type.operasjoner.map(
+        return dbBehandlinger.map { it.type.operasjoner.mapTilEksisterendeBehandling(
             dbBehandling = it,
             parter = parter.getOrDefault(it.id, emptyList())
         )}
@@ -71,7 +72,7 @@ internal class BehandlingService(
 
         val eksisterendeBehandlinger = dbBehandlinger
             .associateBy { it.id }
-            .mapValues { it.value.type.operasjoner.map(
+            .mapValues { it.value.type.operasjoner.mapTilEksisterendeBehandling(
                 dbBehandling = it.value,
                 parter = parter.getOrDefault(it.value.id, emptyList())
             )}

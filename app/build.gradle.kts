@@ -1,10 +1,10 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitJupiterVersion = "5.7.1"
+val k9rapidVersion = "1.a7233f8"
 val dusseldorfVersion = "1.5.1.609bb61"
 val ktorVersion = "1.5.1"
 val jsonassertVersion = "1.5.0"
-val kafkaVersion = "2.7.0"
 val mockkVersion = "1.10.5"
 val assertjVersion = "3.19.0"
 val jacksonVersion = "2.12.1"
@@ -29,6 +29,7 @@ java {
 }
 
 dependencies {
+    implementation("no.nav.k9.rapid:river:$k9rapidVersion")
     implementation("io.ktor:ktor-client-jackson:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
@@ -38,8 +39,7 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
-    implementation("org.apache.kafka:kafka-clients:$kafkaVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    //implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
 
     // Database

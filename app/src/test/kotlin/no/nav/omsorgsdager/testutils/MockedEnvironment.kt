@@ -4,8 +4,6 @@ import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.server.engine.*
-import io.mockk.every
-import io.mockk.mockk
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.jws.NaisSts
@@ -14,10 +12,8 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsJwksUrl
 import no.nav.omsorgsdager.ApplicationContext
-import no.nav.omsorgsdager.app
-import no.nav.omsorgsdager.config.DataSourceBuilder
+import no.nav.omsorgsdager.omsorgsdager
 import no.nav.omsorgsdager.testutils.wiremock.*
-import org.apache.kafka.clients.producer.KafkaProducer
 import java.io.File
 import java.nio.file.Files
 
@@ -86,7 +82,7 @@ internal class MockedEnvironment(
     internal companion object {
         internal fun ApplicationEngineEnvironmentBuilder.omsorgsdager(applicationContext: ApplicationContext) {
             connector { port = applicationContext.env.getValue("PORT").toInt() }
-            module { app(applicationContext) }
+            module { omsorgsdager(applicationContext) }
         }
     }
 }
