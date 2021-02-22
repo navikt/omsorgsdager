@@ -13,7 +13,11 @@ internal class InfotrygdInnvilgetVedtakService(
     private val omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway) {
 
     internal suspend fun hentInnvilgedeVedtak(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) : InnvilgedeVedtak {
-        val fraInfotrygd = omsorgspengerInfotrygdRammevedtakGateway.hentInnvilgedeVedtak(identitetsnummer, periode)
+        val fraInfotrygd = omsorgspengerInfotrygdRammevedtakGateway.hentInnvilgedeVedtak(
+            identitetsnummer = identitetsnummer,
+            periode = periode,
+            correlationId = correlationId
+        )
 
         val kroniskSyktBarn = fraInfotrygd.filterIsInstance<KroniskSyktBarnInfotrygdInnvilgetVedtak>().map { KroniskSyktBarnInnvilgetVedtak(
             barn = Barn(identitetsnummer = it.barnetsIdentitetsnummer.toString(), fødselsdato = it.barnetsFødselsdato),

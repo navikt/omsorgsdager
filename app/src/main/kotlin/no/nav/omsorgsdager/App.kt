@@ -16,7 +16,7 @@ import no.nav.omsorgsdager.CorrelationId.Companion.correlationId
 import no.nav.omsorgsdager.Json.Companion.configured
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver.Companion.token
-import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakRoute
+import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakApis
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import java.net.URI
@@ -104,7 +104,7 @@ internal fun Application.app(
         DefaultProbeRoutes()
         authenticate(*issuers.allIssuers()) {
             route("/api") {
-                InnvilgedeVedtakRoute(
+                InnvilgedeVedtakApis(
                     tilgangsstyring = applicationContext.tilgangsstyring,
                     innvilgedeVedtakService = applicationContext.innvilgedeVedtakService
                 )

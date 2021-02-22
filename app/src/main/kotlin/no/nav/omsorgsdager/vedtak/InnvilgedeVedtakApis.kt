@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager.vedtak
 
 import io.ktor.application.*
+import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.omsorgsdager.CorrelationId.Companion.correlationId
@@ -12,9 +13,12 @@ import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.tid.Periode.Companion.periodeOrNull
 import no.nav.omsorgsdager.tilgangsstyring.Operasjon
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
-internal fun Route.InnvilgedeVedtakRoute(
+private val logger = LoggerFactory.getLogger("no.nav.omsorgsdager.vedtak.InnvilgedeVedtakApis")
+
+internal fun Route.InnvilgedeVedtakApis(
     tilgangsstyring: Tilgangsstyring,
     innvilgedeVedtakService: InnvilgedeVedtakService) {
 
@@ -22,7 +26,7 @@ internal fun Route.InnvilgedeVedtakRoute(
         Operasjon(type = Operasjon.Type.Visning, identitetsnummer = setOf(first), beskrivelse = "Hente innvilgede vedtak om utvidet rett for perioden $second")
 
     fun Json.identitetsnummerOgPeriode() = kotlin.runCatching {
-        val identitetsnummer = map["identitetesnummer"]?.toString()?.somIdentitetsnummer()
+        val identitetsnummer = map["identitetsnummer"]?.toString()?.somIdentitetsnummer()
         val fom = map["fom"]?.toString()?.let { LocalDate.parse(it) }
         val tom = map["tom"]?.toString()?.let { LocalDate.parse(it) }
         val periode = (fom to tom).periodeOrNull()
@@ -30,7 +34,8 @@ internal fun Route.InnvilgedeVedtakRoute(
     }.fold(
         onSuccess = { it },
         onFailure = {
-            // TODO: Log: log ugyldig JSON
+            // TODO: SecureLog
+            logger.warn("Ugylidg request for henting av innvilgede vedtak: $this")
             null
         }
     )
@@ -39,7 +44,12 @@ internal fun Route.InnvilgedeVedtakRoute(
         val json = call.json()
         val correlationId = call.correlationId()
 
-        val identitetsnummerOgPeriode = json.identitetsnummerOgPeriode()?: return@post // TODO: Http 400
+        val identitetsnummerOgPeriode = json.identitetsnummerOgPeriode()
+
+        if (identitetsnummerOgPeriode == null) {
+            call.respond(HttpStatusCode.BadRequest)
+            return@post
+        }
 
         tilgangsstyring.verifiserTilgang(
             call = call,
