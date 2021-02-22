@@ -72,7 +72,7 @@ internal class InnvilgedeVedtakApisTest(
             fom: String = "2021-01-01",
             tom: String = "2021-12-31",
             authorizationHeader: String? = Azure.V2_0.generateJwt(
-                clientId = "k9-aarskvntum",
+                clientId = "k9-aarskvantum",
                 audience = "omsorgsdager",
                 accessAsApplication = true
             ).let { "Bearer $it" },
