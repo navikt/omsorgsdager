@@ -2,7 +2,6 @@ package no.nav.omsorgsdager
 
 import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.util.*
 import java.util.*
 
 internal typealias CorrelationId = String
@@ -12,18 +11,46 @@ internal fun ApplicationCall.correlationId() = when {
     else -> "omsorgsdager-${UUID.randomUUID()}"
 }
 
-internal typealias VedtakId = Long
-internal typealias Saksnummer = String
-internal fun ApplicationCall.saksnummer() : Saksnummer = parameters.getOrFail("saksnummer")
-internal typealias BehandlingId = String
-internal fun ApplicationCall.behandlingId() : BehandlingId = parameters.getOrFail("behandlingId")
-internal typealias Identitetsnummer = String
 
-internal class Fritekst(
-    input: String) {
-    internal val tekst = input
-    init { require(input.length <= 4000 && input.matches(Regex)) }
-    private companion object {
-        private val Regex = "^[\\p{Graph}\\p{Space}\\p{Sc}\\p{L}\\p{M}\\p{N}§]+$".toRegex()
+internal typealias BehandlingId = Long
+
+
+internal data class Identitetsnummer private constructor(private val value: String) {
+    init {
+        // TODO: Valider
+    }
+    override fun toString() = value
+    internal companion object {
+        internal fun String.somIdentitetsnummer() = Identitetsnummer(this)
+    }
+}
+
+internal data class OmsorgspengerSaksnummer private constructor(private val value: String) {
+    init {
+        // TODO: Valider
+    }
+    override fun toString() = value
+    internal companion object {
+        internal fun String.somOmsorgspengerSaksnumer() = OmsorgspengerSaksnummer(this)
+    }
+}
+
+internal data class K9Saksnummer private constructor(private val value: String) {
+    init {
+        // TODO: Valider
+    }
+    override fun toString() = value
+    internal companion object {
+        internal fun String.somK9Saksnummer() = K9Saksnummer(this)
+    }
+}
+
+internal data class K9BehandlingId private constructor(private val value: String) {
+    init {
+        requireNotNull(UUID.fromString(value))
+    }
+    override fun toString() = value
+    internal companion object {
+        internal fun String.somK9BehandlingId() = K9BehandlingId(this)
     }
 }

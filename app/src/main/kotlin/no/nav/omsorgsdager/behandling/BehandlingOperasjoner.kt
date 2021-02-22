@@ -1,23 +1,8 @@
 package no.nav.omsorgsdager.behandling
 
-import no.nav.omsorgsdager.BehandlingId
-import no.nav.omsorgsdager.CorrelationId
-import no.nav.omsorgsdager.Identitetsnummer
-import no.nav.omsorgsdager.Json
-import no.nav.omsorgsdager.Saksnummer
-import no.nav.omsorgsdager.vedtak.Vedtak
-import java.time.ZonedDateTime
+import no.nav.omsorgsdager.behandling.db.DbBehandling
+import no.nav.omsorgsdager.parter.Part
 
-internal interface BehandlingOperasjoner<V: Vedtak> {
-    suspend fun hent(behandlingId: BehandlingId): Behandling<V>?
-    suspend fun hentAlle(saksnummer: Saksnummer): List<Behandling<V>>
-
-    suspend fun preOpprett(grunnlag: Json) : Set<Identitetsnummer>
-    suspend fun opprett(grunnlag: Json, correlationId: CorrelationId): Behandling<V>
-
-    suspend fun løsninger(behandlingId: BehandlingId, grunnlag: Json): Behandling<V>
-
-    suspend fun innvilg(behandlingId: BehandlingId, tidspunkt: ZonedDateTime): Behandling<V>
-    suspend fun avslå(behandlingId: BehandlingId, tidspunkt: ZonedDateTime): Behandling<V>
-    suspend fun forkast(behandlingId: BehandlingId, tidspunkt: ZonedDateTime): Behandling<V>
+internal interface BehandlingOperasjoner<EB: EksisterendeBehandling> {
+    fun map(dbBehandling: DbBehandling, parter: List<Part>) : EB
 }

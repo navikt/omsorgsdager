@@ -12,20 +12,10 @@ import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.omsorgsdager.config.*
 import no.nav.omsorgsdager.config.DataSourceBuilder
 import no.nav.omsorgsdager.config.Environment
-import no.nav.omsorgsdager.config.KafkaBuilder.kafkaProducer
 import no.nav.omsorgsdager.config.hentRequiredEnv
-import no.nav.omsorgsdager.kronisksyktbarn.DbKroniskSyktBarnRepository
-import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnOperasjoner
-import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnVedtak
-import no.nav.omsorgsdager.midlertidigalene.MidlertidigAleneOperasjoner
-import no.nav.omsorgsdager.midlertidigalene.MidlertidigAleneVedtak
-import no.nav.omsorgsdager.pdl.PdlClient
 import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver
-import no.nav.omsorgsdager.vedtak.InMemoryVedtakRepository
-import no.nav.omsorgsdager.vedtak.VedtakRepository
-import org.apache.kafka.clients.producer.KafkaProducer
 import java.net.URI
 import javax.sql.DataSource
 
@@ -36,37 +26,22 @@ internal class ApplicationContext(
     internal val omsorgspengerTilgangsstyringGateway: OmsorgspengerTilgangsstyringGateway,
     internal val tokenResolver: TokenResolver,
     internal val tilgangsstyring: Tilgangsstyring,
-    internal val kafkaProducer: KafkaProducer<String, String>,
-    internal val kroniskSyktBarnRepository: VedtakRepository<KroniskSyktBarnVedtak>,
-    internal val kroniskSyktBarnOperasjoner: KroniskSyktBarnOperasjoner,
-    internal val midlertidigAleneRepository: VedtakRepository<MidlertidigAleneVedtak>,
-    internal val midlertidigAleneOperasjoner: MidlertidigAleneOperasjoner,
     internal val configure: (application: Application) -> Unit) {
 
     internal fun start() {
-        if (kroniskSyktBarnRepository is DbKroniskSyktBarnRepository) {
-            dataSource.migrate()
-        }
+        //dataSource.migrate()
     }
 
-    internal fun stop() {
-        kafkaProducer.close()
-    }
+    internal fun stop() {}
 
     internal class Builder(
         var env: Environment? = null,
         var dataSource: DataSource? = null,
         var httpClient: HttpClient? = null,
         var accessTokenClient: AccessTokenClient? = null,
-        var pdlClient: PdlClient? = null,
         var omsorgspengerTilgangsstyringGateway: OmsorgspengerTilgangsstyringGateway? = null,
         var tokenResolver: TokenResolver? = null,
         var tilgangsstyring: Tilgangsstyring? = null,
-        var kafkaProducer: KafkaProducer<String, String>? = null,
-        var kroniskSyktBarnRepository: VedtakRepository<KroniskSyktBarnVedtak>? = null,
-        var kroniskSyktBarnOperasjoner: KroniskSyktBarnOperasjoner? = null,
-        var midlertidigAleneRepository: VedtakRepository<MidlertidigAleneVedtak>? = null,
-        var midlertidigAleneOperasjoner: MidlertidigAleneOperasjoner? = null,
         var configure: (application: Application) -> Unit = {}) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
@@ -74,17 +49,13 @@ internal class ApplicationContext(
                 install(JsonFeature) { serializer = JacksonSerializer(objectMapper) }
             }
             val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
+
             val benyttetAccessTokenClient = accessTokenClient?: ClientSecretAccessTokenClient(
                 clientId = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_ID"),
                 clientSecret = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_SECRET"),
                 tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_APP_TOKEN_ENDPOINT"))
             )
-            val benyttetPdlClient = pdlClient ?: PdlClient(
-                env = benyttetEnv,
-                accessTokenClient = benyttetAccessTokenClient,
-                httpClient = benyttetHttpClient,
-                objectMapper = objectMapper
-            )
+
             val benyttetOmsorgspengerTilgangsstyringGateway = omsorgspengerTilgangsstyringGateway ?: OmsorgspengerTilgangsstyringGateway(
                 httpClient = benyttetHttpClient,
                 omsorgspengerTilgangsstyringUri = URI.create(benyttetEnv.hentRequiredEnv("TILGANGSSTYRING_URL"))
@@ -101,33 +72,17 @@ internal class ApplicationContext(
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway
             )
 
-            val benyttetKafkaProducer = kafkaProducer ?: benyttetEnv.kafkaProducer()
-
-            // TODO: Bytte til DbRepository når det er klart.
-            val benyttetKroniskSyktBarnRepository = kroniskSyktBarnRepository ?: InMemoryVedtakRepository()
-            val benyttetMidlertidigAleneRepository = midlertidigAleneRepository ?: InMemoryVedtakRepository()
-
             return ApplicationContext(
                 env = benyttetEnv,
                 dataSource = benyttetDataSource,
                 healthService = HealthService(
                     healthChecks = setOf(
-                        benyttetPdlClient,
                         benyttetOmsorgspengerTilgangsstyringGateway
                     )
                 ),
-                kafkaProducer = benyttetKafkaProducer,
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
                 tokenResolver = benyttetTokenResolver,
                 tilgangsstyring = benyttetTilgangsstyring,
-                kroniskSyktBarnRepository = benyttetKroniskSyktBarnRepository,
-                kroniskSyktBarnOperasjoner = kroniskSyktBarnOperasjoner ?: KroniskSyktBarnOperasjoner(
-                    kroniskSyktBarnRepository = benyttetKroniskSyktBarnRepository
-                ),
-                midlertidigAleneRepository = benyttetMidlertidigAleneRepository,
-                midlertidigAleneOperasjoner = midlertidigAleneOperasjoner ?: MidlertidigAleneOperasjoner(
-                    midlertidigAleneRepository = benyttetMidlertidigAleneRepository
-                ),
                 configure = configure
             )
         }
