@@ -89,7 +89,6 @@ internal fun Application.omsorgsdager(
 
     routing {
         HealthRoute(healthService = applicationContext.healthService)
-        DefaultProbeRoutes()
         authenticate(*issuers.allIssuers()) {
             route("/api") {
                 InnvilgedeVedtakApis(
