@@ -104,9 +104,9 @@ internal class ApplicationContext(
 
             val benyttetBehandlingService = behandlingService ?: BehandlingService(
                 behandlingRepository = benyttetBehandlingRepository,
-                partRepository = benyttetPartRepository
+                partRepository = benyttetPartRepository,
+                dataSource = benyttetDataSource
             )
-
 
             val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway ?: OmsorgspengerInfotrygdRammevedtakGateway()
             val benyttetInfotrygdInnvilgetVedtakService = infotrygdInnvilgetVedtakService ?: InfotrygdInnvilgetVedtakService(

@@ -1,21 +1,30 @@
 package no.nav.omsorgsdager.behandling
 
+import kotliquery.sessionOf
+import kotliquery.using
 import no.nav.omsorgsdager.K9BehandlingId
 import no.nav.omsorgsdager.K9Saksnummer
 import no.nav.omsorgsdager.OmsorgspengerSaksnummer
 import no.nav.omsorgsdager.behandling.db.BehandlingRepository
+import no.nav.omsorgsdager.behandling.db.BehandlingRepository.Companion.lagreBehandling
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnBehandling
 import no.nav.omsorgsdager.midlertidigalene.MidlertidigAleneBehandling
 import no.nav.omsorgsdager.parter.Involvering
 import no.nav.omsorgsdager.parter.Part
 import no.nav.omsorgsdager.parter.db.PartRepository
+import no.nav.omsorgsdager.parter.db.PartRepository.Companion.leggTilParter
+import javax.sql.DataSource
 
 internal class BehandlingService(
+    private val dataSource: DataSource,
     private val behandlingRepository: BehandlingRepository,
     private val partRepository: PartRepository) {
 
     internal fun lagre(behandling: NyBehandling, parter: List<Part>) {
-        val behandlingId = behandlingRepository.lagre(behandling)
+        using(sessionOf(dataSource)) { session -> session.transaction { tx ->
+            val behandlingId = tx.lagreBehandling(behandling)
+            tx.leggTilParter(behandlingId = behandlingId, parter = parter)
+        }}
     }
 
     /**
