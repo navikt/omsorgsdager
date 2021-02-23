@@ -31,7 +31,11 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
         behandlingStatus: BehandlingStatus): Pair<NyBehandling, List<Part>> {
         val dto = grunnlag.deserialize<DTO>()
 
-        val søkeren = Søker(identitetsnummer = dto.søker.identitetsnummer.somIdentitetsnummer())
+        val søkeren = dto.søker.identitetsnummer.somIdentitetsnummer().let { Søker(
+            identitetsnummer = it,
+            omsorgspengerSaksnummer = saksnummer.getValue(it)
+        )}
+
         val barnet = Barn(identitetsnummer = dto.barn.identitetsnummer?.somIdentitetsnummer(), fødselsdato = dto.barn.fødselsdato)
 
         val behandling = NyBehandling(
