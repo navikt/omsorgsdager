@@ -7,7 +7,6 @@ import io.ktor.http.auth.*
 import io.ktor.jackson.*
 import io.ktor.request.*
 import io.ktor.routing.*
-import io.ktor.util.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
@@ -21,12 +20,9 @@ import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import java.net.URI
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+private val appLogger = LoggerFactory.getLogger("no.nav.omsorgsdager.omsorgsdager")
 
-private val appLogger = LoggerFactory.getLogger("no.nav.omsorgsdager.App")
-
-@KtorExperimentalAPI
-internal fun Application.app(
+internal fun Application.omsorgsdager(
     applicationContext: ApplicationContext = ApplicationContext.Builder().build()) {
 
     install(ContentNegotiation) {
@@ -76,14 +72,6 @@ internal fun Application.app(
         healthService = applicationContext.healthService
     )
 
-    environment.monitor.subscribe(ApplicationStarted){
-        applicationContext.start()
-        appLogger.info("ApplicationContext Startet")
-    }
-    environment.monitor.subscribe(ApplicationStopped){
-        applicationContext.stop()
-        appLogger.info("ApplicationContext Stoppet")
-    }
     preStopOnApplicationStopPreparing(preStopActions = listOf(
         FullførAktiveRequester(this)
     ))

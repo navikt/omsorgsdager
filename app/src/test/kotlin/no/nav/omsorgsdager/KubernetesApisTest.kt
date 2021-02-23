@@ -2,20 +2,19 @@ package no.nav.omsorgsdager
 
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.handleRequest
-import no.nav.omsorgsdager.testutils.TestApplicationExtension
+import io.ktor.server.testing.*
+import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(TestApplicationExtension::class)
-internal class HealthTest(
-    private val testApplicationEngine: TestApplicationEngine
-) {
+@ExtendWith(ApplicationContextExtension::class)
+internal class KubernetesApisTest(
+    applicationContextBuilder: ApplicationContext.Builder) {
+    private val applicationContext = applicationContextBuilder.build()
 
     @Test
     fun `isready gir 200`() {
-        with(testApplicationEngine) {
+        withTestApplication({ omsorgsdager(applicationContext) }) {
             handleRequest(HttpMethod.Get, "/isready") {}.apply {
                 assert(response.status() == HttpStatusCode.OK)
             }
@@ -24,7 +23,7 @@ internal class HealthTest(
 
     @Test
     fun `isalive gir 200`() {
-        with(testApplicationEngine) {
+        withTestApplication({ omsorgsdager(applicationContext) }) {
             handleRequest(HttpMethod.Get, "/isalive") {}.apply {
                 assert(response.status() == HttpStatusCode.OK)
             }

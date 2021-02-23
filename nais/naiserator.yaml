@@ -1,10 +1,10 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: {{app}}
-  namespace: {{namespace}}
+  name: omsorgsdager
+  namespace: omsorgspenger
   labels:
-    team: {{team}}
+    team: omsorgspenger
 spec:
   image: {{ image }}
   port: 8080
@@ -17,7 +17,14 @@ spec:
       rules:
         - application: omsorgspenger-tilgangsstyring
       external:
-        - host: {{ proxyHost }}
+      {{#each externalHosts as |host|}}
+         - host: {{host}}
+      {{/each}}
+    inbound:
+      rules:
+        - application: k9-aarskvantum
+          namespace: default
+          cluster: {{clusterFss}}
   gcp:
     sqlInstances:
       - type: POSTGRES_12
@@ -68,3 +75,9 @@ spec:
   {{/each}}
     - name: TILGANGSSTYRING_URL
       value: http://omsorgspenger-tilgangsstyring.omsorgspenger.svc.cluster.local
+    - name: KAFKA_PROPERTIES_SECURITY_PROTOCOL
+      value: SASL_SSL
+    - name: KAFKA_RAPID_TOPIC
+      value: k9-rapid-v2
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: omsorgsdager

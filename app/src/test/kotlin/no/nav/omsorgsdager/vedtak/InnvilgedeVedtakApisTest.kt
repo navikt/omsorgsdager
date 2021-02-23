@@ -3,40 +3,46 @@ package no.nav.omsorgsdager.vedtak
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
+import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.Json.Companion.somJson
-import no.nav.omsorgsdager.testutils.TestApplicationExtension
+import no.nav.omsorgsdager.omsorgsdager
+import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-@ExtendWith(TestApplicationExtension::class)
+@ExtendWith(ApplicationContextExtension::class)
 internal class InnvilgedeVedtakApisTest(
-    private val testApplicationEngine: TestApplicationEngine) {
-
+    applicationContextBuilder: ApplicationContext.Builder) {
+    private val applicationContext = applicationContextBuilder.build()
 
     @Test
     fun `Ingen authorization header`() {
-        testApplicationEngine.hentOgAssert(
-            identitetsnummer = IdentitetsnummerUtenVedtak,
-            authorizationHeader = null,
-            forventetHttpStatusCode = HttpStatusCode.Unauthorized
-        )
+        withTestApplication({ omsorgsdager(applicationContext) }) {
+            hentOgAssertInnvilgedeVedtak(
+                identitetsnummer = IdentitetsnummerUtenVedtak,
+                authorizationHeader = null,
+                forventetHttpStatusCode = HttpStatusCode.Unauthorized
+            )
+        }
     }
 
     @Test
     fun `Ikke autorisert system`() {
-        testApplicationEngine.hentOgAssert(
-            identitetsnummer = IdentitetsnummerUtenVedtak,
-            authorizationHeader = Azure.V2_0.generateJwt(
-                clientId = "k9-sak",
-                audience = "omsorgsdager",
-                accessAsApplication = false
-            ).let { "Bearer $it" },
-            forventetHttpStatusCode = HttpStatusCode.Forbidden,
-            forventetResponse = ForventetResponseForbidden
-        )
+        withTestApplication({ omsorgsdager(applicationContext) }) {
+            hentOgAssertInnvilgedeVedtak(
+                identitetsnummer = IdentitetsnummerUtenVedtak,
+                authorizationHeader = Azure.V2_0.generateJwt(
+                    clientId = "k9-sak",
+                    audience = "omsorgsdager",
+                    accessAsApplication = false
+                ).let { "Bearer $it" },
+                forventetHttpStatusCode = HttpStatusCode.Forbidden,
+                forventetResponse = ForventetResponseForbidden
+            )
+        }
     }
 
     @Test
@@ -45,20 +51,24 @@ internal class InnvilgedeVedtakApisTest(
 
     @Test
     fun `Ugyldig request`() {
-        testApplicationEngine.hentOgAssert(
-            identitetsnummer = "identitetsnummer",
-            fom = "tom",
-            tom = "tom",
-            forventetHttpStatusCode = HttpStatusCode.BadRequest
-        )
+        withTestApplication({ omsorgsdager(applicationContext) }) {
+            hentOgAssertInnvilgedeVedtak(
+                identitetsnummer = "identitetsnummer",
+                fom = "tom",
+                tom = "tom",
+                forventetHttpStatusCode = HttpStatusCode.BadRequest
+            )
+        }
     }
 
     @Test
     fun `Person som ikke har vedtak hverken i Infotrygd eller K9-Sak`() {
-        testApplicationEngine.hentOgAssert(
-            identitetsnummer = IdentitetsnummerUtenVedtak,
-            forventetResponse = ForventetResponseUtenVedtak
-        )
+        withTestApplication({ omsorgsdager(applicationContext) }) {
+            hentOgAssertInnvilgedeVedtak(
+                identitetsnummer = IdentitetsnummerUtenVedtak,
+                forventetResponse = ForventetResponseUtenVedtak
+            )
+        }
     }
 
 
@@ -67,7 +77,7 @@ internal class InnvilgedeVedtakApisTest(
         val ForventetResponseUtenVedtak = """{"kroniskSyktBarn": [], "midlertidigAlene": []}"""
         val ForventetResponseForbidden = """{"detail":"Requesten inneholder ikke tilstrekkelige tilganger.","instance":"about:blank","type":"/problem-details/unauthorized","title":"unauthorized","status":403}"""
 
-        fun TestApplicationEngine.hentOgAssert(
+        fun TestApplicationEngine.hentOgAssertInnvilgedeVedtak(
             identitetsnummer: String,
             fom: String = "2021-01-01",
             tom: String = "2021-12-31",

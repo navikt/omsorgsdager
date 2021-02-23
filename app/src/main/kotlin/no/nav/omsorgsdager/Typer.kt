@@ -23,10 +23,11 @@ internal data class CorrelationId private constructor(private val value: String)
 
 internal data class Identitetsnummer private constructor(private val value: String) {
     init {
-        // TODO: Valider
+        require(value.matches(Regex)) { "Ugyldig identitetsnummer" }
     }
     override fun toString() = value
     internal companion object {
+        private val Regex = "\\d{11,25}".toRegex()
         internal fun String.somIdentitetsnummer() = Identitetsnummer(this)
     }
 }

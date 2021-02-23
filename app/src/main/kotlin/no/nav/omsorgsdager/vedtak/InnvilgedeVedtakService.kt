@@ -1,5 +1,7 @@
 package no.nav.omsorgsdager.vedtak
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
 import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.behandling.BehandlingService
@@ -10,13 +12,29 @@ import no.nav.omsorgsdager.tid.Gjeldende.gjeldende
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.dto.InnvilgedeVedtak
 import org.slf4j.LoggerFactory
+import java.time.Duration
 
 internal class InnvilgedeVedtakService(
     private val behandlingService: BehandlingService,
     private val omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService,
     private val infotrygdInnvilgetVedtakService: InfotrygdInnvilgetVedtakService) {
 
-    internal suspend fun hentInnvilgedeVedtak(identitetsnummer: Identitetsnummer, periode: Periode, correlationId: CorrelationId) : InnvilgedeVedtak {
+    private val cache: Cache<Pair<Identitetsnummer, Periode>, InnvilgedeVedtak> =
+        Caffeine.newBuilder()
+            .expireAfterWrite(Duration.ofSeconds(15))
+            .maximumSize(200)
+            .build()
+
+    internal suspend fun hentInnvilgedeVedtak(
+        identitetsnummer: Identitetsnummer,
+        periode: Periode,
+        correlationId: CorrelationId) : InnvilgedeVedtak {
+        val fraCache = cache.getIfPresent(identitetsnummer to periode)
+
+        if (fraCache != null) {
+            return fraCache
+        }
+
         val omsorgspengerSaksnummer = omsorgspengerSaksnummerService.hentSaksnummer(
             identitetsnummer = identitetsnummer,
             correlationId = correlationId
@@ -49,6 +67,8 @@ internal class InnvilgedeVedtakService(
                 kroniskSyktBarn = fraInfotrygd.kroniskSyktBarn.plus(fraK9Sak.kroniskSyktBarn).gjeldende(),
                 midlertidigAlene = fraInfotrygd.midlertidigAlene.plus(fraK9Sak.midlertidigAlene).gjeldende()
             )
+        }.also {
+            cache.put(identitetsnummer to periode, it)
         }
     }
 
