@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.k9.rapid.river.BehovssekvensPacketListener
-import no.nav.k9.rapid.river.harLøsningPåBehov
-import no.nav.k9.rapid.river.skalLøseBehov
+import no.nav.k9.rapid.river.*
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.behandling.BehandlingService
 import no.nav.omsorgsdager.behandling.BehandlingStatus
@@ -23,6 +21,8 @@ internal abstract class LagreBehandlingRiver(
     private val behandlingStatus: BehandlingStatus,
     private val behandlingService: BehandlingService) : BehovssekvensPacketListener(logger = logger) {
 
+    private val BehovKey = "@behov.$behov"
+
     // TODO: Lagre behovssekvensid ?
 
     init {
@@ -30,13 +30,15 @@ internal abstract class LagreBehandlingRiver(
             validate {
                 it.skalLøseBehov(behov)
                 it.harLøsningPåBehov(HentOmsorgspengerSaksnummer)
+                it.require(BehovKey) { behov -> behov.requireObject() }
+                HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
             }
         }.register(this)
     }
 
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet)
-        val grunnlag = (packet["@behov.$behov"] as ObjectNode).somJson()
+        val grunnlag = (packet[BehovKey] as ObjectNode).somJson()
 
         val (nyBehandling, parter) = behandlingType.operasjoner.mapTilNyBehandling(
             saksnummer = saksnummer,
@@ -49,6 +51,8 @@ internal abstract class LagreBehandlingRiver(
             parter = parter
         )
 
+        packet.leggTilLøsning(behov)
+        logger.info("Behandling lagret")
         return true
     }
 }

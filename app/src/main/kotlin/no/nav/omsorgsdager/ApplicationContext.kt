@@ -42,13 +42,12 @@ internal class ApplicationContext(
     internal val omsorgspengerSakGatway: OmsorgspengerSakGatway,
     internal val omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService,
     internal val innvilgedeVedtakService: InnvilgedeVedtakService,
-    internal val configure: (application: Application) -> Unit) {
+    internal val configure: (application: Application) -> Unit,
+    private val onStart: (applicationContext: ApplicationContext) -> Unit,
+    private val onStop: (applicationContext: ApplicationContext) -> Unit) {
 
-    internal fun start() {
-        //dataSource.migrate()
-    }
-
-    internal fun stop() {}
+    internal fun start() = onStart(this)
+    internal fun stop() = onStop(this)
 
     internal class Builder(
         var env: Environment? = null,
@@ -66,7 +65,9 @@ internal class ApplicationContext(
         var omsorgspengerSakGatway: OmsorgspengerSakGatway? = null,
         var omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService? = null,
         var innvilgedeVedtakService: InnvilgedeVedtakService? = null,
-        var configure: (application: Application) -> Unit = {}) {
+        var configure: (application: Application) -> Unit = {},
+        var onStart: (applicationContext: ApplicationContext) -> Unit = {}, // TODO: Migrate
+        var onStop: (applicationContext: ApplicationContext) -> Unit = {}) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
             val benyttetHttpClient = httpClient ?: HttpClient {
@@ -143,7 +144,9 @@ internal class ApplicationContext(
                 innvilgedeVedtakService = benyttetInnvilgedeVedtakService,
                 infotrygdInnvilgetVedtakService = benyttetInfotrygdInnvilgetVedtakService,
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway,
-                partRepository = benyttetPartRepository
+                partRepository = benyttetPartRepository,
+                onStart = onStart,
+                onStop = onStop
             )
         }
 

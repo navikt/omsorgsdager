@@ -205,13 +205,13 @@ internal class TilgangsstyringTest {
         private val VisningOperasjon = Operasjon(
             type = Operasjon.Type.Visning,
             beskrivelse = "Tester tilgangsstyring",
-            identitetsnummer = setOf("123".somIdentitetsnummer())
+            identitetsnummer = setOf("12345678911".somIdentitetsnummer())
         )
 
         private val EndringOperasjon = Operasjon(
             type = Operasjon.Type.Endring,
             beskrivelse = "Tester tilgangsstyring",
-            identitetsnummer = setOf("123".somIdentitetsnummer())
+            identitetsnummer = setOf("12345678911".somIdentitetsnummer())
         )
 
         internal fun azureSystemToken(medTilgang: Boolean) = Azure.V2_0.generateJwt(

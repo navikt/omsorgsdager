@@ -23,7 +23,7 @@ internal abstract class InitierBehandlingRiver(
             validate {
                 it.skalLøseBehov(behov)
                 it.utenLøsningPåBehov(HentOmsorgspengerSaksnummer)
-                it.requireKey(*identitetsnummerKeysFullPath.toTypedArray())
+                it.interestedIn(*identitetsnummerKeysFullPath.toTypedArray())
             }
         }.register(this)
     }
