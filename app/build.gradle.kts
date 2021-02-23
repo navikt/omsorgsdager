@@ -5,18 +5,18 @@ val k9rapidVersion = "1.a7233f8"
 val dusseldorfVersion = "1.5.1.609bb61"
 val ktorVersion = "1.5.1"
 val jsonassertVersion = "1.5.0"
-val mockkVersion = "1.10.5"
+val mockkVersion = "1.10.6"
 val assertjVersion = "3.19.0"
 val jacksonVersion = "2.12.1"
 
 // Database
-val flywayVersion = "7.5.2"
-val hikariVersion = "4.0.1"
+val flywayVersion = "7.5.4"
+val hikariVersion = "4.0.2"
 val kotliqueryVersion = "1.3.1"
-val postgresVersion = "42.2.18"
+val postgresVersion = "42.2.19"
 val embeddedPostgres = "1.2.10"
 
-val mainClass = "no.nav.omsorgsdager.AppKt"
+val mainClass = "no.nav.omsorgsdager.RapidsApplicationKt"
 
 plugins {
     kotlin("jvm") version "1.4.30"
@@ -39,7 +39,6 @@ dependencies {
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
-    //implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
     implementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
 
     // Database
@@ -97,6 +96,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "6.8.1"
+        gradleVersion = "6.8.3"
     }
 }

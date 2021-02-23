@@ -20,9 +20,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import java.net.URI
 
-fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
-
-private val appLogger = LoggerFactory.getLogger("no.nav.omsorgsdager.Omsorgsdager")
+private val appLogger = LoggerFactory.getLogger("no.nav.omsorgsdager.omsorgsdager")
 
 internal fun Application.omsorgsdager(
     applicationContext: ApplicationContext = ApplicationContext.Builder().build()) {
