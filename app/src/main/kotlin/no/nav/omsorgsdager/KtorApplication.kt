@@ -87,7 +87,7 @@ internal fun Application.omsorgsdager(
         callIdMdc("callId")
     }
 
-    install(Routing) {
+    routing {
         HealthRoute(healthService = applicationContext.healthService)
         DefaultProbeRoutes()
         authenticate(*issuers.allIssuers()) {
