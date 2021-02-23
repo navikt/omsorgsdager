@@ -31,7 +31,7 @@ internal class BehandlingService(
     /**
      * Hente en enkeltbehandling i k9-sak
      */
-    internal fun hentEn(behandlingId: K9BehandlingId) : EksisterendeBehandling? {
+    internal fun hentEn(behandlingId: K9BehandlingId) : EksisterendeBehandling? { // TODO: En behandling flere typer..
         val dbBehandling = behandlingRepository.hentEn(behandlingId) ?: return null
         val parter = partRepository.hentParter(listOf(dbBehandling.id)).map { it.part }
 

@@ -1,13 +1,16 @@
 package no.nav.omsorgsdager.behandling.db
 
-import kotliquery.TransactionalSession
-import kotliquery.queryOf
+import kotliquery.*
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.K9BehandlingId
+import no.nav.omsorgsdager.K9BehandlingId.Companion.somK9BehandlingId
 import no.nav.omsorgsdager.K9Saksnummer
+import no.nav.omsorgsdager.K9Saksnummer.Companion.somK9Saksnummer
 import no.nav.omsorgsdager.behandling.BehandlingStatus
+import no.nav.omsorgsdager.behandling.BehandlingType
 import no.nav.omsorgsdager.behandling.NyBehandling
+import no.nav.omsorgsdager.tid.Periode
 import org.intellij.lang.annotations.Language
 import org.slf4j.LoggerFactory
 import javax.sql.DataSource
@@ -16,7 +19,16 @@ internal class BehandlingRepository(
     private val dataSource: DataSource) {
 
     internal fun hentEn(behandlingId: K9BehandlingId) : DbBehandling? {
-        return null
+        val query = queryOf(
+            statement = HentEnkeltbehandlingStatement,
+            paramMap = mapOf(
+                "behandlingId" to "$behandlingId"
+            )
+        )
+
+        return sessionOf(dataSource).use { session ->
+            session.run(query.map { row -> row.somDbBehandling() }.asSingle)
+        }
     }
 
     internal fun hentAlle(saksnummer: K9Saksnummer) : List<DbBehandling> {
@@ -48,7 +60,7 @@ internal class BehandlingRepository(
             return when (nyBehandlingId) {
                 null -> {
                     val query = queryOf(
-                        statement = HentBehandlingNøkkelinfo,
+                        statement = HentBehandlingNøkkelinfoStatement,
                         paramMap = mapOf("behandlingId" to "${behandling.behandlingId}")
                     )
 
@@ -72,11 +84,34 @@ internal class BehandlingRepository(
             }
         }
 
+
+        private fun Row.somDbBehandling() = DbBehandling(
+            id = long("id"),
+            k9Saksnummer = string("k9_saksnummer").somK9Saksnummer(),
+            k9behandlingId = string("k9_behandling_id").somK9BehandlingId(),
+            status = BehandlingStatus.valueOf(string("status")),
+            tidspunkt = zonedDateTime("tidspunkt"),
+            type = BehandlingType.valueOf(string("type")),
+            periode = Periode(
+                fom = localDate("fom"),
+                tom = localDate("tom")
+            )
+        )
+
         @Language("PostgreSQL")
-        private const val HentBehandlingNøkkelinfo = """
+        private const val HentBehandlingNøkkelinfoStatement = """
             SELECT id, status, grunnlag from behandling where k9_behandling_id = :behandlingId
         """
 
+        @Language("PostgreSQL")
+        private const val HentBehandlingerStatement = """
+            SELECT * FROM behandling WHERE id = ANY(:behandlingIder)
+        """
+
+        @Language("PostgreSQL")
+        private const val HentEnkeltbehandlingStatement = """
+            SELECT * FROM behandling WHERE k9_behandling_id = :behandlingId
+        """
 
         @Language("PostgreSQL")
         private const val LagreBehandlingStatement = """
