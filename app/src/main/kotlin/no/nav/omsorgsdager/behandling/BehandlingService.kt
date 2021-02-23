@@ -22,8 +22,9 @@ internal class BehandlingService(
 
     internal fun lagre(behandling: NyBehandling, parter: List<Part>) {
         using(sessionOf(dataSource, returnGeneratedKey = true)) { session -> session.transaction { tx ->
-            val behandlingId = tx.lagreBehandling(behandling)
-            tx.leggTilParter(behandlingId = behandlingId, parter = parter)
+            tx.lagreBehandling(behandling)?.also { nyBehandlingId ->
+                tx.leggTilParter(behandlingId = nyBehandlingId, parter = parter)
+            }
         }}
     }
 

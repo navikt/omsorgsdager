@@ -15,6 +15,7 @@ import javax.sql.DataSource
 
 internal class PartRepository(
     private val dataSource: DataSource) {
+
     internal fun hentParter(behandlingIder: List<BehandlingId>) : List<DbPart> {
         return emptyList()
     }
@@ -36,7 +37,7 @@ internal class PartRepository(
                     statement = LagreBarnStatement,
                     paramMap = mapOf(
                         "behandlingId" to behandlingId,
-                        "identitetsnummer" to part.identitetsnummer,
+                        "identitetsnummer" to "${part.identitetsnummer}",
                         "fodselsdato" to part.fødselsdato
                     )
                 )
@@ -44,7 +45,7 @@ internal class PartRepository(
                     statement = LagrePersonStatement,
                     paramMap = mapOf(
                         "behandlingId" to behandlingId,
-                        "identitetsnummer" to part.identitetsnummer,
+                        "identitetsnummer" to "${part.identitetsnummer}",
                         "omsorgspengerSaksnummer" to "${part.omsorgspengerSaksnummer}",
                         "type" to "SØKER"
                     )
@@ -53,7 +54,7 @@ internal class PartRepository(
                     statement = LagrePersonStatement,
                     paramMap = mapOf(
                         "behandlingId" to behandlingId,
-                        "identitetsnummer" to part.identitetsnummer,
+                        "identitetsnummer" to "${part.identitetsnummer}",
                         "omsorgspengerSaksnummer" to "${part.omsorgspengerSaksnummer}",
                         "type" to "MOTPART"
                     )

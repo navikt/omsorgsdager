@@ -5,6 +5,7 @@ import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.registerApplicationContext
 import no.nav.omsorgsdager.testutils.*
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
+import no.nav.omsorgsdager.testutils.ApplicationContextExtension.Companion.buildStarted
 import no.nav.omsorgsdager.testutils.rapid.mockHentOmsorgsdagerSaksnummer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -14,7 +15,7 @@ internal class MidlertidigAleneRiverTest(
     private val builder: ApplicationContext.Builder) {
 
     private val rapid = TestRapid().also {
-        it.registerApplicationContext(builder.build())
+        it.registerApplicationContext(builder.buildStarted())
     }
 
     @Test

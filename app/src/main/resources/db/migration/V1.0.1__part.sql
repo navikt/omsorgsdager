@@ -9,7 +9,7 @@ CREATE TABLE part
     CONSTRAINT foreign_key_behandling FOREIGN KEY(behandling_id) REFERENCES behandling(id)
 );
 
-CREATE INDEX index_part_behandling_id ON parter(behandling_id);
-CREATE INDEX index_part_omsorgspenger_saksnummer ON parter(omsorgspenger_saksnummer);
-CREATE INDEX index_part_identitetsnummer ON parter(identitetsnummer);
+CREATE INDEX index_part_behandling_id ON part(behandling_id);
+CREATE INDEX index_part_omsorgspenger_saksnummer ON part(omsorgspenger_saksnummer);
+CREATE INDEX index_part_identitetsnummer ON part(identitetsnummer);
 
