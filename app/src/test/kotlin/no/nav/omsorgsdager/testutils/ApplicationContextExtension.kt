@@ -22,15 +22,12 @@ internal class ApplicationContextExtension : ParameterResolver {
         private val mockedEnvironment = MockedEnvironment().start()
 
         val env = mapOf(
-            "PORT" to "8080",
             "DATABASE_HOST" to "localhost",
             "DATABASE_PORT" to "${mockedEnvironment.embeddedPostgres.port}",
             "DATABASE_DATABASE" to "postgres",
             "DATABASE_USERNAME" to "postgres",
             "DATABASE_PASSWORD" to "postgres",
-            "PROXY_SCOPES" to "/.default",
             "TILGANGSSTYRING_URL" to mockedEnvironment.wireMockServer.tilgangApiBaseUrl(),
-            "KAFKA_BOOTSTRAP_SERVERS" to "test",
             "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
             "AZURE_V2_JWKS_URI" to (mockedEnvironment.wireMockServer.getAzureV2JwksUrl()),
             "AZURE_APP_CLIENT_ID" to "omsorgsdager",
@@ -87,7 +84,7 @@ internal class ApplicationContextExtension : ParameterResolver {
                     header(HttpHeaders.Authorization)
                     anyHost()
                 }
-            },
+            }
         )
     }
 }
