@@ -90,8 +90,7 @@ internal class InnvilgedeVedtakServiceTest(
         innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2020-05-05/2021-02-14"), kildeId = "fra-infotrygd", barnIdentitetsnummer = "22222222222")   // Infotrygd frem til behandling1 i k9
         innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2021-02-15/2032-12-31"), kildeId = "$behandlingId1", barnIdentitetsnummer = "22222222222")  // Behandlingen1 i k9
         innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2033-01-01/2033-04-30"), kildeId = "$behandlingId2", barnIdentitetsnummer = "22222222222")  // Deler av behandling2 i k9 som ikke er avslått i behandling3
-        // TODO: Skal et avslag i K9 "overskrive" en vedtatt periode i Infotrygd ? I tilfelle burde denne kun gjelde 2033-07-02/2033-12-31
-        innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2033-05-01/2033-12-31"), kildeId = "fra-infotrygd", barnIdentitetsnummer = "22222222222")   // Infotrygd etter behandling 2
+        innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2033-07-02/2033-12-31"), kildeId = "fra-infotrygd", barnIdentitetsnummer = "22222222222")   // Infotrygd etter behandling 3
         innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2020-05-05/2033-12-31"), kildeId = "fra-infotrygd", barnIdentitetsnummer = "33333333333")   // Infotrygd hele vedtak for barn nummer 2
     }
 
