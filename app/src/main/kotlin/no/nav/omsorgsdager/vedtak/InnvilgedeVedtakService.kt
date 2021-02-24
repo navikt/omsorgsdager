@@ -48,8 +48,6 @@ internal class InnvilgedeVedtakService(
             correlationId = correlationId
         )
 
-        logger.info("Infotrygd[KroniskSyktBarn=${fraInfotrygd.kroniskSyktBarn.size}, MidlertidigAlene=${fraInfotrygd.midlertidigAlene.size}]")
-
         val omsorgspengerSaksnummer = omsorgspengerSaksnummerService.hentSaksnummer(
             identitetsnummer = identitetsnummer,
             correlationId = correlationId
@@ -61,7 +59,10 @@ internal class InnvilgedeVedtakService(
                 gjeldendeBehandlinger = behandlingService.hentAlleGjeldende(omsorgspengerSaksnummer)[Involvering.SØKER] // TODO: Sende inn periode her
             )
         }.also {
-            logger.info("SlåttSammen[KronisSyktBarn=${it.kroniskSyktBarn.size}, MidlertidigAlen=${it.midlertidigAlene.size}]")
+            logger.info(
+                "FraInfotrygd[KroniskSyktBarn=${fraInfotrygd.kroniskSyktBarn.size}, MidlertidigAlene=${fraInfotrygd.midlertidigAlene.size}] " +
+                "SlåttSammen[KroniskSyktBarn=${it.kroniskSyktBarn.size}, MidlertidigAlene=${it.midlertidigAlene.size}]"
+            )
             cache.put(identitetsnummer to periode, it)
         }
     }
