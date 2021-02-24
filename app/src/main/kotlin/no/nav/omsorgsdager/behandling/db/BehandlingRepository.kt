@@ -32,11 +32,17 @@ internal class BehandlingRepository(
     }
 
     internal fun hentAlle(saksnummer: K9Saksnummer) : List<DbBehandling> {
-        return emptyList()
+        throw NotImplementedError("Ikke implementert å hente basert på K9Saksnummer")
     }
 
     internal fun hentAlle(behandlingIder: List<BehandlingId>) : List<DbBehandling> {
-        return emptyList()
+        return sessionOf(dataSource).use { session ->
+            val query = queryOf(
+                statement = HentAlleBehandlingerStatement,
+                paramMap = mapOf("behandlingIder" to session.createArrayOf("oid", behandlingIder))
+            )
+            session.run(query.map { row -> row.somDbBehandling() }.asList)
+        }
     }
 
     internal companion object {
@@ -104,7 +110,7 @@ internal class BehandlingRepository(
         """
 
         @Language("PostgreSQL")
-        private const val HentBehandlingerStatement = """
+        private const val HentAlleBehandlingerStatement = """
             SELECT * FROM behandling WHERE id = ANY(:behandlingIder)
         """
 

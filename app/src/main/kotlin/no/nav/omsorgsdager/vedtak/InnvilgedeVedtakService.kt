@@ -50,13 +50,14 @@ internal class InnvilgedeVedtakService(
             null -> InnvilgedeVedtak.ingenInnvilgedeVedtak().also {
                 logger.info("Personen har ikke et omsorgspenger saksnummer og dermed heller ingen behandlinger i K9-Sak.")
             }
-            else -> InnvilgedeVedtak.gjeldendeBehandlingerSomInnvilgedeVedtak( // TODO: Sende inn periode her
-                gjeldendeBehandlinger = behandlingService.hentAlleGjeldende(omsorgspengerSaksnummer)[Involvering.SØKER]
-            )
+            else -> {
+                val gjeldendeBehandlingerSomSøker = behandlingService.hentAlleGjeldende(omsorgspengerSaksnummer)[Involvering.SØKER] // TODO: Sende inn periode her
+                InnvilgedeVedtak.gjeldendeBehandlingerSomInnvilgedeVedtak(gjeldendeBehandlinger = gjeldendeBehandlingerSomSøker)
+            }
         }
 
         logger.info(
-            "Infotrygd[KroniskSyktBarn=${fraInfotrygd.kroniskSyktBarn.size}, MidlertidigAlene=${fraInfotrygd.midlertidigAlene.size}]" +
+            "Infotrygd[KroniskSyktBarn=${fraInfotrygd.kroniskSyktBarn.size}, MidlertidigAlene=${fraInfotrygd.midlertidigAlene.size}] " +
             "K9-Sak[KroniskSyktBarn=${fraK9Sak.kroniskSyktBarn.size}, MidlertidigAlene=${fraK9Sak.midlertidigAlene.size}]"
         )
 

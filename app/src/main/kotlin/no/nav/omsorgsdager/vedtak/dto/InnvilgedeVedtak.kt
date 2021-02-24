@@ -29,7 +29,7 @@ internal data class InnvilgedeVedtak(
                     periode = it.periode,
                     kilder = it.k9behandlingId.somKilder()
                 )},
-                midlertidigAlene = gjeldendeBehandlinger.kroniskSyktBarn.filter { it.status == BehandlingStatus.INNVILGET }.map { MidlertidigAleneInnvilgetVedtak(
+                midlertidigAlene = gjeldendeBehandlinger.midlertidigAlene.filter { it.status == BehandlingStatus.INNVILGET }.map { MidlertidigAleneInnvilgetVedtak(
                     tidspunkt = it.tidspunkt,
                     periode = it.periode,
                     kilder = it.k9behandlingId.somKilder()
@@ -67,7 +67,7 @@ internal data class KroniskSyktBarnInnvilgetVedtak(
     @get:JsonIgnore override val periode: Periode) : InnvilgetVedtak {
     @get:JsonIgnore override val enPer = barn
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
-        periode = periode
+        periode = nyPeriode
     )
 }
 
@@ -77,6 +77,6 @@ internal data class MidlertidigAleneInnvilgetVedtak(
     @get:JsonIgnore override val periode: Periode) : InnvilgetVedtak {
     @get:JsonIgnore override val enPer = MidlertidigAleneInnvilgetVedtak::class
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
-        periode = periode
+        periode = nyPeriode
     )
 }
