@@ -90,7 +90,6 @@ internal class BehandlingRepository(
             }
         }
 
-
         private fun Row.somDbBehandling() = DbBehandling(
             id = long("id"),
             k9Saksnummer = string("k9_saksnummer").somK9Saksnummer(),
