@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager.vedtak.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.omsorgsdager.K9BehandlingId
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.GjeldendeBehandlinger
@@ -28,7 +29,7 @@ internal data class InnvilgedeVedtak(
                     periode = it.periode,
                     kilder = it.k9behandlingId.somKilder()
                 )},
-                midlertidigAlene = gjeldendeBehandlinger.kroniskSyktBarn.filter { it.status == BehandlingStatus.INNVILGET }.map { MidlertidigAleneInnvilgetVedtak(
+                midlertidigAlene = gjeldendeBehandlinger.midlertidigAlene.filter { it.status == BehandlingStatus.INNVILGET }.map { MidlertidigAleneInnvilgetVedtak(
                     tidspunkt = it.tidspunkt,
                     periode = it.periode,
                     kilder = it.k9behandlingId.somKilder()
@@ -54,9 +55,9 @@ data class Barn(
 
 internal interface InnvilgetVedtak : Gjeldende.KanUtledeGjeldende {
     val kilder: Set<Kilde>
-    fun vedtatt() = tidspunkt.toLocalDateOslo()
-    fun gyligFraOgMed() = periode.fom
-    fun gyldigTilOgMed() = periode.tom
+    @JsonProperty("vedtatt") fun vedtatt() = tidspunkt.toLocalDateOslo()
+    @JsonProperty("gyldigFraOgMed") fun gyldigFraOgMed() = periode.fom
+    @JsonProperty("gyldigTilOgMed") fun gyldigTilOgMed() = periode.tom
 }
 
 internal data class KroniskSyktBarnInnvilgetVedtak(
@@ -66,7 +67,7 @@ internal data class KroniskSyktBarnInnvilgetVedtak(
     @get:JsonIgnore override val periode: Periode) : InnvilgetVedtak {
     @get:JsonIgnore override val enPer = barn
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
-        periode = periode
+        periode = nyPeriode
     )
 }
 
@@ -76,6 +77,6 @@ internal data class MidlertidigAleneInnvilgetVedtak(
     @get:JsonIgnore override val periode: Periode) : InnvilgetVedtak {
     @get:JsonIgnore override val enPer = MidlertidigAleneInnvilgetVedtak::class
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
-        periode = periode
+        periode = nyPeriode
     )
 }

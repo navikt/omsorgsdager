@@ -12,11 +12,12 @@ internal data class CorrelationId private constructor(private val value: String)
     }
     override fun toString() = value
     internal companion object {
+        internal fun genererCorrelationId() = CorrelationId("omsorgsdager-${UUID.randomUUID()}")
         internal fun ApplicationCall.correlationId() = when {
-            request.headers.contains(HttpHeaders.XCorrelationId) -> request.headers[HttpHeaders.XCorrelationId]!!
-            request.headers.contains("Nav-Call-Id") -> request.headers["Nav-Call-Id"]!!
-            else -> "omsorgsdager-${UUID.randomUUID()}"
-        }.let { CorrelationId(it) }
+            request.headers.contains(HttpHeaders.XCorrelationId) -> request.headers[HttpHeaders.XCorrelationId]!!.let { CorrelationId(it) }
+            request.headers.contains("Nav-Call-Id") -> request.headers["Nav-Call-Id"]!!.let { CorrelationId(it) }
+            else -> genererCorrelationId()
+        }
     }
 }
 
