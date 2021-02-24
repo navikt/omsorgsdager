@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager.vedtak.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.omsorgsdager.K9BehandlingId
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.GjeldendeBehandlinger
@@ -54,9 +55,9 @@ data class Barn(
 
 internal interface InnvilgetVedtak : Gjeldende.KanUtledeGjeldende {
     val kilder: Set<Kilde>
-    fun vedtatt() = tidspunkt.toLocalDateOslo()
-    fun gyligFraOgMed() = periode.fom
-    fun gyldigTilOgMed() = periode.tom
+    @JsonProperty("vedtatt") fun vedtatt() = tidspunkt.toLocalDateOslo()
+    @JsonProperty("gyldigFraOgMed") fun gyldigFraOgMed() = periode.fom
+    @JsonProperty("gyldigTilOgMed") fun gyldigTilOgMed() = periode.tom
 }
 
 internal data class KroniskSyktBarnInnvilgetVedtak(

@@ -5,6 +5,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.k9.rapid.river.leggTilLøsning
 import no.nav.omsorgsdager.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgsdager.testutils.sisteMeldingSomJsonMessage
+import no.nav.omsorgsdager.testutils.somMocketOmsorgspengerSaksnummer
 
 internal fun TestRapid.mockHentOmsorgsdagerSaksnummer(identitetsnummer: Set<String>) =
     sendTestMessage(sisteMeldingSomJsonMessage().leggTilLøsningPåHenteOmsorgspengerSaksnummer(identitetsnummer).toJson())
@@ -14,6 +15,6 @@ private fun JsonMessage.leggTilLøsningPåHenteOmsorgspengerSaksnummer(
 ) = leggTilLøsning(
     behov = HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer,
     løsning = mapOf(
-        "saksnummer" to identitetsnummer.associateWith { "OP$it" }
+        "saksnummer" to identitetsnummer.associateWith { it.somMocketOmsorgspengerSaksnummer().toString() }
     )
 )
