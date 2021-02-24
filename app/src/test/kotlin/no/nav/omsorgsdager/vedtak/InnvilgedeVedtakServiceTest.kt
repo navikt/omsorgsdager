@@ -17,6 +17,7 @@ import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension.Companion.buildStarted
 import no.nav.omsorgsdager.testutils.somMocketOmsorgspengerSaksnummer
 import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.tid.Periode.Companion.toLocalDateOslo
 import no.nav.omsorgsdager.vedtak.dto.Kilde
 import no.nav.omsorgsdager.vedtak.dto.KroniskSyktBarnInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.infotrygd.KroniskSyktBarnInfotrygdInnvilgetVedtak
@@ -33,13 +34,15 @@ import kotlin.test.assertNotNull
 internal class InnvilgedeVedtakServiceTest(
     applicationContextBuilder: ApplicationContext.Builder) {
 
+    private val nå = ZonedDateTime.now()
+
     private val mockedOmsorgspengerSakGateway = mockk<OmsorgspengerSakGatway>().also {
         coEvery { it.hentSaksnummer(Identitetsnummer1, any()) }.returns(OmsorgspengerSaksnummer1)
     }
 
     private val mockedOmsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
         val kroniskSyktBarnInfotrygdVedtak = KroniskSyktBarnInfotrygdInnvilgetVedtak(
-            vedtatt = LocalDate.parse("2020-05-05"),
+            vedtatt = nå.plusMinutes(1).toLocalDateOslo(),
             gyldigFraOgMed = LocalDate.parse("2020-05-05"),
             gyldigTilOgMed = LocalDate.parse("2033-12-31"),
             kilder = setOf(Kilde(id = "fra-infotrygd", type = "Infotrygd")),
@@ -58,10 +61,11 @@ internal class InnvilgedeVedtakServiceTest(
 
     @Test
     fun `Kombinerer innvilgede vedtak om kronisk sykt barn fra Infotrygd & K9-sak`() {
-        val nå = ZonedDateTime.now()
         val behandlingId1 = "${UUID.randomUUID()}".somK9BehandlingId()
         val behandlingId2 = "${UUID.randomUUID()}".somK9BehandlingId()
         val behandlingId3 = "${UUID.randomUUID()}".somK9BehandlingId()
+        val behandlingId4 = "${UUID.randomUUID()}".somK9BehandlingId()
+
 
         val parter = listOf(
             Søker(identitetsnummer = Identitetsnummer1, omsorgspengerSaksnummer = OmsorgspengerSaksnummer1),
@@ -77,12 +81,14 @@ internal class InnvilgedeVedtakServiceTest(
             periode = Periode("2021-02-15/2032-12-31"),
             grunnlag = Json.tomJson()
         )
-        val behandling2 = behandling1.copy(behandlingId = behandlingId2, periode = Periode("2033-01-01/2033-07-01"), tidspunkt = nå.plusMinutes(1))
-        val behandling3 = behandling1.copy(behandlingId = behandlingId3, periode = Periode("2033-05-01/2033-07-01"), tidspunkt = nå.plusMinutes(1), status = BehandlingStatus.AVSLÅTT)
+        val behandling2 = behandling1.copy(behandlingId = behandlingId2, periode = Periode("2033-01-01/2033-07-01"), tidspunkt = nå.plusMinutes(2))
+        val behandling3 = behandling1.copy(behandlingId = behandlingId3, periode = Periode("2033-05-01/2033-07-01"), tidspunkt = nå.plusMinutes(3), status = BehandlingStatus.AVSLÅTT)
+        val behandling4 = behandling1.copy(behandlingId = behandlingId4, periode = Periode("2020-05-05/2033-12-31"), tidspunkt = nå.minusWeeks(1), status = BehandlingStatus.AVSLÅTT)
 
         applicationContext.behandlingService.lagre(behandling1, parter)
         applicationContext.behandlingService.lagre(behandling2, parter)
         applicationContext.behandlingService.lagre(behandling3, parter)
+        applicationContext.behandlingService.lagre(behandling4, parter) // Denne skal ikke ha noen innvirkning på re sultatet ettersom tidspunktet er satt før både vedtatt i Infotrygd & før andre behandligner i K9-Sak
 
         val innvilgedeVedtakKroniskSyktBarn = hentInnvilgedeVedtak("11111111111".somIdentitetsnummer(), Periode("2020-01-01/2050-01-01")).kroniskSyktBarn
 
@@ -90,8 +96,7 @@ internal class InnvilgedeVedtakServiceTest(
         innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2020-05-05/2021-02-14"), kildeId = "fra-infotrygd", barnIdentitetsnummer = "22222222222")   // Infotrygd frem til behandling1 i k9
         innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2021-02-15/2032-12-31"), kildeId = "$behandlingId1", barnIdentitetsnummer = "22222222222")  // Behandlingen1 i k9
         innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2033-01-01/2033-04-30"), kildeId = "$behandlingId2", barnIdentitetsnummer = "22222222222")  // Deler av behandling2 i k9 som ikke er avslått i behandling3
-        // TODO: Skal et avslag i K9 "overskrive" en vedtatt periode i Infotrygd ? I tilfelle burde denne kun gjelde 2033-07-02/2033-12-31
-        innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2033-05-01/2033-12-31"), kildeId = "fra-infotrygd", barnIdentitetsnummer = "22222222222")   // Infotrygd etter behandling 2
+        innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2033-07-02/2033-12-31"), kildeId = "fra-infotrygd", barnIdentitetsnummer = "22222222222")   // Infotrygd etter behandling 3
         innvilgedeVedtakKroniskSyktBarn.assertInneholder(periode = Periode("2020-05-05/2033-12-31"), kildeId = "fra-infotrygd", barnIdentitetsnummer = "33333333333")   // Infotrygd hele vedtak for barn nummer 2
     }
 
