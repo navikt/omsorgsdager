@@ -112,9 +112,11 @@ internal class PartRepository(
                         "type" to "MOTPART"
                     )
                 )
-                else -> throw IllegalStateException("Støtter ikke å lagre part av type ${part.javaClass}")
+                else -> throw IllegalStateException("[BehandlingId=$behandlingId] Støtter ikke å lagre part av type ${part.javaClass}")
             }}
-            queries.forEach { query -> update(query) }
+            queries.forEach { query -> require(update(query) == 1) {
+                "[BehandlingId=$behandlingId] Feil ved lagring av part"
+            }}
         }
 
         @Language("PostgreSQL")
