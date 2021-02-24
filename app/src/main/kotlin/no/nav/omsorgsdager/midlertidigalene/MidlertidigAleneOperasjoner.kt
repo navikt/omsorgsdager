@@ -22,7 +22,23 @@ internal object MidlertidigAleneOperasjoner : BehandlingOperasjoner<MidlertidigA
     override fun mapTilEksisterendeBehandling(
         dbBehandling: DbBehandling,
         parter: List<Part>): MidlertidigAleneBehandling {
-        TODO("Not yet implemented")
+        require(dbBehandling.type == BehandlingType.MIDLERTIDIG_ALENE) {
+            "Kan ikke mappe ${dbBehandling.type} til MIDLERTIDIG_ALENE"
+        }
+
+        require(parter.size == 2) {
+            "Forventer at behandligner for MIDLERTIDIG_ALENE skal ha 2 parter, hadde ${parter.size}"
+        }
+
+        return MidlertidigAleneBehandling(
+            k9Saksnummer = dbBehandling.k9Saksnummer,
+            k9behandlingId = dbBehandling.k9behandlingId,
+            tidspunkt = dbBehandling.tidspunkt,
+            status = dbBehandling.status,
+            periode = dbBehandling.periode,
+            søker = parter.first { it is Søker } as Søker,
+            annenForelder = parter.first { it is Motpart } as Motpart
+        )
     }
 
     override fun mapTilNyBehandling(

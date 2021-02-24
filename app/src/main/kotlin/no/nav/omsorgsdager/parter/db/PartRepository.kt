@@ -1,17 +1,53 @@
 package no.nav.omsorgsdager.parter.db
 
 import kotliquery.TransactionalSession
+import kotliquery.queryOf
+import kotliquery.sessionOf
 import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Identitetsnummer
+import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.OmsorgspengerSaksnummer
+import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnumer
+import no.nav.omsorgsdager.parter.*
+import no.nav.omsorgsdager.parter.Barn
 import no.nav.omsorgsdager.parter.Involvering
-import no.nav.omsorgsdager.parter.Part
+import no.nav.omsorgsdager.parter.Motpart
+import no.nav.omsorgsdager.parter.Søker
+import org.intellij.lang.annotations.Language
 import javax.sql.DataSource
 
 internal class PartRepository(
     private val dataSource: DataSource) {
+
     internal fun hentParter(behandlingIder: List<BehandlingId>) : List<DbPart> {
-        return emptyList()
+        return sessionOf(dataSource).use { session ->
+            val query = queryOf(
+                statement = HenteParterStatement,
+                paramMap = mapOf(
+                    "behandlingIder" to session.createArrayOf("oid", behandlingIder)
+                )
+            )
+            session.run(query.map { row ->
+                val behandlingId = row.long("id")
+                val type = row.string("type")
+                when (type) {
+                    "SØKER" -> DbPart(behandlingId = behandlingId, part = Søker(
+                        identitetsnummer = row.string("identitetsnummer").somIdentitetsnummer(),
+                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnumer()
+                    ))
+                    "MOTPART" -> DbPart(behandlingId = behandlingId, part = Motpart(
+                        identitetsnummer = row.string("identitetsnummer").somIdentitetsnummer(),
+                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnumer()
+                    ))
+                    "BARN" -> DbPart(behandlingId = behandlingId, part = Barn(
+                        identitetsnummer = row.stringOrNull("identitetsnummer")?.somIdentitetsnummer(), // TODO: saksnummer også på barn... ?
+                        fødselsdato = row.localDate("fodselsdato")
+                    ))
+                    else -> throw IllegalStateException("Ukjent Type=[$type], BehandlingId=[$behandlingId]")
+                }
+
+            }.asList)
+        }
     }
 
     internal fun hentInvolveringer(omsorgspengerSaksnummer: OmsorgspengerSaksnummer) : Map<Involvering, List<BehandlingId>> {
@@ -26,7 +62,53 @@ internal class PartRepository(
         internal fun TransactionalSession.leggTilParter(
             behandlingId: BehandlingId,
             parter: List<Part>) {
-
+            val queries = parter.map { part -> when (part) {
+                is Barn -> queryOf(
+                    statement = LagreBarnStatement,
+                    paramMap = mapOf(
+                        "behandlingId" to behandlingId,
+                        "identitetsnummer" to "${part.identitetsnummer}",
+                        "fodselsdato" to part.fødselsdato
+                    )
+                )
+                is Søker -> queryOf(
+                    statement = LagrePersonStatement,
+                    paramMap = mapOf(
+                        "behandlingId" to behandlingId,
+                        "identitetsnummer" to "${part.identitetsnummer}",
+                        "omsorgspengerSaksnummer" to "${part.omsorgspengerSaksnummer}",
+                        "type" to "SØKER"
+                    )
+                )
+                is Motpart -> queryOf(
+                    statement = LagrePersonStatement,
+                    paramMap = mapOf(
+                        "behandlingId" to behandlingId,
+                        "identitetsnummer" to "${part.identitetsnummer}",
+                        "omsorgspengerSaksnummer" to "${part.omsorgspengerSaksnummer}",
+                        "type" to "MOTPART"
+                    )
+                )
+                else -> throw IllegalStateException("Støtter ikke å lagre part av type ${part.javaClass}")
+            }}
+            queries.forEach { query -> update(query) }
         }
+
+        @Language("PostgreSQL")
+        private const val LagreBarnStatement = """
+            INSERT INTO part (behandling_id, identitetsnummer, fodselsdato, type)
+            VALUES(:behandlingId, :identitetsnummer, :fodselsdato, 'BARN')
+        """
+
+        @Language("PostgreSQL")
+        private const val LagrePersonStatement = """
+            INSERT INTO part (behandling_id, identitetsnummer, omsorgspenger_saksnummer, type)
+            VALUES(:behandlingId, :identitetsnummer, :omsorgspengerSaksnummer, :type)
+        """
+
+        @Language("PostgreSQL")
+        private const val HenteParterStatement = """
+            SELECT * FROM part WHERE behandling_id = ANY(:behandlingIder)
+        """
     }
 }

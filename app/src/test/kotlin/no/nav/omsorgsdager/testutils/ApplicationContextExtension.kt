@@ -17,11 +17,13 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import javax.sql.DataSource
 
 internal class ApplicationContextExtension : ParameterResolver {
-    private companion object {
+    internal companion object {
+
+        internal fun ApplicationContext.Builder.buildStarted() = build().also { it.start() }
 
         private val mockedEnvironment = MockedEnvironment().start()
 
-        val env = mapOf(
+        private val env = mapOf(
             "DATABASE_HOST" to "localhost",
             "DATABASE_PORT" to "${mockedEnvironment.embeddedPostgres.port}",
             "DATABASE_DATABASE" to "postgres",

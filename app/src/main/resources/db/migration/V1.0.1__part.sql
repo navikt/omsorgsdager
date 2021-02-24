@@ -1,4 +1,4 @@
-CREATE TABLE parter
+CREATE TABLE part
 (
     id                          BIGSERIAL PRIMARY KEY,
     behandling_id               BIGINT NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE parter
     CONSTRAINT foreign_key_behandling FOREIGN KEY(behandling_id) REFERENCES behandling(id)
 );
 
-CREATE INDEX index_parter_behandling_id ON parter(behandling_id);
-CREATE INDEX index_parter_omsorgspenger_saksnummer ON parter(omsorgspenger_saksnummer);
-CREATE INDEX index_parter_identitetsnummer ON parter(identitetsnummer);
+CREATE INDEX index_part_behandling_id ON part(behandling_id);
+CREATE INDEX index_part_omsorgspenger_saksnummer ON part(omsorgspenger_saksnummer);
+CREATE INDEX index_part_identitetsnummer ON part(identitetsnummer);
 

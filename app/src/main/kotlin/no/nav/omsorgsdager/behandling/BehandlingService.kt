@@ -21,16 +21,17 @@ internal class BehandlingService(
     private val partRepository: PartRepository) {
 
     internal fun lagre(behandling: NyBehandling, parter: List<Part>) {
-        using(sessionOf(dataSource)) { session -> session.transaction { tx ->
-            val behandlingId = tx.lagreBehandling(behandling)
-            tx.leggTilParter(behandlingId = behandlingId, parter = parter)
+        using(sessionOf(dataSource, returnGeneratedKey = true)) { session -> session.transaction { tx ->
+            tx.lagreBehandling(behandling)?.also { nyBehandlingId ->
+                tx.leggTilParter(behandlingId = nyBehandlingId, parter = parter)
+            }
         }}
     }
 
     /**
      * Hente en enkeltbehandling i k9-sak
      */
-    internal fun hentEn(behandlingId: K9BehandlingId) : EksisterendeBehandling? {
+    internal fun hentEn(behandlingId: K9BehandlingId) : EksisterendeBehandling? { // TODO: En behandling flere typer..
         val dbBehandling = behandlingRepository.hentEn(behandlingId) ?: return null
         val parter = partRepository.hentParter(listOf(dbBehandling.id)).map { it.part }
 

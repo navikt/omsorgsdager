@@ -3,6 +3,7 @@ package no.nav.omsorgsdager.testutils
 import com.fasterxml.jackson.databind.node.TextNode
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
+import no.nav.helse.rapids_rivers.isMissingOrNull
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.json.JSONObject
 import java.time.ZonedDateTime
@@ -27,4 +28,11 @@ internal fun TestRapid.sisteMeldingHarLøsningPå(behov: String) {
     val jsonMessage = sisteMeldingSomJsonMessage().also { it.interestedIn(key) }
     val node = jsonMessage[key]
     require(node is TextNode && ZonedDateTime.parse(node.textValue()) != null)
+}
+
+internal fun TestRapid.sisteMeldingManglerLøsningPå(behov: String) {
+    val key = "@løsninger.$behov.løst"
+    val jsonMessage = sisteMeldingSomJsonMessage().also { it.interestedIn(key) }
+    val node = jsonMessage[key]
+    require(node.isMissingOrNull())
 }
