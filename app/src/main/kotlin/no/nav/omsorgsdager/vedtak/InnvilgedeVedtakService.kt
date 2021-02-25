@@ -56,7 +56,10 @@ internal class InnvilgedeVedtakService(
         return when (omsorgspengerSaksnummer) {
             null -> fraInfotrygd.also { logger.info("Ingen behandligner i K9-Sak") }
             else -> fraInfotrygd.slåSammenMed(
-                gjeldendeBehandlinger = behandlingService.hentAlleGjeldende(omsorgspengerSaksnummer)[Involvering.SØKER] // TODO: https://github.com/navikt/omsorgsdager/issues/41
+                gjeldendeBehandlinger = behandlingService.hentAlleGjeldende(
+                    saksnummer = omsorgspengerSaksnummer,
+                    periode = periode
+                )[Involvering.SØKER]
             )
         }.also {
             logger.info(
@@ -106,6 +109,5 @@ internal class InnvilgedeVedtakService(
                 midlertidigAlene = slåttSammenMidlertidigAlene
             )
         }
-
     }
 }
