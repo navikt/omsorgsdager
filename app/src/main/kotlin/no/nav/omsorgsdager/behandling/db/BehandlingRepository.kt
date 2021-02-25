@@ -18,16 +18,16 @@ import javax.sql.DataSource
 internal class BehandlingRepository(
     private val dataSource: DataSource) {
 
-    internal fun hentEn(behandlingId: K9BehandlingId) : DbBehandling? {
+    internal fun hentAlle(behandlingId: K9BehandlingId) : List<DbBehandling> {
         val query = queryOf(
-            statement = HentEnkeltbehandlingStatement,
+            statement = HentBehandlingerFraK9BehandlingIdStatement,
             paramMap = mapOf(
                 "behandlingId" to "$behandlingId"
             )
         )
 
         return sessionOf(dataSource).use { session ->
-            session.run(query.map { row -> row.somDbBehandling() }.asSingle)
+            session.run(query.map { row -> row.somDbBehandling() }.asList)
         }
     }
 
@@ -38,7 +38,7 @@ internal class BehandlingRepository(
     internal fun hentAlle(behandlingIder: List<BehandlingId>) : List<DbBehandling> {
         return sessionOf(dataSource).use { session ->
             val query = queryOf(
-                statement = HentAlleBehandlingerStatement,
+                statement = HentBehandlingerFraBehandlingIderStatement,
                 paramMap = mapOf("behandlingIder" to session.createArrayOf("oid", behandlingIder))
             )
             session.run(query.map { row -> row.somDbBehandling() }.asList)
@@ -66,7 +66,7 @@ internal class BehandlingRepository(
             return when (nyBehandlingId) {
                 null -> {
                     val query = queryOf(
-                        statement = HentBehandlingNøkkelinfoStatement,
+                        statement = HentBehandlingIdempotentInfoStatement,
                         paramMap = mapOf("behandlingId" to "${behandling.behandlingId}")
                     )
 
@@ -104,17 +104,17 @@ internal class BehandlingRepository(
         )
 
         @Language("PostgreSQL")
-        private const val HentBehandlingNøkkelinfoStatement = """
+        private const val HentBehandlingIdempotentInfoStatement = """
             SELECT id, status, grunnlag from behandling where k9_behandling_id = :behandlingId
         """
 
         @Language("PostgreSQL")
-        private const val HentAlleBehandlingerStatement = """
+        private const val HentBehandlingerFraBehandlingIderStatement = """
             SELECT * FROM behandling WHERE id = ANY(:behandlingIder)
         """
 
         @Language("PostgreSQL")
-        private const val HentEnkeltbehandlingStatement = """
+        private const val HentBehandlingerFraK9BehandlingIdStatement = """
             SELECT * FROM behandling WHERE k9_behandling_id = :behandlingId
         """
 
