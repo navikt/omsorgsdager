@@ -109,7 +109,12 @@ internal class ApplicationContext(
                 dataSource = benyttetDataSource
             )
 
-            val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway ?: OmsorgspengerInfotrygdRammevedtakGateway()
+            val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway ?: OmsorgspengerInfotrygdRammevedtakGateway(
+                accessTokenClient = benyttetAccessTokenClient,
+                hentRammevedtakFraInfotrygdScopes = benyttetEnv.hentRequiredEnv("HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES").csv().toSet(),
+                omsorgspengerInfotrygdRammevedtakBaseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL"))
+            )
+
             val benyttetInfotrygdInnvilgetVedtakService = infotrygdInnvilgetVedtakService ?: InfotrygdInnvilgetVedtakService(
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway
             )
@@ -130,7 +135,8 @@ internal class ApplicationContext(
                 dataSource = benyttetDataSource,
                 healthService = HealthService(
                     healthChecks = setOf(
-                        benyttetOmsorgspengerTilgangsstyringGateway
+                        benyttetOmsorgspengerTilgangsstyringGateway,
+                        benyttetOmsorgspengerInfotrygdRammevedtakGateway
                     )
                 ),
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,

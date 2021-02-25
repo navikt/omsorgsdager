@@ -9,6 +9,7 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsJwksUrl
 import no.nav.omsorgsdager.ApplicationContext
+import no.nav.omsorgsdager.testutils.wiremock.infotrygdRammevedtakBaseUrl
 import no.nav.omsorgsdager.testutils.wiremock.tilgangApiBaseUrl
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -37,7 +38,9 @@ internal class ApplicationContextExtension : ParameterResolver {
             "AZURE_APP_TOKEN_ENDPOINT" to (mockedEnvironment.wireMockServer.getAzureV2TokenUrl()),
             "OPEN_AM_ISSUER" to NaisSts.getIssuer(),
             "OPEN_AM_JWKS_URI" to (mockedEnvironment.wireMockServer.getNaisStsJwksUrl()),
-            "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak"
+            "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak",
+            "HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES" to "/.default",
+            "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL" to mockedEnvironment.wireMockServer.infotrygdRammevedtakBaseUrl()
         )
 
         init {

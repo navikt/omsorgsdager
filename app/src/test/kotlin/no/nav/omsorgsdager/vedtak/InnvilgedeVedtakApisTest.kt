@@ -15,7 +15,8 @@ import kotlin.test.assertNull
 
 @ExtendWith(ApplicationContextExtension::class)
 internal class InnvilgedeVedtakApisTest(
-    applicationContextBuilder: ApplicationContext.Builder) {
+    applicationContextBuilder: ApplicationContext.Builder
+) {
     private val applicationContext = applicationContextBuilder.build()
 
     @Test
@@ -71,11 +72,39 @@ internal class InnvilgedeVedtakApisTest(
         }
     }
 
+    @Test
+    fun `Person med utvidetrett i infotrygd`() {
+        val IdentitetsnummerMedVedtakInfotrygd = "29099022222"
+        @Language("JSON")
+        val ForventetResponseMedInfotrygdVedtak = """
+            {
+               "kroniskSyktBarn":[
+                  {
+                     "barn": {"identitetsnummer":"01019911111", "fødselsdato":"1999-01-01"},
+                     "kilder": [{"id":"UTV.RETT/20D/29099022222",  "type":"Personkort" }]
+                  }
+               ],
+               "midlertidigAlene":[
+                  {
+                  "kilder":[{"id":"midl.alene.om/17D", "type":"Personkort"}]
+                  }
+               ]
+            }
+        """.trimIndent()
+        withTestApplication({ omsorgsdager(applicationContext) }) {
+            hentOgAssertInnvilgedeVedtak(
+                identitetsnummer = IdentitetsnummerMedVedtakInfotrygd,
+                forventetResponse = ForventetResponseMedInfotrygdVedtak
+            )
+        }
+    }
+
 
     private companion object {
         val IdentitetsnummerUtenVedtak = "29099011111"
         val ForventetResponseUtenVedtak = """{"kroniskSyktBarn": [], "midlertidigAlene": []}"""
-        val ForventetResponseForbidden = """{"detail":"Requesten inneholder ikke tilstrekkelige tilganger.","instance":"about:blank","type":"/problem-details/unauthorized","title":"unauthorized","status":403}"""
+        val ForventetResponseForbidden =
+            """{"detail":"Requesten inneholder ikke tilstrekkelige tilganger.","instance":"about:blank","type":"/problem-details/unauthorized","title":"unauthorized","status":403}"""
 
         fun TestApplicationEngine.hentOgAssertInnvilgedeVedtak(
             identitetsnummer: String,

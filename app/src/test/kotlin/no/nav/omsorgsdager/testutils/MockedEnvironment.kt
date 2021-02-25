@@ -19,6 +19,7 @@ internal class MockedEnvironment {
         .withNaisStsSupport()
         .build()
         .stubTilgangApi()
+        .stubInfotrygdRammevedtak()
 
     internal fun start() = this
     internal fun stop() {
