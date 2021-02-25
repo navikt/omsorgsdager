@@ -73,7 +73,7 @@ internal class InnvilgedeVedtakServiceTest(
         )
 
         val behandling1 = NyBehandling(
-            saksnummer = "1234".somK9Saksnummer(),
+            saksnummer = "12345".somK9Saksnummer(),
             behandlingId = behandlingId1,
             tidspunkt = nå,
             type = BehandlingType.KRONISK_SYKT_BARN,
