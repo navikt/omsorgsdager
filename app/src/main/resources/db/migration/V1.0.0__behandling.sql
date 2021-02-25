@@ -1,7 +1,7 @@
 CREATE TABLE behandling
 (
     id                          BIGSERIAL PRIMARY KEY,
-    behovssekvens_id            VARCHAR(100) NOT NULL,
+    behovssekvens_id            VARCHAR(50) NOT NULL,
     k9_saksnummer               VARCHAR(50) NOT NULL,
     k9_behandling_id            VARCHAR(50) NOT NULL,
     status                      VARCHAR(50) NOT NULL,
