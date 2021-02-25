@@ -1,5 +1,6 @@
 package no.nav.omsorgsdager.kronisksyktbarn
 
+import no.nav.omsorgsdager.BehovssekvensId
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.Json
@@ -42,6 +43,7 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
     }
 
     override fun mapTilNyBehandling(
+        behovssekvensId: BehovssekvensId,
         grunnlag: Json,
         saksnummer: Map<Identitetsnummer, OmsorgspengerSaksnummer>,
         behandlingStatus: BehandlingStatus): Pair<NyBehandling, List<Part>> {
@@ -55,6 +57,7 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
         val barnet = Barn(identitetsnummer = dto.barn.identitetsnummer?.somIdentitetsnummer(), fødselsdato = dto.barn.fødselsdato)
 
         val behandling = NyBehandling(
+            behovssekvensId = behovssekvensId,
             saksnummer = dto.saksnummer.somK9Saksnummer(),
             behandlingId = dto.behandlingId.somK9BehandlingId(),
             tidspunkt = dto.tidspunkt,

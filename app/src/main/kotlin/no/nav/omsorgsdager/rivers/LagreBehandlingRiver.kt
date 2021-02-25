@@ -5,6 +5,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.k9.rapid.river.*
+import no.nav.omsorgsdager.BehovssekvensId.Companion.somBehovssekvensId
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.behandling.BehandlingService
 import no.nav.omsorgsdager.behandling.BehandlingStatus
@@ -23,8 +24,6 @@ internal abstract class LagreBehandlingRiver(
 
     private val BehovKey = "@behov.$behov"
 
-    // TODO: Lagre behovssekvensid ?
-
     init {
         River(rapidsConnection).apply {
             validate {
@@ -41,6 +40,7 @@ internal abstract class LagreBehandlingRiver(
         val grunnlag = (packet[BehovKey] as ObjectNode).somJson()
 
         val (nyBehandling, parter) = behandlingType.operasjoner.mapTilNyBehandling(
+            behovssekvensId = id.somBehovssekvensId(),
             saksnummer = saksnummer,
             grunnlag = grunnlag,
             behandlingStatus = behandlingStatus

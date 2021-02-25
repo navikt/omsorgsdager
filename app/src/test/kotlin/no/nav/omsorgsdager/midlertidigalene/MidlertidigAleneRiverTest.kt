@@ -39,10 +39,10 @@ internal class MidlertidigAleneRiverTest(
         rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer, annenForelderIdentitetsnummer))
         rapid.sisteMeldingHarLøsningPå("InnvilgetMidlertidigAlene")
 
-        val behandling = applicationContext.behandlingService.hentEn(behandlingId = behandlingId.somK9BehandlingId())
+        val behandling = applicationContext.behandlingService.hentAlle(behandlingId = behandlingId.somK9BehandlingId()).first()
         assertNotNull(behandling)
         assertTrue(behandling is MidlertidigAleneBehandling)
-        assertEquals(behandlingId.somK9BehandlingId(), behandling!!.k9behandlingId)
+        assertEquals(behandlingId.somK9BehandlingId(), behandling.k9behandlingId)
         assertEquals(BehandlingStatus.INNVILGET, behandling.status)
     }
 
@@ -63,10 +63,10 @@ internal class MidlertidigAleneRiverTest(
         rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer, annenForelderIdentitetsnummer))
         rapid.sisteMeldingHarLøsningPå("AvslåttMidlertidigAlene")
 
-        val behandling = applicationContext.behandlingService.hentEn(behandlingId = behandlingId.somK9BehandlingId())
+        val behandling = applicationContext.behandlingService.hentAlle(behandlingId = behandlingId.somK9BehandlingId()).first()
         assertNotNull(behandling)
         assertTrue(behandling is MidlertidigAleneBehandling)
-        assertEquals(behandlingId.somK9BehandlingId(), behandling!!.k9behandlingId)
+        assertEquals(behandlingId.somK9BehandlingId(), behandling.k9behandlingId)
         assertEquals(BehandlingStatus.AVSLÅTT, behandling.status)
     }
 }
