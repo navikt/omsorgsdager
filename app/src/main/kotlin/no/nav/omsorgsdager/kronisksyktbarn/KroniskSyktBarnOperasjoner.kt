@@ -22,7 +22,23 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
     override fun mapTilEksisterendeBehandling(
         dbBehandling: DbBehandling,
         parter: List<Part>): KroniskSyktBarnBehandling {
-        TODO("Not yet implemented")
+        require(dbBehandling.type == BehandlingType.KRONISK_SYKT_BARN) {
+            "Kan ikke mappe ${dbBehandling.type} til KRONISK_SYKT_BARN"
+        }
+
+        require(parter.size == 2) {
+            "Forventer at behandligner for KRONISK_SYKT_BARN skal ha 2 parter, hadde ${parter.size}"
+        }
+
+        return KroniskSyktBarnBehandling(
+            k9Saksnummer = dbBehandling.k9Saksnummer,
+            k9behandlingId = dbBehandling.k9behandlingId,
+            tidspunkt = dbBehandling.tidspunkt,
+            status = dbBehandling.status,
+            periode = dbBehandling.periode,
+            søker = parter.first { it is Søker } as Søker,
+            barn = parter.first { it is Barn } as Barn
+        )
     }
 
     override fun mapTilNyBehandling(

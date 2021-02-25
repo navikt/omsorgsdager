@@ -28,7 +28,7 @@ internal class PartRepository(
                 )
             )
             session.run(query.map { row ->
-                val behandlingId = row.long("id")
+                val behandlingId = row.long("behandling_id")
                 val type = row.string("type")
                 when (type) {
                     "SØKER" -> DbPart(behandlingId = behandlingId, part = Søker(
@@ -51,11 +51,34 @@ internal class PartRepository(
     }
 
     internal fun hentInvolveringer(omsorgspengerSaksnummer: OmsorgspengerSaksnummer) : Map<Involvering, List<BehandlingId>> {
-        return emptyMap()
+        val query = queryOf(
+            statement = HenteInvolveringerStatement,
+            paramMap = mapOf(
+                "omsorgspengerSaksnummer" to "$omsorgspengerSaksnummer"
+            )
+        )
+
+        val søker = mutableListOf<BehandlingId>()
+        val motpart = mutableListOf<BehandlingId>()
+
+        sessionOf(dataSource).use { session ->
+            session.run(query.map { row ->
+                when (Involvering.valueOf(row.string("type"))) {
+                    Involvering.SØKER -> søker.add(row.long("behandling_id"))
+                    Involvering.MOTPART -> motpart.add(row.long("behandling_id"))
+                }
+            }.asList)
+        }
+
+        return mapOf(
+            Involvering.SØKER to søker,
+            Involvering.MOTPART to motpart
+        )
+
     }
 
     internal fun hentOmsorgspengerSaksnummer(identitetsnummer: Identitetsnummer) : OmsorgspengerSaksnummer? {
-        return null
+        return null // TODO
     }
 
     internal companion object {
@@ -89,9 +112,11 @@ internal class PartRepository(
                         "type" to "MOTPART"
                     )
                 )
-                else -> throw IllegalStateException("Støtter ikke å lagre part av type ${part.javaClass}")
+                else -> throw IllegalStateException("[BehandlingId=$behandlingId] Støtter ikke å lagre part av type ${part.javaClass}")
             }}
-            queries.forEach { query -> update(query) }
+            queries.forEach { query -> require(update(query) == 1) {
+                "[BehandlingId=$behandlingId] Feil ved lagring av part"
+            }}
         }
 
         @Language("PostgreSQL")
@@ -109,6 +134,12 @@ internal class PartRepository(
         @Language("PostgreSQL")
         private const val HenteParterStatement = """
             SELECT * FROM part WHERE behandling_id = ANY(:behandlingIder)
+        """
+
+        @Language("PostgreSQL")
+        private const val HenteInvolveringerStatement = """
+            SELECT behandling_id, type FROM part 
+            WHERE omsorgspenger_saksnummer = :omsorgspengerSaksnummer
         """
     }
 }
