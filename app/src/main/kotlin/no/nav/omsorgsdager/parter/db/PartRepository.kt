@@ -8,6 +8,7 @@ import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.OmsorgspengerSaksnummer
 import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnumer
+import no.nav.omsorgsdager.SecureLogger
 import no.nav.omsorgsdager.parter.*
 import no.nav.omsorgsdager.parter.Barn
 import no.nav.omsorgsdager.parter.Involvering
@@ -78,7 +79,24 @@ internal class PartRepository(
     }
 
     internal fun hentOmsorgspengerSaksnummer(identitetsnummer: Identitetsnummer) : OmsorgspengerSaksnummer? {
-        return null // TODO
+        val query = queryOf(
+            statement = HenteSaksnummerStatement,
+            paramMap = mapOf(
+                "identitetsnummer" to "$identitetsnummer"
+            )
+        )
+
+        val saksnummer = sessionOf(dataSource).use { session ->
+            session.run(query.map { row ->
+                row.string("omsorgspenger_saksnummer")
+            }.asList)
+        }.toSet()
+
+        require(saksnummer.size in 0..1) {
+            SecureLogger.warn("Fant ${saksnummer.size} saksnummer for identitetsnummer $identitetsnummer: $saksnummer")
+        }
+
+        return saksnummer.firstOrNull()?.somOmsorgspengerSaksnumer()
     }
 
     internal companion object {
@@ -90,7 +108,7 @@ internal class PartRepository(
                     statement = LagreBarnStatement,
                     paramMap = mapOf(
                         "behandlingId" to behandlingId,
-                        "identitetsnummer" to "${part.identitetsnummer}",
+                        "identitetsnummer" to part.identitetsnummer?.toString(),
                         "fodselsdato" to part.fødselsdato
                     )
                 )
@@ -140,6 +158,12 @@ internal class PartRepository(
         private const val HenteInvolveringerStatement = """
             SELECT behandling_id, type FROM part 
             WHERE omsorgspenger_saksnummer = :omsorgspengerSaksnummer
+        """
+
+        @Language("PostgreSQL")
+        private const val HenteSaksnummerStatement = """
+            SELECT omsorgspenger_saksnummer FROM part 
+            WHERE identitetsnummer = :identitetsnummer
         """
     }
 }
