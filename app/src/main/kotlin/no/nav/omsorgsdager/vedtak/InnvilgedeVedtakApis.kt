@@ -9,14 +9,12 @@ import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.Json.Companion.json
+import no.nav.omsorgsdager.SecureLogger
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.tid.Periode.Companion.periodeOrNull
 import no.nav.omsorgsdager.tilgangsstyring.Operasjon
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
-import org.slf4j.LoggerFactory
 import java.time.LocalDate
-
-private val logger = LoggerFactory.getLogger("no.nav.omsorgsdager.vedtak.InnvilgedeVedtakApis")
 
 internal fun Route.InnvilgedeVedtakApis(
     tilgangsstyring: Tilgangsstyring,
@@ -34,8 +32,7 @@ internal fun Route.InnvilgedeVedtakApis(
     }.fold(
         onSuccess = { it },
         onFailure = {
-            // TODO: SecureLog
-            logger.warn("Ugylidg request for henting av innvilgede vedtak: $this")
+            SecureLogger.warn("Ugylidg request for henting av innvilgede vedtak: $this")
             null
         }
     )
