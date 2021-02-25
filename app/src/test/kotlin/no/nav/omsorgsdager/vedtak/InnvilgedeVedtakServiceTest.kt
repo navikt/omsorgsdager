@@ -73,6 +73,7 @@ internal class InnvilgedeVedtakServiceTest(
         )
 
         val behandling1 = NyBehandling(
+            behovssekvensId = BehovssekvensId.genererBehovssekvensId(),
             saksnummer = "12345".somK9Saksnummer(),
             behandlingId = behandlingId1,
             tidspunkt = nå,

@@ -52,6 +52,7 @@ internal class BehandlingRepository(
             val nyBehandlingId = updateAndReturnGeneratedKey(queryOf(
                 statement = LagreBehandlingStatement,
                 paramMap = mapOf(
+                    "behovssekvensId" to "${behandling.behovssekvensId}",
                     "saksnummer" to "${behandling.saksnummer}",
                     "behandlingId" to "${behandling.behandlingId}",
                     "status" to behandling.status.name,
@@ -120,8 +121,8 @@ internal class BehandlingRepository(
 
         @Language("PostgreSQL")
         private const val LagreBehandlingStatement = """
-            INSERT INTO behandling (k9_saksnummer, k9_behandling_id, status, type, tidspunkt, fom, tom, grunnlag)
-            VALUES(:saksnummer, :behandlingId, :status, :type, :tidspunkt, :fom, :tom, :grunnlag ::jsonb)
+            INSERT INTO behandling (behovssekvens_id, k9_saksnummer, k9_behandling_id, status, type, tidspunkt, fom, tom, grunnlag)
+            VALUES(:behovssekvensId, :saksnummer, :behandlingId, :status, :type, :tidspunkt, :fom, :tom, :grunnlag ::jsonb)
             ON CONFLICT (k9_behandling_id, type) DO NOTHING 
         """
     }
