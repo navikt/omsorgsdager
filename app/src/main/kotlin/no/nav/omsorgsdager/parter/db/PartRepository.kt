@@ -41,7 +41,7 @@ internal class PartRepository(
                         omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnumer()
                     ))
                     "BARN" -> DbPart(behandlingId = behandlingId, part = Barn(
-                        identitetsnummer = row.stringOrNull("identitetsnummer")?.somIdentitetsnummer(), // TODO: saksnummer også på barn... ?
+                        identitetsnummer = row.stringOrNull("identitetsnummer")?.somIdentitetsnummer(), // TODO: https://github.com/navikt/omsorgsdager/issues/25
                         fødselsdato = row.localDate("fodselsdato")
                     ))
                     else -> throw IllegalStateException("Ukjent Type=[$type], BehandlingId=[$behandlingId]")
