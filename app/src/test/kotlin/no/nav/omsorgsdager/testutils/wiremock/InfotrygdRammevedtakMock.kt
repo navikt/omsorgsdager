@@ -8,7 +8,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
 import com.github.tomakehurst.wiremock.matching.AnythingPattern
 
-private const val apiPath = "/"
+private const val apiPath = "/infotrygd-rammemeldinger-mock"
 
 private fun WireMockServer.stubDefaultTomtSvar(): WireMockServer {
     WireMock.stubFor(

@@ -12,7 +12,7 @@ import no.nav.omsorgsdager.behandling.BehandlingType
 import no.nav.omsorgsdager.behandling.NyBehandling
 import no.nav.omsorgsdager.parter.Barn
 import no.nav.omsorgsdager.parter.Søker
-import no.nav.omsorgsdager.saksnummer.OmsorgspengerSakGatway
+import no.nav.omsorgsdager.saksnummer.OmsorgspengerSakGateway
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension.Companion.buildStarted
 import no.nav.omsorgsdager.testutils.somMocketOmsorgspengerSaksnummer
@@ -36,7 +36,7 @@ internal class InnvilgedeVedtakServiceTest(
 
     private val nå = ZonedDateTime.now()
 
-    private val mockedOmsorgspengerSakGateway = mockk<OmsorgspengerSakGatway>().also {
+    private val mockedOmsorgspengerSakGateway = mockk<OmsorgspengerSakGateway>().also {
         coEvery { it.hentSaksnummer(Identitetsnummer1, any()) }.returns(OmsorgspengerSaksnummer1)
     }
 
@@ -55,7 +55,7 @@ internal class InnvilgedeVedtakServiceTest(
     }
 
     private val applicationContext = applicationContextBuilder.also {
-        it.omsorgspengerSakGatway = mockedOmsorgspengerSakGateway
+        it.omsorgspengerSakGateway = mockedOmsorgspengerSakGateway
         it.omsorgspengerInfotrygdRammevedtakGateway = mockedOmsorgspengerInfotrygdRammevedtakGateway
     }.buildStarted()
 

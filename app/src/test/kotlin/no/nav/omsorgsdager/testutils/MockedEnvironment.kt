@@ -20,6 +20,7 @@ internal class MockedEnvironment {
         .build()
         .stubTilgangApi()
         .stubInfotrygdRammevedtak()
+        .stubOmsorgspengerSakApi()
 
     internal fun start() = this
     internal fun stop() {

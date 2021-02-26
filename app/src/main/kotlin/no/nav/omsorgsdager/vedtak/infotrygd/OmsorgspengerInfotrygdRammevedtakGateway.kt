@@ -37,8 +37,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         identitetsnummer: Identitetsnummer,
         periode: Periode,
         correlationId: CorrelationId
-    )
-            : List<InfotrygdInnvilgetVedtak> {
+    ) : List<InfotrygdInnvilgetVedtak> {
 
         val (_, response, result) = rammevedtakUrl
             .httpPost()

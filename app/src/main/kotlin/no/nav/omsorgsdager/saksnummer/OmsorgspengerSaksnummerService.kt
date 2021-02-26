@@ -10,7 +10,7 @@ import java.time.Duration
 
 internal class OmsorgspengerSaksnummerService(
     private val partRepository: PartRepository,
-    private val omsorgspengerSakGatway: OmsorgspengerSakGatway) {
+    private val omsorgspengerSakGateway: OmsorgspengerSakGateway) {
 
     private val cache: Cache<Identitetsnummer, OmsorgspengerSaksnummer> =
         Caffeine.newBuilder()
@@ -22,7 +22,7 @@ internal class OmsorgspengerSaksnummerService(
         return cache.getIfPresent(identitetsnummer)
             ?: partRepository.hentOmsorgspengerSaksnummer(
                 identitetsnummer = identitetsnummer)
-            ?: omsorgspengerSakGatway.hentSaksnummer(
+            ?: omsorgspengerSakGateway.hentSaksnummer(
                 identitetsnummer = identitetsnummer,
                 correlationId = correlationId
         ).also { saksnummer -> saksnummer?.also {
