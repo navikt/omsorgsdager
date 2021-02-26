@@ -6,6 +6,7 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.jws.NaisSts
+import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -249,7 +250,7 @@ internal class TilgangsstyringTest {
         private fun call(authorizationHeader: String) = mockk<ApplicationCall>().also {
             every { it.request.headers }.returns(Headers.build {
                 append(HttpHeaders.Authorization, authorizationHeader)
-                append(HttpHeaders.XCorrelationId, "${UUID.randomUUID()}")
+                append(HttpHeaders.XCorrelationId, "${CorrelationId.genererCorrelationId()}")
             })
         }
     }

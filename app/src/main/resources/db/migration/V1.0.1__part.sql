@@ -2,10 +2,10 @@ CREATE TABLE part
 (
     id                          BIGSERIAL PRIMARY KEY,
     behandling_id               BIGINT NOT NULL,
-    identitetsnummer            VARCHAR(25),
+    identitetsnummer            VARCHAR(25) NOT NULL,
+    type                        VARCHAR(50) NOT NULL,
+    omsorgspenger_saksnummer    VARCHAR(50) NOT NULL,
     fodselsdato                 DATE,
-    type                        VARCHAR(50),
-    omsorgspenger_saksnummer    VARCHAR(50),
     CONSTRAINT foreign_key_behandling FOREIGN KEY(behandling_id) REFERENCES behandling(id)
 );
 

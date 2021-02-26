@@ -13,6 +13,7 @@ import no.nav.omsorgsdager.parter.Involvering
 import no.nav.omsorgsdager.parter.Part
 import no.nav.omsorgsdager.parter.db.PartRepository
 import no.nav.omsorgsdager.parter.db.PartRepository.Companion.leggTilParter
+import no.nav.omsorgsdager.tid.Periode
 import javax.sql.DataSource
 
 internal class BehandlingService(
@@ -70,11 +71,11 @@ internal class BehandlingService(
      * Her finner man ikke bare behandlinger man selv vare søker
      * Men også der du er motpart i f.eks. Midlertidig alene.
      */
-    private fun hentAlle(sakssnummer: OmsorgspengerSaksnummer) : Map<Involvering, List<EksisterendeBehandling>> {
+    private fun hentAlle(sakssnummer: OmsorgspengerSaksnummer, periode: Periode) : Map<Involvering, List<EksisterendeBehandling>> {
         val involveringer = partRepository.hentInvolveringer(sakssnummer)
         val behandlingIder = involveringer.values.flatten()
 
-        val dbBehandlinger = behandlingRepository.hentAlle(behandlingIder)
+        val dbBehandlinger = behandlingRepository.hentAlle(behandlingIder, periode)
 
         val parter = partRepository.hentParter(dbBehandlinger.map { it.id })
             .groupBy { it.behandlingId }
@@ -92,8 +93,8 @@ internal class BehandlingService(
             .mapValues { it.value.filterNotNull() }
     }
 
-    internal fun hentAlleGjeldende(saksnummer: OmsorgspengerSaksnummer) : Map<Involvering, GjeldendeBehandlinger> {
-        return hentAlle(saksnummer).mapValues { GjeldendeBehandlinger(
+    internal fun hentAlleGjeldende(saksnummer: OmsorgspengerSaksnummer, periode: Periode) : Map<Involvering, GjeldendeBehandlinger> {
+        return hentAlle(saksnummer, periode).mapValues { GjeldendeBehandlinger(
             alleKroniskSyktBarn = it.value.filterIsInstance<KroniskSyktBarnBehandling>(),
             alleMidlertidigAlene = it.value.filterIsInstance<MidlertidigAleneBehandling>()
         )}

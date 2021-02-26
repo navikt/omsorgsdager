@@ -12,7 +12,8 @@ private object Behov {
     const val InnvilgetKroniskSyktBarn = "InnvilgetKroniskSyktBarn"
     const val AvslåttKroniskSyktBarn = "AvslåttKroniskSyktBarn"
     val identitetsnummerKeys = setOf(
-        "søker.identitetsnummer"
+        "søker.identitetsnummer",
+        "barn.identitetsnummer"
     )
 }
 

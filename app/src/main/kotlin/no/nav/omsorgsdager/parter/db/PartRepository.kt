@@ -7,7 +7,7 @@ import no.nav.omsorgsdager.BehandlingId
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.OmsorgspengerSaksnummer
-import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnumer
+import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnummer
 import no.nav.omsorgsdager.SecureLogger
 import no.nav.omsorgsdager.parter.*
 import no.nav.omsorgsdager.parter.Barn
@@ -34,19 +34,19 @@ internal class PartRepository(
                 when (type) {
                     "SØKER" -> DbPart(behandlingId = behandlingId, part = Søker(
                         identitetsnummer = row.string("identitetsnummer").somIdentitetsnummer(),
-                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnumer()
+                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnummer()
                     ))
                     "MOTPART" -> DbPart(behandlingId = behandlingId, part = Motpart(
                         identitetsnummer = row.string("identitetsnummer").somIdentitetsnummer(),
-                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnumer()
+                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnummer()
                     ))
                     "BARN" -> DbPart(behandlingId = behandlingId, part = Barn(
-                        identitetsnummer = row.stringOrNull("identitetsnummer")?.somIdentitetsnummer(), // TODO: https://github.com/navikt/omsorgsdager/issues/25
+                        identitetsnummer = row.string("identitetsnummer").somIdentitetsnummer(),
+                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnummer(),
                         fødselsdato = row.localDate("fodselsdato")
                     ))
                     else -> throw IllegalStateException("Ukjent Type=[$type], BehandlingId=[$behandlingId]")
                 }
-
             }.asList)
         }
     }
@@ -96,57 +96,43 @@ internal class PartRepository(
             SecureLogger.warn("Fant ${saksnummer.size} saksnummer for identitetsnummer $identitetsnummer: $saksnummer")
         }
 
-        return saksnummer.firstOrNull()?.somOmsorgspengerSaksnumer()
+        return saksnummer.firstOrNull()?.somOmsorgspengerSaksnummer()
     }
 
     internal companion object {
         internal fun TransactionalSession.leggTilParter(
             behandlingId: BehandlingId,
             parter: List<Part>) {
-            val queries = parter.map { part -> when (part) {
-                is Barn -> queryOf(
-                    statement = LagreBarnStatement,
-                    paramMap = mapOf(
-                        "behandlingId" to behandlingId,
-                        "identitetsnummer" to part.identitetsnummer?.toString(),
-                        "fodselsdato" to part.fødselsdato
-                    )
+            val queries = parter.map { part ->
+                val paramMap = mapOf(
+                    "behandlingId" to behandlingId,
+                    "identitetsnummer" to "${part.identitetsnummer}",
+                    "omsorgspengerSaksnummer" to "${part.omsorgspengerSaksnummer}",
+                    "type" to when (part) {
+                        is Barn -> "BARN"
+                        is Søker -> "SØKER"
+                        is Motpart -> "MOTPART"
+                        else -> throw IllegalStateException("[BehandlingId=$behandlingId] Støtter ikke å lagre part av type ${part.javaClass}")
+                    },
+                    "fodselsdato" to when (part) {
+                        is Barn -> part.fødselsdato
+                        else -> null
+                    }
                 )
-                is Søker -> queryOf(
-                    statement = LagrePersonStatement,
-                    paramMap = mapOf(
-                        "behandlingId" to behandlingId,
-                        "identitetsnummer" to "${part.identitetsnummer}",
-                        "omsorgspengerSaksnummer" to "${part.omsorgspengerSaksnummer}",
-                        "type" to "SØKER"
-                    )
+                queryOf(
+                    statement = LagrePartStatement,
+                    paramMap = paramMap
                 )
-                is Motpart -> queryOf(
-                    statement = LagrePersonStatement,
-                    paramMap = mapOf(
-                        "behandlingId" to behandlingId,
-                        "identitetsnummer" to "${part.identitetsnummer}",
-                        "omsorgspengerSaksnummer" to "${part.omsorgspengerSaksnummer}",
-                        "type" to "MOTPART"
-                    )
-                )
-                else -> throw IllegalStateException("[BehandlingId=$behandlingId] Støtter ikke å lagre part av type ${part.javaClass}")
-            }}
+            }
             queries.forEach { query -> require(update(query) == 1) {
                 "[BehandlingId=$behandlingId] Feil ved lagring av part"
             }}
         }
 
         @Language("PostgreSQL")
-        private const val LagreBarnStatement = """
-            INSERT INTO part (behandling_id, identitetsnummer, fodselsdato, type)
-            VALUES(:behandlingId, :identitetsnummer, :fodselsdato, 'BARN')
-        """
-
-        @Language("PostgreSQL")
-        private const val LagrePersonStatement = """
-            INSERT INTO part (behandling_id, identitetsnummer, omsorgspenger_saksnummer, type)
-            VALUES(:behandlingId, :identitetsnummer, :omsorgspengerSaksnummer, :type)
+        private const val LagrePartStatement = """
+            INSERT INTO part (behandling_id, identitetsnummer, omsorgspenger_saksnummer, type, fodselsdato)
+            VALUES(:behandlingId, :identitetsnummer, :omsorgspengerSaksnummer, :type, :fodselsdato)
         """
 
         @Language("PostgreSQL")
@@ -158,6 +144,7 @@ internal class PartRepository(
         private const val HenteInvolveringerStatement = """
             SELECT behandling_id, type FROM part 
             WHERE omsorgspenger_saksnummer = :omsorgspengerSaksnummer
+            AND type NOT IN('BARN')
         """
 
         @Language("PostgreSQL")

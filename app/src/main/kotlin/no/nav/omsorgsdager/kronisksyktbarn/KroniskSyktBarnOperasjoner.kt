@@ -54,7 +54,11 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
             omsorgspengerSaksnummer = saksnummer.getValue(it)
         )}
 
-        val barnet = Barn(identitetsnummer = dto.barn.identitetsnummer?.somIdentitetsnummer(), fødselsdato = dto.barn.fødselsdato)
+        val barnet = dto.barn.identitetsnummer.somIdentitetsnummer().let { Barn(
+            identitetsnummer = it,
+            omsorgspengerSaksnummer = saksnummer.getValue(it),
+            fødselsdato = dto.barn.fødselsdato
+        )}
 
         val behandling = NyBehandling(
             behovssekvensId = behovssekvensId,
@@ -85,7 +89,7 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
             val identitetsnummer: String
         )
         data class Barn(
-            val identitetsnummer: String?,
+            val identitetsnummer: String,
             val fødselsdato: LocalDate
         )
     }

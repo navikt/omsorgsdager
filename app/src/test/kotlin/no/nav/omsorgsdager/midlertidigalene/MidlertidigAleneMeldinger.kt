@@ -2,18 +2,17 @@ package no.nav.omsorgsdager.midlertidigalene
 
 import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.behov.Behovssekvens
-import no.nav.omsorgsdager.BehovssekvensId
-import no.nav.omsorgsdager.Json
+import no.nav.omsorgsdager.*
 import no.nav.omsorgsdager.Json.Companion.somJson
+import no.nav.omsorgsdager.testutils.mocketK9Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import java.time.ZonedDateTime
-import java.util.*
 
 internal object MidlertidigAleneMeldinger {
 
     internal fun melding(
-        saksnummer: String = UUID.randomUUID().toString().takeLast(10),
-        behandlingId: String = UUID.randomUUID().toString(),
+        saksnummer: String = "${mocketK9Saksnummer()}",
+        behandlingId: String = "${K9BehandlingId.generateK9BehandlingId()}",
         søkersIdentitetsnummer: String,
         annenForelderIdentitetsnummer: String,
         tidspunkt: ZonedDateTime = ZonedDateTime.now(),
@@ -38,7 +37,7 @@ internal object MidlertidigAleneMeldinger {
         melding: Json
     ) = Behovssekvens(
         id = "${BehovssekvensId.genererBehovssekvensId()}",
-        correlationId = "CallId_${UUID.randomUUID()}",
+        correlationId = "${CorrelationId.genererCorrelationId()}",
         behov = arrayOf(Behov(navn = "InnvilgetMidlertidigAlene", input = melding.map))
     )
 
@@ -46,7 +45,7 @@ internal object MidlertidigAleneMeldinger {
         melding: Json
     ) = Behovssekvens(
         id = "${BehovssekvensId.genererBehovssekvensId()}",
-        correlationId = "CallId_${UUID.randomUUID()}",
+        correlationId = "${CorrelationId.genererCorrelationId()}",
         behov = arrayOf(Behov(navn = "AvslåttMidlertidigAlene", input = melding.map))
     )
 }

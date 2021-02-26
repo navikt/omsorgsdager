@@ -35,11 +35,14 @@ internal class BehandlingRepository(
         throw NotImplementedError("Ikke implementert å hente basert på K9Saksnummer")
     }
 
-    internal fun hentAlle(behandlingIder: List<BehandlingId>) : List<DbBehandling> {
+    internal fun hentAlle(behandlingIder: List<BehandlingId>, periode: Periode) : List<DbBehandling> {
         return sessionOf(dataSource).use { session ->
             val query = queryOf(
                 statement = HentBehandlingerFraBehandlingIderStatement,
-                paramMap = mapOf("behandlingIder" to session.createArrayOf("oid", behandlingIder))
+                paramMap = mapOf(
+                    "behandlingIder" to session.createArrayOf("oid", behandlingIder),
+                    "fom" to periode.fom
+                )
             )
             session.run(query.map { row -> row.somDbBehandling() }.asList)
         }
@@ -111,12 +114,14 @@ internal class BehandlingRepository(
 
         @Language("PostgreSQL")
         private const val HentBehandlingerFraBehandlingIderStatement = """
-            SELECT * FROM behandling WHERE id = ANY(:behandlingIder)
+            SELECT * FROM behandling 
+            WHERE id = ANY(:behandlingIder) AND tom >= :fom
         """
 
         @Language("PostgreSQL")
         private const val HentBehandlingerFraK9BehandlingIdStatement = """
             SELECT * FROM behandling WHERE k9_behandling_id = :behandlingId
+            
         """
 
         @Language("PostgreSQL")
