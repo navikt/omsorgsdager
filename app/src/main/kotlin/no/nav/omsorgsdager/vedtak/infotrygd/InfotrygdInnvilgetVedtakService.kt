@@ -19,14 +19,17 @@ internal class InfotrygdInnvilgetVedtakService(
             correlationId = correlationId
         )
 
-        val kroniskSyktBarn = fraInfotrygd.filterIsInstance<KroniskSyktBarnInfotrygdInnvilgetVedtak>().map { KroniskSyktBarnInnvilgetVedtak(
-            barn = Barn(identitetsnummer = it.barnetsIdentitetsnummer.toString(), fødselsdato = it.barnetsFødselsdato),
-            kilder = it.kilder,
-            tidspunkt = it.vedtatt.startenAvDagenOslo(),
-            periode = Periode(
-                fom = it.gyldigFraOgMed,
-                tom = it.gyldigTilOgMed
-            )
+        val kroniskSyktBarn = fraInfotrygd.filterIsInstance<KroniskSyktBarnInfotrygdInnvilgetVedtak>().map {
+            val barn = Barn(identitetsnummer = it.barnetsIdentitetsnummer, fødselsdato = it.barnetsFødselsdato)
+            KroniskSyktBarnInnvilgetVedtak(
+                barn = Barn(identitetsnummer = it.barnetsIdentitetsnummer, fødselsdato = it.barnetsFødselsdato),
+                kilder = it.kilder,
+                tidspunkt = it.vedtatt.startenAvDagenOslo(),
+                periode = Periode(
+                    fom = it.gyldigFraOgMed,
+                    tom = it.gyldigTilOgMed
+                ),
+                enPer = barn
         )}
 
         val midlertidigAlene = fraInfotrygd.filterIsInstance<MidlertidigAleneInfotrygdInnvilgetVedtak>().map { MidlertidigAleneInnvilgetVedtak(

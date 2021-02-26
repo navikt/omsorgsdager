@@ -50,7 +50,7 @@ internal data class OmsorgspengerSaksnummer private constructor(private val valu
     override fun toString() = value
     internal companion object {
         private val Regex = "[A-Za-z0-9]{5,20}".toRegex()
-        internal fun String.somOmsorgspengerSaksnumer() = OmsorgspengerSaksnummer(this)
+        internal fun String.somOmsorgspengerSaksnummer() = OmsorgspengerSaksnummer(this)
     }
 }
 
@@ -67,6 +67,7 @@ internal data class K9BehandlingId private constructor(private val value: String
     init { requireNoException(error = "$value er ikke en gyldig K9 behandlingId", block = {UUID.fromString(value)})}
     override fun toString() = value
     internal companion object {
+        internal fun generateK9BehandlingId() = K9BehandlingId("${UUID.randomUUID()}")
         internal fun String.somK9BehandlingId() = K9BehandlingId(this)
     }
 }

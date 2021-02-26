@@ -12,8 +12,8 @@ internal object Gjeldende {
         fun kopiMedNyPeriode(nyPeriode: Periode) : KanUtledeGjeldende
     }
 
-    internal fun <KUG: KanUtledeGjeldende> List<KUG>.gjeldende() : List<KUG> {
-        if (isEmpty()) return emptyList()
+    internal fun <KUG: KanUtledeGjeldende> List<KUG>.gjeldendePer() : Map<Any, List<KUG>> {
+        if (isEmpty()) return emptyMap()
         require(all { it.javaClass == first().javaClass }) {
             "Alt som skal sammenstilles som gjeldede må være av samme type"
         }
@@ -21,12 +21,13 @@ internal object Gjeldende {
         return asSequence()
             .sortedByDescending { it.tidspunkt }
             .groupBy { it.enPer }
-            .map { it.value.gjeldendePer() }
-            .flatten()
-            .toList()
+            .mapValues { it.value.finnGjeldendePer() }
     }
 
-    private fun<KUG: KanUtledeGjeldende> List<KUG>.gjeldendePer() : List<KUG> {
+    internal fun <KUG: KanUtledeGjeldende> Map<Any, List<KUG>>.flatten() = values.flatten()
+    internal fun <KUG: KanUtledeGjeldende> List<KUG>.gjeldende() = gjeldendePer().values.flatten()
+
+    private fun<KUG: KanUtledeGjeldende> List<KUG>.finnGjeldendePer() : List<KUG> {
         if (isEmpty()) return emptyList()
         require(all { it.enPer == first().enPer }) {
             "Alle må gjeldende ${first().enPer}"

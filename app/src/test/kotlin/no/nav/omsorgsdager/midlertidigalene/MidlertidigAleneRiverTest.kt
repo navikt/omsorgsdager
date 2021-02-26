@@ -2,6 +2,7 @@ package no.nav.omsorgsdager.midlertidigalene
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgsdager.ApplicationContext
+import no.nav.omsorgsdager.K9BehandlingId
 import no.nav.omsorgsdager.K9BehandlingId.Companion.somK9BehandlingId
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.registerApplicationContext
@@ -25,7 +26,7 @@ internal class MidlertidigAleneRiverTest(
 
     @Test
     fun `innvilget midlertidig alene`() {
-        val behandlingId = "${UUID.randomUUID()}"
+        val behandlingId = "${K9BehandlingId.generateK9BehandlingId()}"
         val søkersIdentitetsnummer = "29099011113"
         val annenForelderIdentitetsnummer = "29099011114"
 
@@ -48,7 +49,7 @@ internal class MidlertidigAleneRiverTest(
 
     @Test
     fun `avslått midlertidig alene`() {
-        val behandlingId = "${UUID.randomUUID()}"
+        val behandlingId = "${K9BehandlingId.generateK9BehandlingId()}"
         val søkersIdentitetsnummer = "29099011115"
         val annenForelderIdentitetsnummer = "29099011116"
 

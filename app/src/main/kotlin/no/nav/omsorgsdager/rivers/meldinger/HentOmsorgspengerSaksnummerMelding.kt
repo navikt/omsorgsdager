@@ -6,7 +6,7 @@ import no.nav.k9.rapid.behov.Behov
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.OmsorgspengerSaksnummer
-import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnumer
+import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnummer
 
 internal object HentOmsorgspengerSaksnummerMelding {
     internal const val HentOmsorgspengerSaksnummer = "HentOmsorgspengerSaksnummer"
@@ -27,7 +27,7 @@ internal object HentOmsorgspengerSaksnummerMelding {
         return (packet[SaksnummerKey] as ObjectNode)
             .fields()
             .asSequence()
-            .map { Pair(it.key.somIdentitetsnummer(), it.value.asText().somOmsorgspengerSaksnumer())}
+            .map { Pair(it.key.somIdentitetsnummer(), it.value.asText().somOmsorgspengerSaksnummer())}
             .toMap()
     }
 }
