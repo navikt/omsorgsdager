@@ -131,12 +131,9 @@ internal class InnvilgedeVedtakService(
             }).gjeldende().filterNot { avslåtteKilder.contains(it.kilder.first()) }
         }
 
-        internal fun InnvilgedeVedtak.slåSammenMed(gjeldendeBehandlinger: GjeldendeBehandlinger) : InnvilgedeVedtak {
-            if (gjeldendeBehandlinger == null) return this // TODO: Teste ingen vedtak osv, slås barn sammen også kun fra Infotrygd?
-            return InnvilgedeVedtak(
-                kroniskSyktBarn = kroniskSyktBarn.slåSammenKroniskSykeBarn(gjeldendeBehandlinger.kroniskSyktBarn),
-                midlertidigAlene = midlertidigAlene.slåSammenMidlertidigAlene(gjeldendeBehandlinger.midlertidigAlene)
-            )
-        }
+        internal fun InnvilgedeVedtak.slåSammenMed(gjeldendeBehandlinger: GjeldendeBehandlinger) = InnvilgedeVedtak(
+            kroniskSyktBarn = kroniskSyktBarn.slåSammenKroniskSykeBarn(gjeldendeBehandlinger.kroniskSyktBarn),
+            midlertidigAlene = midlertidigAlene.slåSammenMidlertidigAlene(gjeldendeBehandlinger.midlertidigAlene)
+        )
     }
 }
