@@ -62,7 +62,7 @@ internal class OmsorgspengerSakGateway(
         Result.merge(
             "OmsorgspengerSakGateway",
             accessTokenCheck(),
-            pingOmsorgspengerInfotrygdRammevetakCheck()
+            pingOmsorgspengerSakCheck()
         )
 
     private fun accessTokenCheck() = kotlin.runCatching {
@@ -81,7 +81,7 @@ internal class OmsorgspengerSakGateway(
     )
 
 
-    private suspend fun pingOmsorgspengerInfotrygdRammevetakCheck() =
+    private suspend fun pingOmsorgspengerSakCheck() =
         pingUrl.httpGet().awaitStringResponseResult().third.fold(
             success = { Healthy("PingOmsorgspengerSak", "OK: $it") },
             failure = { UnHealthy("PingOmsorgspengerSak", "Feil: ${it.message}") }
