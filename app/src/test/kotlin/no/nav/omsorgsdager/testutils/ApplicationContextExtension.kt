@@ -37,7 +37,8 @@ internal class ApplicationContextExtension : ParameterResolver {
             "AZURE_APP_TOKEN_ENDPOINT" to (mockedEnvironment.wireMockServer.getAzureV2TokenUrl()),
             "OPEN_AM_ISSUER" to NaisSts.getIssuer(),
             "OPEN_AM_JWKS_URI" to (mockedEnvironment.wireMockServer.getNaisStsJwksUrl()),
-            "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak"
+            "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak",
+            "HENT_BEHANDLINGER" to "enabled"
         )
 
         init {

@@ -20,7 +20,6 @@ internal class InfotrygdInnvilgetVedtakService(
         )
 
         val kroniskSyktBarn = fraInfotrygd.filterIsInstance<KroniskSyktBarnInfotrygdInnvilgetVedtak>().map {
-            val barn = Barn(identitetsnummer = it.barnetsIdentitetsnummer, fødselsdato = it.barnetsFødselsdato)
             KroniskSyktBarnInnvilgetVedtak(
                 barn = Barn(identitetsnummer = it.barnetsIdentitetsnummer, fødselsdato = it.barnetsFødselsdato),
                 kilder = it.kilder,
@@ -28,8 +27,7 @@ internal class InfotrygdInnvilgetVedtakService(
                 periode = Periode(
                     fom = it.gyldigFraOgMed,
                     tom = it.gyldigTilOgMed
-                ),
-                enPer = barn
+                )
         )}
 
         val midlertidigAlene = fraInfotrygd.filterIsInstance<MidlertidigAleneInfotrygdInnvilgetVedtak>().map { MidlertidigAleneInnvilgetVedtak(
