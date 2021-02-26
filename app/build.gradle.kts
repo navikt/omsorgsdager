@@ -61,8 +61,6 @@ dependencies {
 }
 
 repositories {
-    mavenLocal()
-    mavenCentral()
     maven {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/navikt/k9-rapid")
@@ -71,7 +69,8 @@ repositories {
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
-    maven("https://dl.bintray.com/kotlin/ktor")
+    mavenLocal()
+    mavenCentral()
 }
 
 tasks {
