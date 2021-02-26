@@ -29,8 +29,7 @@ internal data class Periode(
         private val Oslo = ZoneId.of("Europe/Oslo")
         internal fun ZonedDateTime.toLocalDateOslo() = withZoneSameInstant(Oslo).toLocalDate()
         internal fun LocalDate.startenAvDagenOslo() = ZonedDateTime.of(this, LocalTime.MIDNIGHT, Oslo)
-        internal fun LocalDate.sisteDagIÅretOm18År() =
-            plusYears(18).withMonth(12).withDayOfMonth(31)
+        internal fun LocalDate.sisteDagIÅretOm18År() = plusYears(18).withMonth(12).withDayOfMonth(31)
         internal fun LocalDate.erFørEllerLik(annen: LocalDate) = isBefore(annen) || isEqual(annen)
         internal fun LocalDate.erEtterEllerLik(annen: LocalDate) = isAfter(annen) || isEqual(annen)
         internal fun LocalDate.nesteDag() = plusDays(1)

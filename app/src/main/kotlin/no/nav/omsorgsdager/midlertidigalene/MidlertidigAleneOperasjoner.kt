@@ -1,5 +1,6 @@
 package no.nav.omsorgsdager.midlertidigalene
 
+import no.nav.omsorgsdager.BehovssekvensId
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.Json
@@ -42,6 +43,7 @@ internal object MidlertidigAleneOperasjoner : BehandlingOperasjoner<MidlertidigA
     }
 
     override fun mapTilNyBehandling(
+        behovssekvensId: BehovssekvensId,
         grunnlag: Json,
         saksnummer: Map<Identitetsnummer, OmsorgspengerSaksnummer>,
         behandlingStatus: BehandlingStatus): Pair<NyBehandling, List<Part>> {
@@ -57,6 +59,7 @@ internal object MidlertidigAleneOperasjoner : BehandlingOperasjoner<MidlertidigA
         )}
 
         val behandling = NyBehandling(
+            behovssekvensId = behovssekvensId,
             saksnummer = dto.saksnummer.somK9Saksnummer(),
             behandlingId = dto.behandlingId.somK9BehandlingId(),
             tidspunkt = dto.tidspunkt,

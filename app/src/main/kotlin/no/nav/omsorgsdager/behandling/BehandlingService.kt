@@ -29,16 +29,16 @@ internal class BehandlingService(
     }
 
     /**
-     * Hente en enkeltbehandling i k9-sak
+     * Hente basert på en behandlingId i k9-sak
      */
-    internal fun hentEn(behandlingId: K9BehandlingId) : EksisterendeBehandling? { // TODO: En behandling flere typer..
-        val dbBehandling = behandlingRepository.hentEn(behandlingId) ?: return null
-        val parter = partRepository.hentParter(listOf(dbBehandling.id)).map { it.part }
+    internal fun hentAlle(behandlingId: K9BehandlingId) : List<EksisterendeBehandling> {
+        val dbBehandling = behandlingRepository.hentAlle(behandlingId)
+        val parter = partRepository.hentParter(dbBehandling.map { it.id }).map { it.part }
 
-        return dbBehandling.type.operasjoner.mapTilEksisterendeBehandling(
-            dbBehandling = dbBehandling,
+        return dbBehandling.map { it.type.operasjoner.mapTilEksisterendeBehandling(
+            dbBehandling = it,
             parter = parter
-        )
+        )}
     }
 
     /**
