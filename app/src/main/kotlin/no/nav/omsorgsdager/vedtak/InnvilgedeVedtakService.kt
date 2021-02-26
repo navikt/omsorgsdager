@@ -64,7 +64,7 @@ internal class InnvilgedeVedtakService(
                 gjeldendeBehandlinger = behandlingService.hentAlleGjeldende(
                     saksnummer = omsorgspengerSaksnummer,
                     periode = periode
-                )[Involvering.SØKER]
+                )[Involvering.SØKER]?: GjeldendeBehandlinger()
             )
         }.also {
             logger.info(
@@ -89,7 +89,7 @@ internal class InnvilgedeVedtakService(
         /**
          * Regner også med avslåtte behandlinger slik at de overskriver eventuelle innvilgede perioder i Infotrygd.
          */
-        internal fun List<KroniskSyktBarnInnvilgetVedtak>.slåSammenKroniskSyktBarn(kroniskSyktBarnBehandlinger: List<KroniskSyktBarnBehandling>) : List<KroniskSyktBarnInnvilgetVedtak> {
+        private fun List<KroniskSyktBarnInnvilgetVedtak>.slåSammenKroniskSykeBarn(kroniskSyktBarnBehandlinger: List<KroniskSyktBarnBehandling>) : List<KroniskSyktBarnInnvilgetVedtak> {
             // Finner først alle kilder for avslåtte behandlinger slik at de kan filtreres bort i det ferdige resultatet
             val avslåtteKilder = kroniskSyktBarnBehandlinger.filter{
                 it.status == BehandlingStatus.AVSLÅTT }.map { it.k9behandlingId.somKilde() }
@@ -113,10 +113,10 @@ internal class InnvilgedeVedtakService(
             return alle.map { it.copy(enPer = sammenlignBarnPå(it.barn)) }.gjeldendePer().mapValues {
                 val barnMedMestInfo = it.value.map { vedtak -> vedtak.barn }.medMestInfo()
                 it.value.map { vedtak -> vedtak.copy(barn = barnMedMestInfo) }
-            }.flatten().filterNot { avslåtteKilder.contains(it.kilder.first()) }
+            }.flatten().filterNot { avslåtteKilder.contains(it.kilder.firstOrNull()) }
         }
 
-        internal fun List<MidlertidigAleneInnvilgetVedtak>.slåSammenMidlertidigAlene(midlertidigAlenebehandlinger: List<MidlertidigAleneBehandling>) : List<MidlertidigAleneInnvilgetVedtak> {
+        private fun List<MidlertidigAleneInnvilgetVedtak>.slåSammenMidlertidigAlene(midlertidigAlenebehandlinger: List<MidlertidigAleneBehandling>) : List<MidlertidigAleneInnvilgetVedtak> {
             // Finner først alle kilder for avslåtte behandlinger slik at de kan filtreres bort i det ferdige resultatet
             val avslåtteKilder = midlertidigAlenebehandlinger.filter {
                 it.status == BehandlingStatus.AVSLÅTT }.map { it.k9behandlingId.somKilde() }
@@ -131,10 +131,10 @@ internal class InnvilgedeVedtakService(
             }).gjeldende().filterNot { avslåtteKilder.contains(it.kilder.first()) }
         }
 
-        private fun InnvilgedeVedtak.slåSammenMed(gjeldendeBehandlinger: GjeldendeBehandlinger?) : InnvilgedeVedtak {
+        internal fun InnvilgedeVedtak.slåSammenMed(gjeldendeBehandlinger: GjeldendeBehandlinger) : InnvilgedeVedtak {
             if (gjeldendeBehandlinger == null) return this // TODO: Teste ingen vedtak osv, slås barn sammen også kun fra Infotrygd?
             return InnvilgedeVedtak(
-                kroniskSyktBarn = kroniskSyktBarn.slåSammenKroniskSyktBarn(gjeldendeBehandlinger.kroniskSyktBarn),
+                kroniskSyktBarn = kroniskSyktBarn.slåSammenKroniskSykeBarn(gjeldendeBehandlinger.kroniskSyktBarn),
                 midlertidigAlene = midlertidigAlene.slåSammenMidlertidigAlene(gjeldendeBehandlinger.midlertidigAlene)
             )
         }
