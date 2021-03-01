@@ -76,6 +76,8 @@ spec:
   {{/each}}
     - name: TILGANGSSTYRING_URL
       value: http://omsorgspenger-tilgangsstyring.omsorgspenger.svc.cluster.local
+    - name: OMSORGSPENGER_SAK_BASE_URL
+      value: http://omsorgspenger-sak.omsorgspenger.svc.cluster.local
     - name: KAFKA_PROPERTIES_SECURITY_PROTOCOL
       value: SASL_SSL
     - name: KAFKA_RAPID_TOPIC
