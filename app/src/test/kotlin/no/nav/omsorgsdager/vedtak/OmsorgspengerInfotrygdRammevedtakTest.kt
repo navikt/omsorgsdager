@@ -1,13 +1,18 @@
 package no.nav.omsorgsdager.vedtak
 
-import io.ktor.server.testing.*
+import kotlinx.coroutines.runBlocking
 import no.nav.omsorgsdager.ApplicationContext
-import no.nav.omsorgsdager.omsorgsdager
+import no.nav.omsorgsdager.CorrelationId
+import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
-import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakApisTest.Companion.hentOgAssertInnvilgedeVedtak
-import org.intellij.lang.annotations.Language
+import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.vedtak.dto.Kilde
+import no.nav.omsorgsdager.vedtak.infotrygd.KroniskSyktBarnInfotrygdInnvilgetVedtak
+import no.nav.omsorgsdager.vedtak.infotrygd.MidlertidigAleneInfotrygdInnvilgetVedtak
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDate
+import kotlin.test.assertEquals
 
 @ExtendWith(ApplicationContextExtension::class)
 internal class OmsorgspengerInfotrygdRammevedtakTest(
@@ -15,52 +20,39 @@ internal class OmsorgspengerInfotrygdRammevedtakTest(
 ) {
 
     private val applicationContext = applicationContextBuilder.build()
+    private val omsorgspengerInfotrygdRammevedtakGateway = applicationContext.omsorgspengerInfotrygdRammevedtakGateway
 
     @Test
-    fun `Person med utvidetrett i infotrygd`() {
-        val IdentitetsnummerMedVedtakInfotrygd = "29099022222"
+    fun `Person med utvidetrett & midlertidigalene i infotrygd`() {
+        val identitetsnummerMedVedtakInfotrygd = "29099022222".somIdentitetsnummer()
 
-        @Language("JSON")
-        val ForventetResponseMedInfotrygdVedtak = """
-            {
-               "kroniskSyktBarn":[
-                  {
-                     "barn":{
-                        "identitetsnummer":"01019911111",
-                        "fødselsdato":"1999-01-01"
-                     },
-                     "kilder":[
-                        {
-                           "id":"UTV.RETT/20D/29099022222",
-                           "type":"Personkort"
-                        }
-                     ],
-                     "gyldigFraOgMed":"2020-06-21",
-                     "gyldigTilOgMed":"2020-06-21",
-                     "vedtatt":"2020-06-21"
-                  }
-               ],
-               "midlertidigAlene":[
-                  {
-                     "kilder":[
-                        {
-                           "id":"midl.alene.om/17D",
-                           "type":"Personkort"
-                        }
-                     ],
-                     "gyldigFraOgMed":"1998-06-25",
-                     "gyldigTilOgMed":"2001-06-25",
-                     "vedtatt":"1998-06-21"
-                  }
-               ]
-            }
-        """.trimIndent()
-        withTestApplication({ omsorgsdager(applicationContext) }) {
-            hentOgAssertInnvilgedeVedtak(
-                identitetsnummer = IdentitetsnummerMedVedtakInfotrygd,
-                forventetResponse = ForventetResponseMedInfotrygdVedtak
+        val forventetResponseMedInfotrygdVedtak = listOf(
+            KroniskSyktBarnInfotrygdInnvilgetVedtak(
+                vedtatt = LocalDate.parse("2020-06-21"),
+                kilder = setOf(Kilde(id="UTV.RETT/20D/29099022222", type="Personkort")),
+                gyldigFraOgMed = LocalDate.parse("2020-06-21"),
+                gyldigTilOgMed = LocalDate.parse("2020-06-21"),
+                barnetsIdentitetsnummer = "01019911111".somIdentitetsnummer(),
+                barnetsFødselsdato = LocalDate.parse("1999-01-01")
+            ),
+            MidlertidigAleneInfotrygdInnvilgetVedtak(
+                vedtatt = LocalDate.parse("1998-06-21"),
+                kilder = setOf(Kilde(id="midl.alene.om/17D", type = "Personkort")),
+                gyldigFraOgMed = LocalDate.parse("1998-06-25"),
+                gyldigTilOgMed = LocalDate.parse("2001-06-25")
             )
+        )
 
+        val resultat = runBlocking {
+            // WireMock svarer på identitetsnummer = 29099022222, any, any
+            omsorgspengerInfotrygdRammevedtakGateway.hentInnvilgedeVedtak(
+                identitetsnummer = identitetsnummerMedVedtakInfotrygd,
+                periode = Periode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(1)),
+                correlationId = CorrelationId.genererCorrelationId()
+            )
         }
+
+        assertEquals(forventetResponseMedInfotrygdVedtak, resultat)
+
     }
 }

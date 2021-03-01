@@ -153,7 +153,7 @@ internal class InnvilgedeVedtakApisTest(
     }
 
 
-    internal companion object {
+    private companion object {
         val IdentitetsnummerMedToAvHver = "29099011110"
         val IdentitetsnummerUtenVedtak = "29099011111"
         val ForventetResponseUtenVedtak = """{"kroniskSyktBarn": [], "midlertidigAlene": []}"""
