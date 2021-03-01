@@ -26,7 +26,7 @@ internal class OmsorgspengerSaksnummerService(
                 identitetsnummer = identitetsnummer,
                 correlationId = correlationId
         ).also { saksnummer -> saksnummer?.also {
-                cache.put(identitetsnummer, it)
+            cache.put(identitetsnummer, it)
         }}
     }
 }

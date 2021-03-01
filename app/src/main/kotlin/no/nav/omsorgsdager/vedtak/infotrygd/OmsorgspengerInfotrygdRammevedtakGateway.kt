@@ -1,17 +1,10 @@
 package no.nav.omsorgsdager.vedtak.infotrygd
 
-import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
-import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
-import com.nimbusds.jwt.SignedJWT
 import io.ktor.http.*
 import io.ktor.utils.io.charsets.*
-import no.nav.helse.dusseldorf.ktor.health.HealthCheck
-import no.nav.helse.dusseldorf.ktor.health.Healthy
-import no.nav.helse.dusseldorf.ktor.health.Result
-import no.nav.helse.dusseldorf.ktor.health.UnHealthy
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
-import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
+import no.nav.omsorgsdager.AzureAwareGateway
 import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
@@ -23,14 +16,15 @@ import java.net.URI
 import java.time.LocalDate
 
 internal class OmsorgspengerInfotrygdRammevedtakGateway(
-    private val accessTokenClient: AccessTokenClient,
-    private val hentRammevedtakFraInfotrygdScopes: Set<String>,
+    accessTokenClient: AccessTokenClient,
+    hentRammevedtakFraInfotrygdScopes: Set<String>,
     omsorgspengerInfotrygdRammevedtakBaseUrl: URI
-) : HealthCheck {
+) : AzureAwareGateway(
+    navn = "OmsorgspengerInfotrygdRammevedtakGateway",
+    accessTokenClient = accessTokenClient,
+    scopes = hentRammevedtakFraInfotrygdScopes,
+    pingUri = URI("$omsorgspengerInfotrygdRammevedtakBaseUrl/isready")) {
 
-
-    private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
-    private val pingUrl = "$omsorgspengerInfotrygdRammevedtakBaseUrl/isready"
     private val rammevedtakUrl = "$omsorgspengerInfotrygdRammevedtakBaseUrl/rammevedtak"
 
     internal suspend fun hentInnvilgedeVedtak(
@@ -90,38 +84,6 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             .toList()
     }
 
-    private fun authorizationHeader() =
-        cachedAccessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).asAuthoriationHeader()
-
-    override suspend fun check() =
-        Result.merge(
-            "OmsorgspengerInfotrygdRammevedtakGateway",
-            accessTokenCheck(),
-            pingOmsorgspengerInfotrygdRammevetakCheck()
-        )
-
-    private fun accessTokenCheck() = kotlin.runCatching {
-        accessTokenClient.getAccessToken(hentRammevedtakFraInfotrygdScopes).let {
-            (SignedJWT.parse(it.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()
-                ?: emptyList()).contains("access_as_application")
-        }
-    }.fold(
-        onSuccess = {
-            when (it) {
-                true -> Healthy("AccessTokenCheck", "OK")
-                false -> UnHealthy("AccessTokenCheck", "Feil: Mangler rettigheter")
-            }
-        },
-        onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
-    )
-
-
-    private suspend fun pingOmsorgspengerInfotrygdRammevetakCheck() =
-        pingUrl.httpGet().awaitStringResponseResult().third.fold(
-            success = { Healthy("PingOmsorgspengerInfotrygdRammevetak", "OK: $it") },
-            failure = { UnHealthy("PingOmsorgspengerInfotrygdRammevetak", "Feil: ${it.message}") }
-        )
-
     private companion object {
         private fun JSONObject.getArray(key: String) = when (has(key) && get(key) is JSONArray) {
             true -> getJSONArray(key)
@@ -148,5 +110,4 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         private fun JSONObject.fødselsdato(): LocalDate = LocalDate.parse(getString("fødselsdato"))
         private fun JSONArray.mapJSONObject() = map { it as JSONObject }
     }
-
 }
