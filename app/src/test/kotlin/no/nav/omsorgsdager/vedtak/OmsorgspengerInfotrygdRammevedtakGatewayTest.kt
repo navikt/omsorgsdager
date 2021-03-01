@@ -9,15 +9,14 @@ import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.dto.Kilde
 import no.nav.omsorgsdager.vedtak.infotrygd.KroniskSyktBarnInfotrygdInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.infotrygd.MidlertidigAleneInfotrygdInnvilgetVedtak
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
-import kotlin.test.assertEquals
 
 @ExtendWith(ApplicationContextExtension::class)
-internal class OmsorgspengerInfotrygdRammevedtakTest(
-    applicationContextBuilder: ApplicationContext.Builder
-) {
+internal class OmsorgspengerInfotrygdRammevedtakGatewayTest(
+    applicationContextBuilder: ApplicationContext.Builder) {
 
     private val applicationContext = applicationContextBuilder.build()
     private val omsorgspengerInfotrygdRammevedtakGateway = applicationContext.omsorgspengerInfotrygdRammevedtakGateway
@@ -29,10 +28,18 @@ internal class OmsorgspengerInfotrygdRammevedtakTest(
         val forventetResponseMedInfotrygdVedtak = listOf(
             KroniskSyktBarnInfotrygdInnvilgetVedtak(
                 vedtatt = LocalDate.parse("2020-06-21"),
-                kilder = setOf(Kilde(id="UTV.RETT/20D/29099022222", type="Personkort")),
+                kilder = setOf(Kilde(id="UTV.RETT/20D/29099022222", type= "Personkort")),
                 gyldigFraOgMed = LocalDate.parse("2020-06-21"),
                 gyldigTilOgMed = LocalDate.parse("2020-06-21"),
                 barnetsIdentitetsnummer = "01019911111".somIdentitetsnummer(),
+                barnetsFødselsdato = LocalDate.parse("1999-01-01")
+            ),
+            KroniskSyktBarnInfotrygdInnvilgetVedtak(
+                vedtatt = LocalDate.parse("2020-06-22"),
+                kilder = setOf(Kilde(id="UTV.RETT/20D/010199", type= "Personkort")),
+                gyldigFraOgMed = LocalDate.parse("2020-06-22"),
+                gyldigTilOgMed = LocalDate.parse("2020-06-25"),
+                barnetsIdentitetsnummer = null,
                 barnetsFødselsdato = LocalDate.parse("1999-01-01")
             ),
             MidlertidigAleneInfotrygdInnvilgetVedtak(
@@ -52,7 +59,6 @@ internal class OmsorgspengerInfotrygdRammevedtakTest(
             )
         }
 
-        assertEquals(forventetResponseMedInfotrygdVedtak, resultat)
-
+        assertThat(resultat).hasSameElementsAs(forventetResponseMedInfotrygdVedtak)
     }
 }

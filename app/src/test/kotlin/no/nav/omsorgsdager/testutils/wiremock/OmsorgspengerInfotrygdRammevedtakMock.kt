@@ -56,6 +56,20 @@ private fun WireMockServer.stubUtvidetOchMidlAlene(): WireMockServer {
                                     "id": "UTV.RETT/20D/29099022222",
                                     "type": "Personkort"
                                 }]
+                            },{
+                                "vedtatt": "2020-06-22",
+                                "barn": {
+                                    "id": "1999-01-01",
+                                    "type": "Fødselsdato",
+                                    "fødselsdato": "1999-01-01"
+                                },
+                                "gyldigFraOgMed": "2020-06-22",
+                                "gyldigTilOgMed": "2020-06-25",
+                                "lengde": "PT480H",
+                                "kilder": [{
+                                    "id": "UTV.RETT/20D/010199",
+                                    "type": "Personkort"
+                                }]
                             }],
                             "MidlertidigAleneOmOmsorgen": [{
                                 "vedtatt": "1998-06-21",
@@ -86,7 +100,7 @@ private fun WireMockServer.stubInfotrygdRammevedtakHelsesjekk(): WireMockServer 
     return this
 }
 
-internal fun WireMockServer.stubInfotrygdRammevedtak() = stubInfotrygdRammevedtakHelsesjekk()
+internal fun WireMockServer.stubOmsorgspengerInfotrygdRammevedtak() = stubInfotrygdRammevedtakHelsesjekk()
     .stubDefaultTomtSvar()
     .stubUtvidetOchMidlAlene()
 internal fun WireMockServer.infotrygdRammevedtakBaseUrl() = baseUrl() + apiPath
