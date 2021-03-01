@@ -17,7 +17,7 @@ internal data class KroniskSyktBarnInfotrygdInnvilgetVedtak(
     override val gyldigTilOgMed: LocalDate,
     override val kilder: Set<Kilde>,
     internal val barnetsFødselsdato: LocalDate,
-    internal val barnetsIdentitetsnummer: Identitetsnummer) : InfotrygdInnvilgetVedtak
+    internal val barnetsIdentitetsnummer: Identitetsnummer?) : InfotrygdInnvilgetVedtak
 
 internal data class MidlertidigAleneInfotrygdInnvilgetVedtak(
     override val vedtatt: LocalDate,

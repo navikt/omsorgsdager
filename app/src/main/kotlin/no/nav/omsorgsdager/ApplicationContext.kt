@@ -9,6 +9,7 @@ import io.ktor.client.features.json.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
+import no.nav.k9.rapid.river.csvTilSet
 import no.nav.omsorgsdager.behandling.BehandlingService
 import no.nav.omsorgsdager.behandling.db.BehandlingRepository
 import no.nav.omsorgsdager.config.*
@@ -16,7 +17,7 @@ import no.nav.omsorgsdager.config.DataSourceBuilder
 import no.nav.omsorgsdager.config.Environment
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.parter.db.PartRepository
-import no.nav.omsorgsdager.saksnummer.OmsorgspengerSakGatway
+import no.nav.omsorgsdager.saksnummer.OmsorgspengerSakGateway
 import no.nav.omsorgsdager.saksnummer.OmsorgspengerSaksnummerService
 import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
@@ -39,7 +40,7 @@ internal class ApplicationContext(
     internal val partRepository: PartRepository,
     internal val omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway,
     internal val infotrygdInnvilgetVedtakService: InfotrygdInnvilgetVedtakService,
-    internal val omsorgspengerSakGatway: OmsorgspengerSakGatway,
+    internal val omsorgspengerSakGateway: OmsorgspengerSakGateway,
     internal val omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService,
     internal val innvilgedeVedtakService: InnvilgedeVedtakService,
     internal val configure: (application: Application) -> Unit,
@@ -62,7 +63,7 @@ internal class ApplicationContext(
         var partRepository: PartRepository? = null,
         var omsorgspengerInfotrygdRammevedtakGateway: OmsorgspengerInfotrygdRammevedtakGateway? = null,
         var infotrygdInnvilgetVedtakService: InfotrygdInnvilgetVedtakService? = null,
-        var omsorgspengerSakGatway: OmsorgspengerSakGatway? = null,
+        var omsorgspengerSakGateway: OmsorgspengerSakGateway? = null,
         var omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService? = null,
         var innvilgedeVedtakService: InnvilgedeVedtakService? = null,
         var configure: (application: Application) -> Unit = {},
@@ -109,13 +110,22 @@ internal class ApplicationContext(
                 dataSource = benyttetDataSource
             )
 
-            val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway ?: OmsorgspengerInfotrygdRammevedtakGateway()
+            val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway ?: OmsorgspengerInfotrygdRammevedtakGateway(
+                accessTokenClient = benyttetAccessTokenClient,
+                hentRammevedtakFraInfotrygdScopes = benyttetEnv.hentRequiredEnv("HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES").csvTilSet(),
+                omsorgspengerInfotrygdRammevedtakBaseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL"))
+            )
+
             val benyttetInfotrygdInnvilgetVedtakService = infotrygdInnvilgetVedtakService ?: InfotrygdInnvilgetVedtakService(
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway
             )
-            val benyttetOmsorgspengerSakGatway = omsorgspengerSakGatway ?: OmsorgspengerSakGatway()
+            val benyttetOmsorgspengerSakGateway = omsorgspengerSakGateway ?: OmsorgspengerSakGateway(
+                accessTokenClient = benyttetAccessTokenClient,
+                hentSaksnummerFraOmsorgspengerSakScopes = benyttetEnv.hentRequiredEnv("HENT_SAKSNUMMER_FRA_OMSORGSPENGER_SAK_SCOPES").csvTilSet(),
+                omsorgspengerSakUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_SAK_BASE_URL"))
+            )
             val benyttetOmsorgspengerSaksnummerService = omsorgspengerSaksnummerService ?: OmsorgspengerSaksnummerService(
-                omsorgspengerSakGatway = benyttetOmsorgspengerSakGatway,
+                omsorgspengerSakGateway = benyttetOmsorgspengerSakGateway,
                 partRepository = benyttetPartRepository
             )
             val benyttetInnvilgedeVedtakService = innvilgedeVedtakService ?: InnvilgedeVedtakService(
@@ -130,7 +140,9 @@ internal class ApplicationContext(
                 dataSource = benyttetDataSource,
                 healthService = HealthService(
                     healthChecks = setOf(
-                        benyttetOmsorgspengerTilgangsstyringGateway
+                        benyttetOmsorgspengerTilgangsstyringGateway,
+                        benyttetOmsorgspengerInfotrygdRammevedtakGateway,
+                        benyttetOmsorgspengerSakGateway
                     )
                 ),
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
@@ -140,7 +152,7 @@ internal class ApplicationContext(
                 behandlingRepository = benyttetBehandlingRepository,
                 behandlingService = benyttetBehandlingService,
                 omsorgspengerSaksnummerService = benyttetOmsorgspengerSaksnummerService,
-                omsorgspengerSakGatway = benyttetOmsorgspengerSakGatway,
+                omsorgspengerSakGateway = benyttetOmsorgspengerSakGateway,
                 innvilgedeVedtakService = benyttetInnvilgedeVedtakService,
                 infotrygdInnvilgetVedtakService = benyttetInfotrygdInnvilgetVedtakService,
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway,

@@ -28,7 +28,7 @@ internal class InnvilgedeVedtakApisTest(
 
     private val applicationContext = applicationContextBuilder.also {
         it.innvilgedeVedtakService = mockk<InnvilgedeVedtakService>().also {
-            coEvery { it.hentInnvilgedeVedtak(eq(IdentitetsnummerUtenVedtak.somIdentitetsnummer()), any(), any()) }.returns(InnvilgedeVedtak())
+            coEvery { it.hentInnvilgedeVedtak(eq(IdentitetsnummerUtenVedtak.somIdentitetsnummer()), any(), any()) }.returns(InnvilgedeVedtak(emptyList()))
             coEvery { it.hentInnvilgedeVedtak(eq(IdentitetsnummerMedToAvHver.somIdentitetsnummer()), any(), any()) }.returns(InnvilgedeVedtak(
                 kroniskSyktBarn = listOf(
                     KroniskSyktBarnInnvilgetVedtak(barn = Barn(identitetsnummer = IdentitetsnummerBarn1, fødselsdato = LocalDate.parse("2020-01-01"), omsorgspengerSaksnummer = IdentitetsnummerBarn1.somMocketOmsorgspengerSaksnummer()), tidspunkt = ZonedDateTime.parse("2020-11-10T12:00:00.00Z"), periode = Periode("2020-01-01/2020-12-31"), kilder = setOf(Kilde(id ="1", type = "K9-Sak"))),
