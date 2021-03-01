@@ -4,7 +4,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
-import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnumer
+import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnummer
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -21,7 +21,7 @@ internal class OmsorgspengerSaksnummerGatewayTest(
     @Test
     fun `Person som har saksnummer i omsorgspenger-sak`() {
         val personIdentSaksnummer = "11111111111"
-        val expectedResponse = "a1b2c3".somOmsorgspengerSaksnumer()
+        val expectedResponse = "a1b2c3".somOmsorgspengerSaksnummer()
 
         val response = runBlocking {
             omsorgspengerSakGateway.hentSaksnummer(

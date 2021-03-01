@@ -14,7 +14,7 @@ import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
 import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.OmsorgspengerSaksnummer
-import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnumer
+import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnummer
 import org.json.JSONObject
 import java.net.URI
 
@@ -49,7 +49,7 @@ internal class OmsorgspengerSakGateway(
             success = {
                 return JSONObject(it)
                 .getString("saksnummer")
-                .somOmsorgspengerSaksnumer() },
+                .somOmsorgspengerSaksnummer() },
             failure = { return null }
         )
 
