@@ -5,7 +5,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.omsorgsdager.*
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
-import no.nav.omsorgsdager.K9BehandlingId.Companion.somK9BehandlingId
 import no.nav.omsorgsdager.K9Saksnummer.Companion.somK9Saksnummer
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.BehandlingType
@@ -17,6 +16,7 @@ import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension.Companion.buildStarted
 import no.nav.omsorgsdager.testutils.somMocketOmsorgspengerSaksnummer
 import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.tid.Periode.Companion.dato
 import no.nav.omsorgsdager.tid.Periode.Companion.toLocalDateOslo
 import no.nav.omsorgsdager.vedtak.dto.Kilde
 import no.nav.omsorgsdager.vedtak.dto.KroniskSyktBarnInnvilgetVedtak
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -47,10 +46,13 @@ internal class InnvilgedeVedtakServiceTest(
             gyldigTilOgMed = LocalDate.parse("2033-12-31"),
             kilder = setOf(Kilde(id = "fra-infotrygd", type = "Infotrygd")),
             barnetsFødselsdato = LocalDate.parse("2020-01-01"),
-            barnetsIdentitetsnummer = "22222222222".somIdentitetsnummer()
+            barnetsIdentitetsnummer = Identitetsnummer2
         )
         coEvery { it.hentInnvilgedeVedtak(Identitetsnummer1, any(), any()) }.returns(listOf(
-            kroniskSyktBarnInfotrygdVedtak, kroniskSyktBarnInfotrygdVedtak.copy(barnetsIdentitetsnummer = "33333333333".somIdentitetsnummer())
+            kroniskSyktBarnInfotrygdVedtak, kroniskSyktBarnInfotrygdVedtak.copy(
+                barnetsIdentitetsnummer = "33333333333".somIdentitetsnummer(),
+                barnetsFødselsdato = "2020-01-02".dato()
+            )
         ))
     }
 
@@ -61,15 +63,15 @@ internal class InnvilgedeVedtakServiceTest(
 
     @Test
     fun `Kombinerer innvilgede vedtak om kronisk sykt barn fra Infotrygd & K9-sak`() {
-        val behandlingId1 = "${UUID.randomUUID()}".somK9BehandlingId()
-        val behandlingId2 = "${UUID.randomUUID()}".somK9BehandlingId()
-        val behandlingId3 = "${UUID.randomUUID()}".somK9BehandlingId()
-        val behandlingId4 = "${UUID.randomUUID()}".somK9BehandlingId()
+        val behandlingId1 = K9BehandlingId.generateK9BehandlingId()
+        val behandlingId2 = K9BehandlingId.generateK9BehandlingId()
+        val behandlingId3 = K9BehandlingId.generateK9BehandlingId()
+        val behandlingId4 = K9BehandlingId.generateK9BehandlingId()
 
 
         val parter = listOf(
             Søker(identitetsnummer = Identitetsnummer1, omsorgspengerSaksnummer = OmsorgspengerSaksnummer1),
-            Barn(fødselsdato = LocalDate.parse("2020-01-01"), identitetsnummer = "22222222222".somIdentitetsnummer())
+            Barn(identitetsnummer = Identitetsnummer2, omsorgspengerSaksnummer = OmsorgspengerSaksnummer2, fødselsdato = LocalDate.parse("2020-01-01"))
         )
 
         val behandling1 = NyBehandling(
@@ -111,6 +113,8 @@ internal class InnvilgedeVedtakServiceTest(
 
     private companion object {
         val Identitetsnummer1 = "11111111111".somIdentitetsnummer()
+        val Identitetsnummer2 = "22222222222".somIdentitetsnummer()
         val OmsorgspengerSaksnummer1 = Identitetsnummer1.somMocketOmsorgspengerSaksnummer()
+        val OmsorgspengerSaksnummer2 = Identitetsnummer2.somMocketOmsorgspengerSaksnummer()
     }
 }

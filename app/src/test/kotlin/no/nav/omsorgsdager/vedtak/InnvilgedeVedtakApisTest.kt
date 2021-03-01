@@ -11,6 +11,7 @@ import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.omsorgsdager
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension.Companion.buildStarted
+import no.nav.omsorgsdager.testutils.somMocketOmsorgspengerSaksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.dto.*
 import org.intellij.lang.annotations.Language
@@ -30,7 +31,7 @@ internal class InnvilgedeVedtakApisTest(
             coEvery { it.hentInnvilgedeVedtak(eq(IdentitetsnummerUtenVedtak.somIdentitetsnummer()), any(), any()) }.returns(InnvilgedeVedtak(emptyList()))
             coEvery { it.hentInnvilgedeVedtak(eq(IdentitetsnummerMedToAvHver.somIdentitetsnummer()), any(), any()) }.returns(InnvilgedeVedtak(
                 kroniskSyktBarn = listOf(
-                    KroniskSyktBarnInnvilgetVedtak(barn = Barn(identitetsnummer = "11111111111", fødselsdato = LocalDate.parse("2020-01-01")), tidspunkt = ZonedDateTime.parse("2020-11-10T12:00:00.00Z"), periode = Periode("2020-01-01/2020-12-31"), kilder = setOf(Kilde(id ="1", type = "K9-Sak"))),
+                    KroniskSyktBarnInnvilgetVedtak(barn = Barn(identitetsnummer = IdentitetsnummerBarn1, fødselsdato = LocalDate.parse("2020-01-01"), omsorgspengerSaksnummer = IdentitetsnummerBarn1.somMocketOmsorgspengerSaksnummer()), tidspunkt = ZonedDateTime.parse("2020-11-10T12:00:00.00Z"), periode = Periode("2020-01-01/2020-12-31"), kilder = setOf(Kilde(id ="1", type = "K9-Sak"))),
                     KroniskSyktBarnInnvilgetVedtak(barn = Barn(identitetsnummer = null, fødselsdato = LocalDate.parse("2019-01-01")), tidspunkt = ZonedDateTime.parse("2021-02-19T23:30:00.00Z"), periode = Periode("2018-01-01/2025-12-31"), kilder = setOf(Kilde(id ="1", type = "Infotrygd")))
                 ),
                 midlertidigAlene = listOf(
@@ -103,7 +104,8 @@ internal class InnvilgedeVedtakApisTest(
             "kroniskSyktBarn": [{
                 "barn": {
                     "identitetsnummer": "11111111111",
-                    "fødselsdato": "2020-01-01"
+                    "fødselsdato": "2020-01-01",
+                    "omsorgspengerSaksnummer": "OP11111111111"
                 },
                 "kilder": [{
                     "id": "1",
@@ -115,7 +117,8 @@ internal class InnvilgedeVedtakApisTest(
             }, {
                 "barn": {
                     "identitetsnummer": null,
-                    "fødselsdato": "2019-01-01"
+                    "fødselsdato": "2019-01-01",
+                    "omsorgspengerSaksnummer": null
                 },
                 "kilder": [{
                     "id": "1",
@@ -154,6 +157,7 @@ internal class InnvilgedeVedtakApisTest(
 
 
     private companion object {
+        val IdentitetsnummerBarn1 = "11111111111".somIdentitetsnummer()
         val IdentitetsnummerMedToAvHver = "29099011110"
         val IdentitetsnummerUtenVedtak = "29099011111"
         val ForventetResponseUtenVedtak = """{"kroniskSyktBarn": [], "midlertidigAlene": []}"""

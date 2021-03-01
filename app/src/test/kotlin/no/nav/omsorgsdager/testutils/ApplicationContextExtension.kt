@@ -43,7 +43,8 @@ internal class ApplicationContextExtension : ParameterResolver {
             "HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES" to "/.default",
             "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL" to mockedEnvironment.wireMockServer.infotrygdRammevedtakBaseUrl(),
             "OMSORGSPENGER_SAK_BASE_URL" to mockedEnvironment.wireMockServer.omsorgspengerSakBaseUrl(),
-            "HENT_SAKSNUMMER_FRA_OMSORGSPENGER_SAK_SCOPES" to "/.default"
+            "HENT_SAKSNUMMER_FRA_OMSORGSPENGER_SAK_SCOPES" to "/.default",
+            "HENT_BEHANDLINGER" to "enabled"
         )
 
         init {

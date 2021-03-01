@@ -2,6 +2,7 @@ package no.nav.omsorgsdager.kronisksyktbarn
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgsdager.ApplicationContext
+import no.nav.omsorgsdager.K9BehandlingId
 import no.nav.omsorgsdager.registerApplicationContext
 import no.nav.omsorgsdager.testutils.*
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
@@ -22,40 +23,49 @@ internal class KroniskSyktBarnRiverTest(
     @Test
     fun `innvilget kronisk sykt barn`() {
         val søkersIdentitetsnummer = "29099011111"
+        val barnetsIdentitetsnummer = "29099011112"
+
         val melding = KroniskSyktBarnMeldinger.melding(
-            søkersIdentitetsnummer = søkersIdentitetsnummer
+            søkersIdentitetsnummer = søkersIdentitetsnummer,
+            barnetsIdentitetsnummer = barnetsIdentitetsnummer
         )
         val (_, behovssekvens) = KroniskSyktBarnMeldinger.innvilget(melding).keyValue
         rapid.sendTestMessage(behovssekvens)
-        rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer))
+        rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer, barnetsIdentitetsnummer))
         rapid.sisteMeldingHarLøsningPå("InnvilgetKroniskSyktBarn")
     }
 
     @Test
     fun `avslått kronisk sykt barn`() {
-        val søkersIdentitetsnummer = "29099011112"
+        val søkersIdentitetsnummer = "29099011113"
+        val barnetsIdentitetsnummer = "29099011114"
+
         val melding = KroniskSyktBarnMeldinger.melding(
-            søkersIdentitetsnummer = søkersIdentitetsnummer
+            søkersIdentitetsnummer = søkersIdentitetsnummer,
+            barnetsIdentitetsnummer = barnetsIdentitetsnummer
         )
         val (_, behovssekvens) = KroniskSyktBarnMeldinger.avslått(melding).keyValue
         rapid.sendTestMessage(behovssekvens)
-        rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer))
+        rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer, barnetsIdentitetsnummer))
         rapid.sisteMeldingHarLøsningPå("AvslåttKroniskSyktBarn")
     }
 
     @Test
     fun `håndterer at en melding med samme behandlingId kan kommer flere ganger`() {
-        val søkersIdentitetsnummer = "29099111111"
-        val behandlingId = "${UUID.randomUUID()}"
+        val søkersIdentitetsnummer = "29099011115"
+        val barnetsIdentitetsnummer = "29099011116"
+
+        val behandlingId = "${K9BehandlingId.generateK9BehandlingId()}"
 
         // Første melding alt OK
         val melding = KroniskSyktBarnMeldinger.melding(
             søkersIdentitetsnummer = søkersIdentitetsnummer,
-            behandlingId = behandlingId
+            behandlingId = behandlingId,
+            barnetsIdentitetsnummer = barnetsIdentitetsnummer
         )
         val (_, behovssekvens) = KroniskSyktBarnMeldinger.innvilget(melding).keyValue
         rapid.sendTestMessage(behovssekvens)
-        rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer))
+        rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer, barnetsIdentitetsnummer))
         rapid.sisteMeldingHarLøsningPå("InnvilgetKroniskSyktBarn")
 
         // Samme grunnlag men ny status skal feile
@@ -68,14 +78,15 @@ internal class KroniskSyktBarnRiverTest(
         // Samme grunnlag og samme status skal gå OK
         val (_, behovssekvens3) = KroniskSyktBarnMeldinger.innvilget(melding).keyValue
         rapid.sendTestMessage(behovssekvens3)
-        rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer))
+        rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkersIdentitetsnummer, barnetsIdentitetsnummer))
         rapid.sisteMeldingHarLøsningPå("InnvilgetKroniskSyktBarn")
 
 
         // Nytt grunnlag vil feile
         val melding2 = KroniskSyktBarnMeldinger.melding(
             søkersIdentitetsnummer = søkersIdentitetsnummer,
-            behandlingId = behandlingId
+            behandlingId = behandlingId,
+            barnetsIdentitetsnummer = barnetsIdentitetsnummer
         )
 
         val (_, behovssekvens4) = KroniskSyktBarnMeldinger.innvilget(melding2).keyValue

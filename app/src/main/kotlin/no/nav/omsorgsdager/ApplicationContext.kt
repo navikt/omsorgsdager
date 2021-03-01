@@ -131,9 +131,9 @@ internal class ApplicationContext(
             val benyttetInnvilgedeVedtakService = innvilgedeVedtakService ?: InnvilgedeVedtakService(
                 behandlingService = benyttetBehandlingService,
                 omsorgspengerSaksnummerService = benyttetOmsorgspengerSaksnummerService,
-                infotrygdInnvilgetVedtakService = benyttetInfotrygdInnvilgetVedtakService
+                infotrygdInnvilgetVedtakService = benyttetInfotrygdInnvilgetVedtakService,
+                hentBehandlinger = benyttetEnv.hentOptionalEnv("HENT_BEHANDLINGER") == "enabled"
             )
-
 
             return ApplicationContext(
                 env = benyttetEnv,
