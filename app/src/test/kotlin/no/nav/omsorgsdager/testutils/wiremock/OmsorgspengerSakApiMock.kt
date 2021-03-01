@@ -27,6 +27,22 @@ private fun WireMockServer.stubDefaultTomtSvar(): WireMockServer {
     return this
 }
 
+private fun WireMockServer.stubUventetFeil(): WireMockServer {
+    WireMock.stubFor(
+        WireMock.post(
+            WireMock.urlPathMatching(".*$apiPath.*/saksnummer"))
+            .atPriority(catchAllPriority)
+            .withHeader("Authorization", containing("Bearer"))
+            .withHeader("Content-Type", equalTo("application/json"))
+            .withRequestBody(matchingJsonPath("$.identitetsnummer", equalTo("11111111112")))
+            .willReturn(
+                aResponse()
+                    .withStatus(HttpStatusCode.InternalServerError.value)
+            )
+    )
+    return this
+}
+
 private fun WireMockServer.stubPersonSomHarSaksnummer(): WireMockServer {
     WireMock.stubFor(
         WireMock.post(
@@ -62,4 +78,5 @@ private fun WireMockServer.stubInfotrygdRammevedtakHelsesjekk(): WireMockServer 
 internal fun WireMockServer.stubOmsorgspengerSakApi() = stubInfotrygdRammevedtakHelsesjekk()
     .stubDefaultTomtSvar()
     .stubPersonSomHarSaksnummer()
+    .stubUventetFeil()
 internal fun WireMockServer.omsorgspengerSakBaseUrl() = baseUrl() + apiPath

@@ -6,13 +6,13 @@ import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.OmsorgspengerSaksnummer.Companion.somOmsorgspengerSaksnummer
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
+import org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 @ExtendWith(ApplicationContextExtension::class)
-internal class OmsorgspengerSaksnummerGatewayTest(
+internal class OmsorgspengerSakGatewayTest(
     applicationContextBuilder: ApplicationContext.Builder) {
 
     private val applicationContext = applicationContextBuilder.build()
@@ -45,5 +45,16 @@ internal class OmsorgspengerSaksnummerGatewayTest(
         assertNull(response)
     }
 
+    @Test
+    fun `Uventet response`() {
+        val personIdentSaksnummer = "11111111112"
 
+        assertThatExceptionOfType(IllegalStateException::class.java).isThrownBy {
+            runBlocking {
+                omsorgspengerSakGateway.hentSaksnummer(
+                    identitetsnummer = personIdentSaksnummer.somIdentitetsnummer(),
+                    correlationId = CorrelationId.genererCorrelationId())
+            }
+        }
+    }
 }
