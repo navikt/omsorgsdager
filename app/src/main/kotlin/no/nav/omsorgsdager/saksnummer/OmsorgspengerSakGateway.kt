@@ -15,12 +15,12 @@ import java.net.URI
 
 internal class OmsorgspengerSakGateway(
     accessTokenClient: AccessTokenClient,
-    hentSaksnummerFraOmsorgspengerSakScopes: Set<String>,
+    scopes: Set<String>,
     omsorgspengerSakUrl: URI
 ) : AzureAwareGateway(
     navn = "OmsorgspengerSakGateway",
     accessTokenClient = accessTokenClient,
-    scopes = hentSaksnummerFraOmsorgspengerSakScopes,
+    scopes = scopes,
     pingUri = URI("$omsorgspengerSakUrl/isready")) {
 
     private val omsorgspengerSaksnummerUrl = "$omsorgspengerSakUrl/saksnummer"

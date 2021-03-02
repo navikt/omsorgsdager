@@ -112,7 +112,7 @@ internal class ApplicationContext(
 
             val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway ?: OmsorgspengerInfotrygdRammevedtakGateway(
                 accessTokenClient = benyttetAccessTokenClient,
-                hentRammevedtakFraInfotrygdScopes = benyttetEnv.hentRequiredEnv("HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES").csvTilSet(),
+                scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES").csvTilSet(),
                 omsorgspengerInfotrygdRammevedtakBaseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL"))
             )
 
@@ -121,7 +121,7 @@ internal class ApplicationContext(
             )
             val benyttetOmsorgspengerSakGateway = omsorgspengerSakGateway ?: OmsorgspengerSakGateway(
                 accessTokenClient = benyttetAccessTokenClient,
-                hentSaksnummerFraOmsorgspengerSakScopes = benyttetEnv.hentRequiredEnv("HENT_SAKSNUMMER_FRA_OMSORGSPENGER_SAK_SCOPES").csvTilSet(),
+                scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_SAK_SCOPES").csvTilSet(),
                 omsorgspengerSakUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_SAK_BASE_URL"))
             )
             val benyttetOmsorgspengerSaksnummerService = omsorgspengerSaksnummerService ?: OmsorgspengerSaksnummerService(

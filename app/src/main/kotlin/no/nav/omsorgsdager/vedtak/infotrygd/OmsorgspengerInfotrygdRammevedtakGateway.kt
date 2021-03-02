@@ -18,12 +18,12 @@ import java.time.LocalDate
 
 internal class OmsorgspengerInfotrygdRammevedtakGateway(
     accessTokenClient: AccessTokenClient,
-    hentRammevedtakFraInfotrygdScopes: Set<String>,
+    scopes: Set<String>,
     omsorgspengerInfotrygdRammevedtakBaseUrl: URI
 ) : AzureAwareGateway(
     navn = "OmsorgspengerInfotrygdRammevedtakGateway",
     accessTokenClient = accessTokenClient,
-    scopes = hentRammevedtakFraInfotrygdScopes,
+    scopes = scopes,
     pingUri = URI("$omsorgspengerInfotrygdRammevedtakBaseUrl/isready")) {
 
     private val rammevedtakUrl = "$omsorgspengerInfotrygdRammevedtakBaseUrl/rammevedtak"
