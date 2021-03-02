@@ -1,0 +1,18 @@
+query($identer: [ID!]!) {
+    hentPersonBolk(identer: $identer) {
+        ident,
+        person {
+            foedsel {
+                foedselsdato
+            }
+        },
+        code
+    },
+    hentIdenterBolk(identer: $identer, grupper: [FOLKEREGISTERIDENT], historikk: false) {
+        ident,
+        identer {
+            ident
+        },
+        code
+    }
+}
