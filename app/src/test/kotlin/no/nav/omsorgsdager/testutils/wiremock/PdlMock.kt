@@ -15,7 +15,7 @@ private const val pdlBasePath = "/pdl-mock"
 private fun WireMockServer.mockPdlHentPersonInfo(correlationId: CorrelationId, response: ResponseDefinitionBuilder): WireMockServer {
     WireMock.stubFor(
         WireMock.post(WireMock
-            .urlPathMatching(".*$pdlBasePath.*"))
+            .urlPathMatching(".*$pdlBasePath/graphql"))
             .withHeader("Authorization", WireMock.containing("Bearer e"))
             .withHeader("Content-Type", WireMock.equalTo("application/json"))
             .withHeader("TEMA", WireMock.equalTo("OMS"))
@@ -29,7 +29,7 @@ private fun WireMockServer.mockPdlHentPersonInfo(correlationId: CorrelationId, r
 private fun WireMockServer.mockPdlPing() : WireMockServer {
     WireMock.stubFor(
         WireMock.options(WireMock
-            .urlPathMatching(".*$pdlBasePath.*"))
+            .urlPathMatching(".*$pdlBasePath/graphql"))
             .withHeader("Authorization", WireMock.containing("Bearer e"))
             .willReturn(aResponse().withStatus(200))
     )

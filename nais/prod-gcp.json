@@ -26,6 +26,8 @@
     "OPEN_AM_AUTHORIZED_CLIENTS": "k9-sak-p",
     "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES": "eadadb81-a814-4402-b820-a3fab240f8ee/.default",
     "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL": "https://omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
-    "OMSORGSPENGER_SAK_SCOPES": "4c4e6e55-2063-4507-8fd6-5d5a4604c0db/.default"
+    "OMSORGSPENGER_SAK_SCOPES": "4c4e6e55-2063-4507-8fd6-5d5a4604c0db/.default",
+    "PDL_BASE_URL": "https://omsorgspenger-proxy.prod-fss-pub.nais.io/pdl",
+    "PDL_SCOPES": "e816bb42-bf62-4be9-a1cc-a9be70fe4403/.default"
   }
 }
