@@ -15,7 +15,8 @@ internal abstract class AzureAwareGateway(
     private val navn: String,
     private val accessTokenClient: AccessTokenClient,
     private val scopes: Set<String>,
-    protected val pingUri: URI) : HealthCheck {
+    protected val pingUri: URI,
+    private val requireAccessAsAppliation: Boolean = true) : HealthCheck {
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
 
@@ -30,9 +31,11 @@ internal abstract class AzureAwareGateway(
         )
 
     private fun accessTokenCheck() = kotlin.runCatching {
-        accessTokenClient.getAccessToken(scopes).let {
-            (SignedJWT.parse(it.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()
+        val accessTokenResponse = accessTokenClient.getAccessToken(scopes)
+        when (requireAccessAsAppliation) {
+            true -> (SignedJWT.parse(accessTokenResponse.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()
                 ?: emptyList()).contains("access_as_application")
+            false -> true
         }
     }.fold(
         onSuccess = {
