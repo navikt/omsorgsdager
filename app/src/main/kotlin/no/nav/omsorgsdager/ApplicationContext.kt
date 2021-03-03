@@ -152,7 +152,8 @@ internal class ApplicationContext(
                     healthChecks = setOf(
                         benyttetOmsorgspengerTilgangsstyringGateway,
                         benyttetOmsorgspengerInfotrygdRammevedtakGateway,
-                        benyttetOmsorgspengerSakGateway
+                        benyttetOmsorgspengerSakGateway,
+                        benyttetPersonInfoGateway
                     )
                 ),
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
