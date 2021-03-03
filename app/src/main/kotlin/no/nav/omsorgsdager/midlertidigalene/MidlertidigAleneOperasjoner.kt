@@ -2,12 +2,11 @@ package no.nav.omsorgsdager.midlertidigalene
 
 import no.nav.omsorgsdager.BehovssekvensId
 import no.nav.omsorgsdager.Identitetsnummer
-import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.K9BehandlingId.Companion.somK9BehandlingId
 import no.nav.omsorgsdager.K9Saksnummer.Companion.somK9Saksnummer
-import no.nav.omsorgsdager.OmsorgspengerSaksnummer
 import no.nav.omsorgsdager.behandling.BehandlingOperasjoner
+import no.nav.omsorgsdager.behandling.BehandlingPersonInfo
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.BehandlingType
 import no.nav.omsorgsdager.behandling.NyBehandling
@@ -15,6 +14,7 @@ import no.nav.omsorgsdager.behandling.db.DbBehandling
 import no.nav.omsorgsdager.parter.Motpart
 import no.nav.omsorgsdager.parter.Part
 import no.nav.omsorgsdager.parter.Søker
+import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.tid.Periode
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -45,18 +45,25 @@ internal object MidlertidigAleneOperasjoner : BehandlingOperasjoner<MidlertidigA
     override fun mapTilNyBehandling(
         behovssekvensId: BehovssekvensId,
         grunnlag: Json,
-        saksnummer: Map<Identitetsnummer, OmsorgspengerSaksnummer>,
+        personInfo: Map<Identitetsnummer, BehandlingPersonInfo>,
         behandlingStatus: BehandlingStatus): Pair<NyBehandling, List<Part>> {
         val dto = grunnlag.deserialize<DTO>()
 
-        val søkeren = dto.søker.identitetsnummer.somIdentitetsnummer().let { Søker(
-            identitetsnummer = it,
-            omsorgspengerSaksnummer = saksnummer.getValue(it)
-        )}
-        val annenForelder = dto.annenForelder.identitetsnummer.somIdentitetsnummer().let { Motpart(
-            identitetsnummer = it,
-            omsorgspengerSaksnummer = saksnummer.getValue(it)
-        )}
+        // TODO: AktørId
+
+        val personInfoForSøkeren = personInfo.entries.first { it.value.aktørId == dto.søker.aktørId.somAktørId() }
+
+        val søkeren = Søker(
+            identitetsnummer = personInfoForSøkeren.key,
+            omsorgspengerSaksnummer = personInfoForSøkeren.value.saksnummer
+        )
+
+        val personInfoForAnnenForelder = personInfo.entries.first { it.value.aktørId == dto.annenForelder.aktørId.somAktørId() }
+
+        val annenForelder = Motpart(
+            identitetsnummer = personInfoForAnnenForelder.key,
+            omsorgspengerSaksnummer = personInfoForAnnenForelder.value.saksnummer
+        )
 
         val behandling = NyBehandling(
             behovssekvensId = behovssekvensId,
@@ -84,7 +91,7 @@ internal object MidlertidigAleneOperasjoner : BehandlingOperasjoner<MidlertidigA
         val søker: Person,
         val annenForelder: Person) {
         data class Person(
-            val identitetsnummer: String
+            val aktørId: String
         )
     }
 }

@@ -22,15 +22,15 @@ fun main() {
 
 internal fun RapidsConnection.registerApplicationContext(applicationContext: ApplicationContext) {
     // Kronisk sykt barn
-    InitierInnvilgetKroniskSyktBarnRiver(rapidsConnection = this)
+    InitierInnvilgetKroniskSyktBarnRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
     LagreInnvilgetKroniskSyktBarnRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
-    InitierAvslåttKroniskSyktBarnRiver(rapidsConnection = this)
+    InitierAvslåttKroniskSyktBarnRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
     LagreAvslåttKroniskSyktBarnRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
 
     // Midlertidig alene
-    InitierInnvilgetMidlertidigAleneRiver(rapidsConnection = this)
+    InitierInnvilgetMidlertidigAleneRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
     LagreInnvilgetMidlertidigAleneRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
-    InitierAvslåttMidlertidigAleneRiver(rapidsConnection = this)
+    InitierAvslåttMidlertidigAleneRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
     LagreAvslåttMidlertidigAleneRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
 
     register(object : RapidsConnection.StatusListener {

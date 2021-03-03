@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.omsorgsdager.behandling.BehandlingService
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.BehandlingType
+import no.nav.omsorgsdager.person.PersonInfoGateway
 import no.nav.omsorgsdager.rivers.InitierBehandlingRiver
 import no.nav.omsorgsdager.rivers.LagreBehandlingRiver
 import org.slf4j.LoggerFactory
@@ -11,19 +12,23 @@ import org.slf4j.LoggerFactory
 private object Behov {
     const val InnvilgetKroniskSyktBarn = "InnvilgetKroniskSyktBarn"
     const val AvslåttKroniskSyktBarn = "AvslåttKroniskSyktBarn"
-    val identitetsnummerKeys = setOf(
-        "søker.identitetsnummer",
-        "barn.identitetsnummer"
+    val aktørIdKeys = setOf(
+        "søker.aktørId",
+        "barn.aktørId"
     )
+    val støttedeVersjoner = setOf("1.0.0")
 }
 
 internal class InitierInnvilgetKroniskSyktBarnRiver(
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
+    personInfoGateway: PersonInfoGateway
 ) : InitierBehandlingRiver(
     rapidsConnection = rapidsConnection,
     logger = LoggerFactory.getLogger(InitierInnvilgetKroniskSyktBarnRiver::class.java),
     behov = Behov.InnvilgetKroniskSyktBarn,
-    identitetsnummerKeys = Behov.identitetsnummerKeys
+    aktørIdKeys = Behov.aktørIdKeys,
+    støttedeVersjoner = Behov.støttedeVersjoner,
+    personInfoGateway = personInfoGateway
 )
 
 internal class LagreInnvilgetKroniskSyktBarnRiver(
@@ -40,12 +45,15 @@ internal class LagreInnvilgetKroniskSyktBarnRiver(
 
 
 internal class InitierAvslåttKroniskSyktBarnRiver(
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
+    personInfoGateway: PersonInfoGateway,
 ) : InitierBehandlingRiver(
     rapidsConnection = rapidsConnection,
     logger = LoggerFactory.getLogger(InitierAvslåttKroniskSyktBarnRiver::class.java),
     behov = Behov.AvslåttKroniskSyktBarn,
-    identitetsnummerKeys = Behov.identitetsnummerKeys
+    aktørIdKeys = Behov.aktørIdKeys,
+    støttedeVersjoner = Behov.støttedeVersjoner,
+    personInfoGateway = personInfoGateway
 )
 
 internal class LagreAvslåttKroniskSyktBarnRiver(

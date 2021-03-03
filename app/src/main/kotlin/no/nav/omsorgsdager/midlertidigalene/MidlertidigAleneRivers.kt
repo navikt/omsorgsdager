@@ -4,6 +4,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.omsorgsdager.behandling.BehandlingService
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.BehandlingType
+import no.nav.omsorgsdager.person.PersonInfoGateway
 import no.nav.omsorgsdager.rivers.InitierBehandlingRiver
 import no.nav.omsorgsdager.rivers.LagreBehandlingRiver
 import org.slf4j.LoggerFactory
@@ -11,19 +12,23 @@ import org.slf4j.LoggerFactory
 private object Behov {
     const val InnvilgetMidlertidigAlene = "InnvilgetMidlertidigAlene"
     const val AvslåttMidlertidigAlene = "AvslåttMidlertidigAlene"
-    val identitetsnummerKeys = setOf(
-        "søker.identitetsnummer",
-        "annenForelder.identitetsnummer"
+    val aktørIdKeys = setOf(
+        "søker.aktørId",
+        "annenForelder.aktørId"
     )
+    val støttedeVersjoner = setOf("1.0.0")
 }
 
 internal class InitierInnvilgetMidlertidigAleneRiver(
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
+    personInfoGateway: PersonInfoGateway
 ) : InitierBehandlingRiver(
     rapidsConnection = rapidsConnection,
     logger = LoggerFactory.getLogger(InitierInnvilgetMidlertidigAleneRiver::class.java),
     behov = Behov.InnvilgetMidlertidigAlene,
-    identitetsnummerKeys = Behov.identitetsnummerKeys
+    aktørIdKeys = Behov.aktørIdKeys,
+    støttedeVersjoner = Behov.støttedeVersjoner,
+    personInfoGateway = personInfoGateway
 )
 
 internal class LagreInnvilgetMidlertidigAleneRiver(
@@ -40,12 +45,15 @@ internal class LagreInnvilgetMidlertidigAleneRiver(
 
 
 internal class InitierAvslåttMidlertidigAleneRiver(
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
+    personInfoGateway: PersonInfoGateway
 ) : InitierBehandlingRiver(
     rapidsConnection = rapidsConnection,
     logger = LoggerFactory.getLogger(InitierAvslåttMidlertidigAleneRiver::class.java),
     behov = Behov.AvslåttMidlertidigAlene,
-    identitetsnummerKeys = Behov.identitetsnummerKeys
+    aktørIdKeys = Behov.aktørIdKeys,
+    støttedeVersjoner = Behov.støttedeVersjoner,
+    personInfoGateway = personInfoGateway
 )
 
 internal class LagreAvslåttMidlertidigAleneRiver(

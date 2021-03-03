@@ -18,6 +18,7 @@ internal data class CorrelationId private constructor(private val value: String)
     internal companion object {
         private val Regex = "[a-zA-Z0-9_.\\-æøåÆØÅ]{5,200}".toRegex()
         internal fun genererCorrelationId() = CorrelationId("omsorgsdager-${UUID.randomUUID()}")
+        internal fun String.somCorrelationId() = CorrelationId(this)
         internal fun ApplicationCall.correlationId() = when {
             request.headers.contains(HttpHeaders.XCorrelationId) -> CorrelationId(request.headers[HttpHeaders.XCorrelationId]!!)
             request.headers.contains("Nav-Call-Id") -> CorrelationId(request.headers["Nav-Call-Id"]!!)

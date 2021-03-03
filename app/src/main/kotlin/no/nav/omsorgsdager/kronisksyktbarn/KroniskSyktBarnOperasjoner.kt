@@ -2,12 +2,11 @@ package no.nav.omsorgsdager.kronisksyktbarn
 
 import no.nav.omsorgsdager.BehovssekvensId
 import no.nav.omsorgsdager.Identitetsnummer
-import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.K9BehandlingId.Companion.somK9BehandlingId
 import no.nav.omsorgsdager.K9Saksnummer.Companion.somK9Saksnummer
-import no.nav.omsorgsdager.OmsorgspengerSaksnummer
 import no.nav.omsorgsdager.behandling.BehandlingOperasjoner
+import no.nav.omsorgsdager.behandling.BehandlingPersonInfo
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.BehandlingType
 import no.nav.omsorgsdager.behandling.NyBehandling
@@ -15,6 +14,7 @@ import no.nav.omsorgsdager.behandling.db.DbBehandling
 import no.nav.omsorgsdager.parter.Barn
 import no.nav.omsorgsdager.parter.Part
 import no.nav.omsorgsdager.parter.Søker
+import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.tid.Periode
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -45,20 +45,26 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
     override fun mapTilNyBehandling(
         behovssekvensId: BehovssekvensId,
         grunnlag: Json,
-        saksnummer: Map<Identitetsnummer, OmsorgspengerSaksnummer>,
+        personInfo: Map<Identitetsnummer, BehandlingPersonInfo>,
         behandlingStatus: BehandlingStatus): Pair<NyBehandling, List<Part>> {
         val dto = grunnlag.deserialize<DTO>()
 
-        val søkeren = dto.søker.identitetsnummer.somIdentitetsnummer().let { Søker(
-            identitetsnummer = it,
-            omsorgspengerSaksnummer = saksnummer.getValue(it)
-        )}
+        // TODO: AktørId
 
-        val barnet = dto.barn.identitetsnummer.somIdentitetsnummer().let { Barn(
-            identitetsnummer = it,
-            omsorgspengerSaksnummer = saksnummer.getValue(it),
-            fødselsdato = dto.barn.fødselsdato
-        )}
+        val personInfoForSøkeren = personInfo.entries.first { it.value.aktørId == dto.søker.aktørId.somAktørId() }
+
+        val søkeren = Søker(
+            identitetsnummer = personInfoForSøkeren.key,
+            omsorgspengerSaksnummer = personInfoForSøkeren.value.saksnummer
+        )
+
+        val personInfoForBarnet = personInfo.entries.first { it.value.aktørId == dto.søker.aktørId.somAktørId() }
+
+        val barnet = Barn(
+            identitetsnummer = personInfoForBarnet.key,
+            fødselsdato = personInfoForBarnet.value.fødselsdato,
+            omsorgspengerSaksnummer = personInfoForBarnet.value.saksnummer
+        )
 
         val behandling = NyBehandling(
             behovssekvensId = behovssekvensId,
@@ -83,14 +89,10 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
         val tidspunkt: ZonedDateTime,
         val gyldigFraOgMed: LocalDate,
         val gyldigTilOgMed: LocalDate,
-        val søker: Søker,
-        val barn: Barn) {
-        data class Søker(
-            val identitetsnummer: String
-        )
-        data class Barn(
-            val identitetsnummer: String,
-            val fødselsdato: LocalDate
+        val søker: Person,
+        val barn: Person) {
+        data class Person(
+            val aktørId: String
         )
     }
 }

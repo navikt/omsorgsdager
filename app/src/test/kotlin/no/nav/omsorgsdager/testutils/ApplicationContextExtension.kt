@@ -4,12 +4,16 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.jws.NaisSts
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsJwksUrl
 import no.nav.omsorgsdager.ApplicationContext
+import no.nav.omsorgsdager.person.MockedPersonInfoGateway
+import no.nav.omsorgsdager.person.PersonInfoGateway
 import no.nav.omsorgsdager.testutils.wiremock.infotrygdRammevedtakBaseUrl
 import no.nav.omsorgsdager.testutils.wiremock.omsorgspengerSakBaseUrl
 import no.nav.omsorgsdager.testutils.wiremock.pdlBaseUrl
