@@ -36,13 +36,15 @@ internal class PdlPersonInfoGateway(
     private val graphqlEndpoint = "$baseUri/graphql"
 
     override suspend fun hent(aktørIder: Set<AktørId>, correlationId: CorrelationId): Map<AktørId, PersonInfo> {
+        val pdlRequest = hentPersonInfoRequest(aktørIder)
+
         val (httpStatusCode, response) = graphqlEndpoint.httpPost {
             it.header(HttpHeaders.Authorization, authorizationHeader())
             it.header(CorrelationIdHeaderKey, "$correlationId")
             it.header(ConsumerId.first, ConsumerId.second)
             it.header(Tema.first, Tema.second)
             it.accept(ContentType.Application.Json)
-            it.jsonBody(hentPersonInfoRequest(aktørIder))
+            it.jsonBody(pdlRequest)
         }.readTextOrThrow()
 
         return kotlin.runCatching {
@@ -61,7 +63,7 @@ internal class PdlPersonInfoGateway(
         }.fold(
             onSuccess = { it },
             onFailure = {
-                SecureLogger.error("AktørIder=$aktørIder, PdlErrorResponse=${response.somJsonOrNull()?:response}")
+                SecureLogger.error("PdlRequest=$pdlRequest, PdlResponse=${response.somJsonOrNull()?:response}")
                 throw IllegalStateException("Feil ved oppslag mot PDL. Se sikker log former detaljer.", it)
             }
         )
@@ -112,6 +114,7 @@ internal class PdlPersonInfoGateway(
         private fun JSONArray.inneholderKunOkCodes() = require(all { (it as JSONObject).getString("code") == "ok"}) {
             "Response fra PDL inneholder ikke bare ok codes."
         }
+
         private fun JSONArray.tilhørende(aktørId: AktørId) = first { (it as JSONObject).getString("ident") == "$aktørId" } as JSONObject
     }
 
