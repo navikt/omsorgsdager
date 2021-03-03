@@ -9,9 +9,9 @@ import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.person.AktørId
 import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.person.PersonInfo
+import no.nav.omsorgsdager.person.pdl.PdlPersonInfoGateway.Companion.hentPersonInfoRequest
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import no.nav.omsorgsdager.testutils.wiremock.mockPdlHentPersonInfo
-import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -24,7 +24,7 @@ internal class PdlPersonInfoGatewayTest(
     private val wireMockServer: WireMockServer,
     applicationContextBuilder: ApplicationContext.Builder) {
 
-    private val client = applicationContextBuilder.build().personInfoGatway as PdlPersonInfoGateway
+    private val client = applicationContextBuilder.build().personInfoGatway
 
     @Test
     fun `Hente personinfo for alle aktørIder`() {
@@ -95,7 +95,19 @@ internal class PdlPersonInfoGatewayTest(
 
     @Test
     fun `Ping check`() {
-        assertTrue(runBlocking{ client.pingCheck()} is Healthy)
+        assertTrue(runBlocking{ client.check()} is Healthy)
+    }
+
+    @Test
+    fun `Request format`() {
+        val expected = """
+        {"variables":{"identer":["1111111111","2222222222"]},"query":"query(${"$"}identer: [ID!]!) {hentPersonBolk(identer: ${"$"}identer) {ident,person {foedsel {foedselsdato}},code},hentIdenterBolk(identer: ${"$"}identer, grupper: [FOLKEREGISTERIDENT], historikk: false) {ident,identer {ident},code}}"}
+        """.trimIndent()
+
+        assertEquals(expected, hentPersonInfoRequest(aktørIder = setOf(
+            "1111111111".somAktørId(),
+            "2222222222".somAktørId()
+        )))
     }
 
     private fun hent(aktørIder: Set<AktørId>, correlationId: CorrelationId) = runBlocking {

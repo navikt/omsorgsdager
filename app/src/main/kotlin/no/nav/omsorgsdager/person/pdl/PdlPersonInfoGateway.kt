@@ -16,6 +16,7 @@ import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.Json.Companion.somJsonOrNull
 import no.nav.omsorgsdager.SecureLogger
 import no.nav.omsorgsdager.person.AktørId
+import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.person.PersonInfo
 import no.nav.omsorgsdager.person.PersonInfoGateway
 import no.nav.omsorgsdager.tid.Periode.Companion.dato
@@ -41,7 +42,7 @@ internal class PdlPersonInfoGateway(
             it.header(ConsumerId.first, ConsumerId.second)
             it.header(Tema.first, Tema.second)
             it.accept(ContentType.Application.Json)
-            it.jsonBody(hentPersonInfo(aktørIder))
+            it.jsonBody(hentPersonInfoRequest(aktørIder))
         }.readTextOrThrow()
 
         return kotlin.runCatching {
@@ -75,14 +76,14 @@ internal class PdlPersonInfoGateway(
         )
     }
 
-    private companion object {
+    internal companion object {
         private const val CorrelationIdHeaderKey = "Nav-Call-Id"
         private val ConsumerId = "Nav-Consumer-Id" to "omsorgsdager"
         private val Tema = "TEMA" to "OMS"
 
-        fun hentPersonInfo(aktørIder: Set<AktørId>) = """
-        query($aktørIder: [ID!]!) {
-            hentPersonBolk(identer: $aktørIder) {
+        private val Query = """
+        query(${"$"}identer: [ID!]!) {
+            hentPersonBolk(identer: ${"$"}identer) {
                 ident,
                 person {
                     foedsel {
@@ -91,7 +92,7 @@ internal class PdlPersonInfoGateway(
                 },
                 code
             },
-            hentIdenterBolk(identer: $aktørIder, grupper: [FOLKEREGISTERIDENT], historikk: false) {
+            hentIdenterBolk(identer: ${"$"}identer, grupper: [FOLKEREGISTERIDENT], historikk: false) {
                 ident,
                 identer {
                     ident
@@ -99,12 +100,19 @@ internal class PdlPersonInfoGateway(
                 code
             }
         }
-        """.let { JSONObject(mapOf("query" to it, "variables" to null)).toString() }
+        """.trimIndent().replace("\n", "").replace("  ", "")
 
-        fun JSONArray.inneholderKunOkCodes() = require(all { (it as JSONObject).getString("code") == "ok"}) {
+        internal fun hentPersonInfoRequest(aktørIder: Set<AktørId>) : String {
+            val request = JSONObject()
+            request.put("query", Query)
+            request.put("variables", JSONObject().also { it.put("identer", aktørIder.map { "$it" }) })
+            return request.toString()
+        }
+
+        private fun JSONArray.inneholderKunOkCodes() = require(all { (it as JSONObject).getString("code") == "ok"}) {
             "Response fra PDL inneholder ikke bare ok codes."
         }
-        fun JSONArray.tilhørende(aktørId: AktørId) = first { (it as JSONObject).getString("ident") == "$aktørId" } as JSONObject
+        private fun JSONArray.tilhørende(aktørId: AktørId) = first { (it as JSONObject).getString("ident") == "$aktørId" } as JSONObject
     }
 
 }
