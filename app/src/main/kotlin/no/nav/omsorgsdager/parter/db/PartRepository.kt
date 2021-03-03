@@ -14,6 +14,7 @@ import no.nav.omsorgsdager.parter.Barn
 import no.nav.omsorgsdager.parter.Involvering
 import no.nav.omsorgsdager.parter.Motpart
 import no.nav.omsorgsdager.parter.Søker
+import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import org.intellij.lang.annotations.Language
 import javax.sql.DataSource
 
@@ -34,16 +35,19 @@ internal class PartRepository(
                 when (type) {
                     "SØKER" -> DbPart(behandlingId = behandlingId, part = Søker(
                         identitetsnummer = row.string("identitetsnummer").somIdentitetsnummer(),
-                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnummer()
+                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnummer(),
+                        aktørId = row.string("aktor_id").somAktørId()
                     ))
                     "MOTPART" -> DbPart(behandlingId = behandlingId, part = Motpart(
                         identitetsnummer = row.string("identitetsnummer").somIdentitetsnummer(),
-                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnummer()
+                        omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnummer(),
+                        aktørId = row.string("aktor_id").somAktørId()
                     ))
                     "BARN" -> DbPart(behandlingId = behandlingId, part = Barn(
                         identitetsnummer = row.string("identitetsnummer").somIdentitetsnummer(),
                         omsorgspengerSaksnummer = row.string("omsorgspenger_saksnummer").somOmsorgspengerSaksnummer(),
-                        fødselsdato = row.localDate("fodselsdato")
+                        fødselsdato = row.localDate("fodselsdato"),
+                        aktørId = row.string("aktor_id").somAktørId()
                     ))
                     else -> throw IllegalStateException("Ukjent Type=[$type], BehandlingId=[$behandlingId]")
                 }
@@ -108,6 +112,7 @@ internal class PartRepository(
                     "behandlingId" to behandlingId,
                     "identitetsnummer" to "${part.identitetsnummer}",
                     "omsorgspengerSaksnummer" to "${part.omsorgspengerSaksnummer}",
+                    "aktorId" to "${part.aktørId}",
                     "type" to when (part) {
                         is Barn -> "BARN"
                         is Søker -> "SØKER"
@@ -131,8 +136,8 @@ internal class PartRepository(
 
         @Language("PostgreSQL")
         private const val LagrePartStatement = """
-            INSERT INTO part (behandling_id, identitetsnummer, omsorgspenger_saksnummer, type, fodselsdato)
-            VALUES(:behandlingId, :identitetsnummer, :omsorgspengerSaksnummer, :type, :fodselsdato)
+            INSERT INTO part (behandling_id, identitetsnummer, omsorgspenger_saksnummer, type, fodselsdato, aktor_id)
+            VALUES(:behandlingId, :identitetsnummer, :omsorgspengerSaksnummer, :type, :fodselsdato, :aktorId)
         """
 
         @Language("PostgreSQL")

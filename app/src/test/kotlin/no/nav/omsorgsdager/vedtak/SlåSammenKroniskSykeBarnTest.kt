@@ -6,6 +6,7 @@ import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.GjeldendeBehandlinger
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnBehandling
 import no.nav.omsorgsdager.parter.Søker
+import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.testutils.mocketK9Saksnummer
 import no.nav.omsorgsdager.testutils.somMocketOmsorgspengerSaksnummer
 import no.nav.omsorgsdager.tid.Periode
@@ -71,7 +72,7 @@ internal class SlåSammenKroniskSykeBarnTest {
         val k9Saksnummer = mocketK9Saksnummer()
         val barnetsOmsorgspengerSaksnummer = identitetsnummer2.somMocketOmsorgspengerSaksnummer()
 
-        val søker = Søker(identitetsnummer = identitetsnummer1, omsorgspengerSaksnummer = identitetsnummer1.somMocketOmsorgspengerSaksnummer())
+        val søker = Søker(identitetsnummer = identitetsnummer1, omsorgspengerSaksnummer = identitetsnummer1.somMocketOmsorgspengerSaksnummer(), aktørId = "11111".somAktørId())
 
         val tidspunkt = ZonedDateTime.now()
         val fødselsdato1 = LocalDate.now()
@@ -83,7 +84,7 @@ internal class SlåSammenKroniskSykeBarnTest {
             tidspunkt = tidspunkt,
             periode = Periode(2021),
             søker = søker,
-            barn = BarnPart(identitetsnummer = identitetsnummer2, omsorgspengerSaksnummer = barnetsOmsorgspengerSaksnummer, fødselsdato = fødselsdato1),
+            barn = BarnPart(identitetsnummer = identitetsnummer2, omsorgspengerSaksnummer = barnetsOmsorgspengerSaksnummer, fødselsdato = fødselsdato1, aktørId = "22222".somAktørId()),
             status = BehandlingStatus.INNVILGET
         )
 
@@ -95,12 +96,12 @@ internal class SlåSammenKroniskSykeBarnTest {
             tidspunkt = tidspunkt.plusMinutes(1),
             periode = Periode("2021-05-02/2021-12-31"),
             søker = søker,
-            barn = BarnPart(identitetsnummer = identitetsnummer3, omsorgspengerSaksnummer = barnetsOmsorgspengerSaksnummer, fødselsdato = sisteInnvilgetFødselsdato),
+            barn = BarnPart(identitetsnummer = identitetsnummer3, omsorgspengerSaksnummer = barnetsOmsorgspengerSaksnummer, fødselsdato = sisteInnvilgetFødselsdato, aktørId = "33333".somAktørId()),
             status = BehandlingStatus.INNVILGET
         )
 
         val behandlingId3 = K9BehandlingId.generateK9BehandlingId()
-        val behandling3Barn = BarnPart(identitetsnummer = identitetsnummer4, omsorgspengerSaksnummer = barnetsOmsorgspengerSaksnummer, fødselsdato = fødselsdato1.plusDays(2))
+        val behandling3Barn = BarnPart(identitetsnummer = identitetsnummer4, omsorgspengerSaksnummer = barnetsOmsorgspengerSaksnummer, fødselsdato = fødselsdato1.plusDays(2), aktørId = "44444".somAktørId())
         val behandling3 = KroniskSyktBarnBehandling(
             k9Saksnummer = k9Saksnummer,
             k9behandlingId = behandlingId3,
@@ -152,7 +153,7 @@ internal class SlåSammenKroniskSykeBarnTest {
         )
 
         val søkerIdentitetsnummer = "11111111111".somIdentitetsnummer()
-        val søker = Søker(identitetsnummer = søkerIdentitetsnummer, omsorgspengerSaksnummer = søkerIdentitetsnummer.somMocketOmsorgspengerSaksnummer())
+        val søker = Søker(identitetsnummer = søkerIdentitetsnummer, omsorgspengerSaksnummer = søkerIdentitetsnummer.somMocketOmsorgspengerSaksnummer(), aktørId = "55555".somAktørId())
         val behandlingId = K9BehandlingId.generateK9BehandlingId()
 
         val avslåttBehandling = KroniskSyktBarnBehandling(
@@ -161,7 +162,7 @@ internal class SlåSammenKroniskSykeBarnTest {
             tidspunkt = infotrygdTidspunkt.plusMinutes(1),
             periode = Periode("2021-12-01/2021-12-31"),
             søker = søker,
-            barn = BarnPart(identitetsnummer = barnIdentitetsnummer, fødselsdato = barnFødselsdato, omsorgspengerSaksnummer = barnIdentitetsnummer.somMocketOmsorgspengerSaksnummer()),
+            barn = BarnPart(identitetsnummer = barnIdentitetsnummer, fødselsdato = barnFødselsdato, omsorgspengerSaksnummer = barnIdentitetsnummer.somMocketOmsorgspengerSaksnummer(), aktørId = "66666".somAktørId()),
             status = BehandlingStatus.AVSLÅTT
         )
 

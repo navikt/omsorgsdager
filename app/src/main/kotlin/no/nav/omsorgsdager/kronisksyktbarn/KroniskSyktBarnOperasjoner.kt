@@ -49,21 +49,21 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
         behandlingStatus: BehandlingStatus): Pair<NyBehandling, List<Part>> {
         val dto = grunnlag.deserialize<DTO>()
 
-        // TODO: AktørId
-
         val personInfoForSøkeren = personInfo.entries.first { it.value.aktørId == dto.søker.aktørId.somAktørId() }
 
         val søkeren = Søker(
             identitetsnummer = personInfoForSøkeren.key,
-            omsorgspengerSaksnummer = personInfoForSøkeren.value.saksnummer
+            omsorgspengerSaksnummer = personInfoForSøkeren.value.saksnummer,
+            aktørId = personInfoForSøkeren.value.aktørId
         )
 
-        val personInfoForBarnet = personInfo.entries.first { it.value.aktørId == dto.søker.aktørId.somAktørId() }
+        val personInfoForBarnet = personInfo.entries.first { it.value.aktørId == dto.barn.aktørId.somAktørId() }
 
         val barnet = Barn(
             identitetsnummer = personInfoForBarnet.key,
             fødselsdato = personInfoForBarnet.value.fødselsdato,
-            omsorgspengerSaksnummer = personInfoForBarnet.value.saksnummer
+            omsorgspengerSaksnummer = personInfoForBarnet.value.saksnummer,
+            aktørId = personInfoForBarnet.value.aktørId
         )
 
         val behandling = NyBehandling(

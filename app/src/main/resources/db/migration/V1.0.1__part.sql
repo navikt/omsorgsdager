@@ -3,6 +3,7 @@ CREATE TABLE part
     id                          BIGSERIAL PRIMARY KEY,
     behandling_id               BIGINT NOT NULL,
     identitetsnummer            VARCHAR(25) NOT NULL,
+    aktor_id                    VARCHAR(50) NOT NULL,
     type                        VARCHAR(50) NOT NULL,
     omsorgspenger_saksnummer    VARCHAR(50) NOT NULL,
     fodselsdato                 DATE,
