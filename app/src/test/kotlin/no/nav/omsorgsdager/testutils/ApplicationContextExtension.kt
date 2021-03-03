@@ -4,7 +4,6 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
-import kotliquery.param
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.jws.NaisSts
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
@@ -43,12 +42,12 @@ internal class ApplicationContextExtension : ParameterResolver {
             "OPEN_AM_ISSUER" to NaisSts.getIssuer(),
             "OPEN_AM_JWKS_URI" to (mockedEnvironment.wireMockServer.getNaisStsJwksUrl()),
             "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak",
-            "HENT_RAMMEVEDTAK_FRA_INFOTRYGD_SCOPES" to "/.default",
             "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL" to mockedEnvironment.wireMockServer.infotrygdRammevedtakBaseUrl(),
+            "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES" to "omsorgspenger-infotrygd-rammevedtak/.default",
             "OMSORGSPENGER_SAK_BASE_URL" to mockedEnvironment.wireMockServer.omsorgspengerSakBaseUrl(),
-            "HENT_SAKSNUMMER_FRA_OMSORGSPENGER_SAK_SCOPES" to "/.default",
+            "OMSORGSPENGER_SAK_SCOPES" to "omsorgspenger-sak/.default",
             "PDL_BASE_URL" to mockedEnvironment.wireMockServer.pdlBaseUrl(),
-            "PDL_SCOPES" to "omsorgsdager/.default",
+            "PDL_SCOPES" to "pdl/.default",
             "HENT_BEHANDLINGER" to "enabled"
         )
 
