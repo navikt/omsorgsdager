@@ -17,6 +17,8 @@ import no.nav.omsorgsdager.config.DataSourceBuilder
 import no.nav.omsorgsdager.config.Environment
 import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.parter.db.PartRepository
+import no.nav.omsorgsdager.person.PersonInfoGateway
+import no.nav.omsorgsdager.person.pdl.PdlPersonInfoGateway
 import no.nav.omsorgsdager.saksnummer.OmsorgspengerSakGateway
 import no.nav.omsorgsdager.saksnummer.OmsorgspengerSaksnummerService
 import no.nav.omsorgsdager.tilgangsstyring.OmsorgspengerTilgangsstyringGateway
@@ -43,6 +45,7 @@ internal class ApplicationContext(
     internal val omsorgspengerSakGateway: OmsorgspengerSakGateway,
     internal val omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService,
     internal val innvilgedeVedtakService: InnvilgedeVedtakService,
+    internal val personInfoGatway: PersonInfoGateway,
     internal val configure: (application: Application) -> Unit,
     private val onStart: (applicationContext: ApplicationContext) -> Unit,
     private val onStop: (applicationContext: ApplicationContext) -> Unit) {
@@ -66,6 +69,7 @@ internal class ApplicationContext(
         var omsorgspengerSakGateway: OmsorgspengerSakGateway? = null,
         var omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService? = null,
         var innvilgedeVedtakService: InnvilgedeVedtakService? = null,
+        var personInfoGatway: PersonInfoGateway? = null,
         var configure: (application: Application) -> Unit = {},
         var onStart: (applicationContext: ApplicationContext) -> Unit = {}, // TODO: Migrate
         var onStop: (applicationContext: ApplicationContext) -> Unit = {}) {
@@ -135,6 +139,12 @@ internal class ApplicationContext(
                 hentBehandlinger = benyttetEnv.hentOptionalEnv("HENT_BEHANDLINGER") == "enabled"
             )
 
+            val benyttetPersonInfoGateway = personInfoGatway ?: PdlPersonInfoGateway(
+                baseUri = URI(benyttetEnv.hentRequiredEnv("PDL_BASE_URL")),
+                accessTokenClient = benyttetAccessTokenClient,
+                scopes = benyttetEnv.hentRequiredEnv("PDL_SCOPES").csvTilSet()
+            )
+
             return ApplicationContext(
                 env = benyttetEnv,
                 dataSource = benyttetDataSource,
@@ -142,7 +152,8 @@ internal class ApplicationContext(
                     healthChecks = setOf(
                         benyttetOmsorgspengerTilgangsstyringGateway,
                         benyttetOmsorgspengerInfotrygdRammevedtakGateway,
-                        benyttetOmsorgspengerSakGateway
+                        benyttetOmsorgspengerSakGateway,
+                        benyttetPersonInfoGateway
                     )
                 ),
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
@@ -157,6 +168,7 @@ internal class ApplicationContext(
                 infotrygdInnvilgetVedtakService = benyttetInfotrygdInnvilgetVedtakService,
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway,
                 partRepository = benyttetPartRepository,
+                personInfoGatway = benyttetPersonInfoGateway,
                 onStart = onStart,
                 onStop = onStop
             )

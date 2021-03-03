@@ -15,7 +15,7 @@ internal abstract class AzureAwareGateway(
     private val navn: String,
     private val accessTokenClient: AccessTokenClient,
     private val scopes: Set<String>,
-    private val pingUri: URI) : HealthCheck {
+    protected val pingUri: URI) : HealthCheck {
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
 
@@ -44,10 +44,8 @@ internal abstract class AzureAwareGateway(
         onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
     )
 
-
-    private suspend fun pingCheck() =
-        pingUri.toString().httpGet().awaitStringResponseResult().third.fold(
-            success = { Healthy("PingCheck", "OK: $it") },
-            failure = { UnHealthy("PingCheck", "Feil: ${it.message}") }
-        )
+    open suspend fun pingCheck() : Result = pingUri.toString().httpGet().awaitStringResponseResult().third.fold(
+        success = { Healthy("PingCheck", "OK: $it") },
+        failure = { UnHealthy("PingCheck", "Feil: ${it.message}") }
+    )
 }
