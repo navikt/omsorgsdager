@@ -1,8 +1,10 @@
 package no.nav.omsorgsdager.testutils
 
+import com.github.tomakehurst.wiremock.WireMockServer
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
+import kotliquery.param
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.helse.dusseldorf.testsupport.jws.NaisSts
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
@@ -11,6 +13,7 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsJwksUrl
 import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.testutils.wiremock.infotrygdRammevedtakBaseUrl
 import no.nav.omsorgsdager.testutils.wiremock.omsorgspengerSakBaseUrl
+import no.nav.omsorgsdager.testutils.wiremock.pdlBaseUrl
 import no.nav.omsorgsdager.testutils.wiremock.tilgangApiBaseUrl
 import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -44,6 +47,8 @@ internal class ApplicationContextExtension : ParameterResolver {
             "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL" to mockedEnvironment.wireMockServer.infotrygdRammevedtakBaseUrl(),
             "OMSORGSPENGER_SAK_BASE_URL" to mockedEnvironment.wireMockServer.omsorgspengerSakBaseUrl(),
             "HENT_SAKSNUMMER_FRA_OMSORGSPENGER_SAK_SCOPES" to "/.default",
+            "PDL_BASE_URL" to mockedEnvironment.wireMockServer.pdlBaseUrl(),
+            "PDL_SCOPES" to "omsorgsdager/.default",
             "HENT_BEHANDLINGER" to "enabled"
         )
 
@@ -58,7 +63,8 @@ internal class ApplicationContextExtension : ParameterResolver {
 
 
     private val støttedeParametre = listOf(
-        ApplicationContext.Builder::class.java
+        ApplicationContext.Builder::class.java,
+        WireMockServer::class.java
     )
 
     override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean {
@@ -78,22 +84,25 @@ internal class ApplicationContextExtension : ParameterResolver {
     }
 
     override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Any {
-        return ApplicationContext.Builder(
-            env = env,
-            onStart = {
-                it.dataSource.cleanAndMigrate()
-            },
-            configure = { application ->
-                application.install(CORS) {
-                    method(HttpMethod.Options)
-                    method(HttpMethod.Get)
-                    method(HttpMethod.Post)
-                    method(HttpMethod.Patch)
-                    allowNonSimpleContentTypes = true
-                    header(HttpHeaders.Authorization)
-                    anyHost()
+        return when (parameterContext.parameter.type) {
+            WireMockServer::class.java -> mockedEnvironment.wireMockServer
+            else -> ApplicationContext.Builder(
+                env = env,
+                onStart = {
+                    it.dataSource.cleanAndMigrate()
+                },
+                configure = { application ->
+                    application.install(CORS) {
+                        method(HttpMethod.Options)
+                        method(HttpMethod.Get)
+                        method(HttpMethod.Post)
+                        method(HttpMethod.Patch)
+                        allowNonSimpleContentTypes = true
+                        header(HttpHeaders.Authorization)
+                        anyHost()
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }

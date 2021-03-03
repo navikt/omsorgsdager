@@ -1,6 +1,5 @@
 package no.nav.omsorgsdager
 
-import com.github.kittinunf.fuel.core.Request
 import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
 import com.github.kittinunf.fuel.httpGet
 import com.nimbusds.jwt.SignedJWT
@@ -16,8 +15,7 @@ internal abstract class AzureAwareGateway(
     private val navn: String,
     private val accessTokenClient: AccessTokenClient,
     private val scopes: Set<String>,
-    private val pingUri: URI,
-    private val pingRequest: (pingUri: URI) -> Request = { it.toString().httpGet() }) : HealthCheck {
+    protected val pingUri: URI) : HealthCheck {
 
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
 
@@ -46,10 +44,8 @@ internal abstract class AzureAwareGateway(
         onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
     )
 
-
-    private suspend fun pingCheck() =
-        pingRequest(pingUri).awaitStringResponseResult().third.fold(
-            success = { Healthy("PingCheck", "OK: $it") },
-            failure = { UnHealthy("PingCheck", "Feil: ${it.message}") }
-        )
+    open suspend fun pingCheck() : Result = pingUri.toString().httpGet().awaitStringResponseResult().third.fold(
+        success = { Healthy("PingCheck", "OK: $it") },
+        failure = { UnHealthy("PingCheck", "Feil: ${it.message}") }
+    )
 }

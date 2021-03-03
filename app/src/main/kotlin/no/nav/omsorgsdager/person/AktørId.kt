@@ -5,6 +5,6 @@ internal data class AktørId private constructor(private val value: String) {
     override fun toString() = value
     internal companion object {
         private val Regex = "\\d{5,30}".toRegex()
-        internal fun String.somIdentitetsnummer() = AktørId(this)
+        internal fun String.somAktørId() = AktørId(this)
     }
 }
