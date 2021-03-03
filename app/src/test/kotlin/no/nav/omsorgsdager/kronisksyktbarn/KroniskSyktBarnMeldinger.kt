@@ -7,6 +7,7 @@ import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Json
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.K9BehandlingId
+import no.nav.omsorgsdager.person.AktørId
 import no.nav.omsorgsdager.testutils.mocketK9Saksnummer
 import no.nav.omsorgsdager.tid.Periode
 import java.time.ZonedDateTime
@@ -15,22 +16,22 @@ internal object KroniskSyktBarnMeldinger {
     internal fun melding(
         saksnummer: String = "${mocketK9Saksnummer()}",
         behandlingId: String = "${K9BehandlingId.generateK9BehandlingId()}",
-        søkersIdentitetsnummer: String,
-        barnetsIdentitetsnummer: String,
+        søkersAktørId: AktørId,
+        barnetsAktørId: AktørId,
         barnetsFødselsdato: String = "2019-05-05",
         tidspunkt: ZonedDateTime = ZonedDateTime.now(),
         periode: Periode = Periode("2020-01-01/2025-12-31")
     ) = """
         {
+            "versjon": "1.0.0",
             "saksnummer": "$saksnummer",
             "behandlingId": "$behandlingId",
             "tidspunkt": "$tidspunkt",
             "søker": {
-                "identitetsnummer": "$søkersIdentitetsnummer"
+                "aktørId": "$søkersAktørId"
             },
             "barn": {
-                "identitetsnummer": "$barnetsIdentitetsnummer",
-                "fødselsdato": "$barnetsFødselsdato"
+                "aktørId": "$barnetsAktørId"
             },
             "gyldigFraOgMed": "${periode.fom}",
             "gyldigTilOgMed": "${periode.tom}"

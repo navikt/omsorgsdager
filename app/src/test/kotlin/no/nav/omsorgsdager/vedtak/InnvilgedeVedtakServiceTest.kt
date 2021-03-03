@@ -11,6 +11,7 @@ import no.nav.omsorgsdager.behandling.BehandlingType
 import no.nav.omsorgsdager.behandling.NyBehandling
 import no.nav.omsorgsdager.parter.Barn
 import no.nav.omsorgsdager.parter.Søker
+import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.saksnummer.OmsorgspengerSakGateway
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension.Companion.buildStarted
@@ -70,8 +71,8 @@ internal class InnvilgedeVedtakServiceTest(
 
 
         val parter = listOf(
-            Søker(identitetsnummer = Identitetsnummer1, omsorgspengerSaksnummer = OmsorgspengerSaksnummer1),
-            Barn(identitetsnummer = Identitetsnummer2, omsorgspengerSaksnummer = OmsorgspengerSaksnummer2, fødselsdato = LocalDate.parse("2020-01-01"))
+            Søker(identitetsnummer = Identitetsnummer1, omsorgspengerSaksnummer = OmsorgspengerSaksnummer1, aktørId = "11111".somAktørId()),
+            Barn(identitetsnummer = Identitetsnummer2, omsorgspengerSaksnummer = OmsorgspengerSaksnummer2, fødselsdato = LocalDate.parse("2020-01-01"), aktørId = "22222".somAktørId())
         )
 
         val behandling1 = NyBehandling(

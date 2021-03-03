@@ -32,7 +32,8 @@ internal class PdlPersonInfoGateway(
     navn = "PdlPersonInfoGateway",
     accessTokenClient = accessTokenClient,
     scopes = scopes,
-    pingUri = URI("$baseUri/graphql")) {
+    pingUri = URI("$baseUri/graphql"),
+    requireAccessAsAppliation = false) { // omsorgspenger-proxy sjekker ikke denne rollen, men allowlister clientId's
     private val graphqlEndpoint = "$baseUri/graphql"
 
     override suspend fun hent(aktørIder: Set<AktørId>, correlationId: CorrelationId): Map<AktørId, PersonInfo> {
