@@ -71,8 +71,8 @@ internal object MidlertidigAleneOperasjoner : BehandlingOperasjoner<MidlertidigA
             behandlingId = dto.behandlingId.somK9BehandlingId(),
             tidspunkt = dto.tidspunkt,
             periode = Periode(
-                fom = dto.gyldigFraOgMed,
-                tom = dto.gyldigTilOgMed
+                fom = dto.periode.fom,
+                tom = dto.periode.tom
             ),
             type = BehandlingType.MIDLERTIDIG_ALENE,
             grunnlag = grunnlag,
@@ -86,12 +86,15 @@ internal object MidlertidigAleneOperasjoner : BehandlingOperasjoner<MidlertidigA
         val saksnummer: String,
         val behandlingId: String,
         val tidspunkt: ZonedDateTime,
-        val gyldigFraOgMed: LocalDate,
-        val gyldigTilOgMed: LocalDate,
+        val periode: DTOPeriode,
         val søker: Person,
         val annenForelder: Person) {
         data class Person(
             val aktørId: String
+        )
+        data class DTOPeriode(
+            val fom: LocalDate,
+            val tom: LocalDate
         )
     }
 }

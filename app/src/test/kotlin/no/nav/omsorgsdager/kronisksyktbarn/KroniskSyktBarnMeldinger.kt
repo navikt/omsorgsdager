@@ -18,7 +18,6 @@ internal object KroniskSyktBarnMeldinger {
         behandlingId: String = "${K9BehandlingId.generateK9BehandlingId()}",
         søkersAktørId: AktørId,
         barnetsAktørId: AktørId,
-        barnetsFødselsdato: String = "2019-05-05",
         tidspunkt: ZonedDateTime = ZonedDateTime.now(),
         periode: Periode = Periode("2020-01-01/2025-12-31")
     ) = """
@@ -33,8 +32,10 @@ internal object KroniskSyktBarnMeldinger {
             "barn": {
                 "aktørId": "$barnetsAktørId"
             },
-            "gyldigFraOgMed": "${periode.fom}",
-            "gyldigTilOgMed": "${periode.tom}"
+            "periode": {
+                "fom": "${periode.fom}",
+                "tom": "${periode.tom}"
+            }
         }
     """.trimIndent().somJson()
 

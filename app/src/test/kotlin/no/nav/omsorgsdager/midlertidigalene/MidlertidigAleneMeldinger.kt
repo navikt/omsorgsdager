@@ -30,8 +30,10 @@ internal object MidlertidigAleneMeldinger {
             "annenForelder": {
                 "aktørId": "$annenForeldersAktørId"
             },
-            "gyldigFraOgMed": "${periode.fom}",
-            "gyldigTilOgMed": "${periode.tom}"
+            "periode": {
+                "fom": "${periode.fom}",
+                "tom": "${periode.tom}"
+            }
         }
     """.trimIndent().somJson()
 
