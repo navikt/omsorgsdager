@@ -1,0 +1,32 @@
+{
+  "request": {
+    "urlPattern": "/api/innvilgede-vedtak-utvidet-rett",
+    "method": "POST",
+    "headers": {
+      "X-Correlation-Id": {
+        "matches": ".*"
+      },
+      "Authorization": {
+        "matches": "Bearer .*"
+      },
+      "Content-Type": {
+        "equalTo": "application/json"
+      },
+      "Accept": {
+        "equalTo": "application/json"
+      }
+    },
+    "bodyPatterns" : [
+      { "matchesJsonPath" : "$.identitetsnummer" },
+      { "matchesJsonPath" : "$.fom" },
+      { "matchesJsonPath" : "$.tom" }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "ingen-innvilgede-vedtak-response.json"
+  }
+}

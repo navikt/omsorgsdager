@@ -1,6 +1,14 @@
 name: Build Pull Request
 
-on: [pull_request]
+on:
+  pull_request:
+  paths-ignore:
+    - '**.md'
+    - '**.MD'
+    - '.gitignore'
+    - 'LICENSE'
+    - 'CODEOWNERS'
+    - 'mock/*'
 
 env:
   GITHUB_USERNAME: x-access-token
