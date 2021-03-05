@@ -46,11 +46,11 @@ private fun WireMockServer.stubTilgangsstyringIkkeTilgang(): WireMockServer {
     return this
 }
 
-private fun WireMockServer.stubTilgangsstyringHelseSjekkM(): WireMockServer {
+private fun WireMockServer.stubTilgangsstyringIsready(): WireMockServer {
     WireMock.stubFor(
         WireMock.any(
             WireMock
-                .urlPathMatching(".*$apiPath.*/isalive")
+                .urlPathMatching(".*$apiPath/isready")
         ).atPriority(catchAllPriority)
             .willReturn(
                 aResponse()
@@ -63,6 +63,6 @@ private fun WireMockServer.stubTilgangsstyringHelseSjekkM(): WireMockServer {
 
 internal fun WireMockServer.stubTilgangApi() = stubTilgangsstyringOk()
     .stubTilgangsstyringIkkeTilgang()
-    .stubTilgangsstyringHelseSjekkM()
+    .stubTilgangsstyringIsready()
 
 internal fun WireMockServer.tilgangApiBaseUrl() = baseUrl() + apiPath
