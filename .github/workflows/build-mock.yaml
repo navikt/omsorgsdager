@@ -19,10 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.4
 
-      - name: Sette Docker navn & tag
+      - name: Sette Docker Tag
         run: |
           echo "TAG=$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "IMAGE=$BASE_IMAGE:$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Bygg & last opp Docker image
         run: |
