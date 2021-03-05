@@ -10,7 +10,7 @@ on:
       - '.gitignore'
       - 'LICENSE'
       - 'CODEOWNERS'
-      - 'docs/openapi.yaml'
+      - 'mock/*'
   workflow_dispatch:
 
 env:
