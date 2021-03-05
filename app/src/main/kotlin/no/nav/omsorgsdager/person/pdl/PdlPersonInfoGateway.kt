@@ -16,7 +16,6 @@ import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.Json.Companion.somJsonOrNull
 import no.nav.omsorgsdager.SecureLogger
 import no.nav.omsorgsdager.person.AktørId
-import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.person.PersonInfo
 import no.nav.omsorgsdager.person.PersonInfoGateway
 import no.nav.omsorgsdager.tid.Periode.Companion.dato

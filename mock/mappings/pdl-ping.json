@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "OPTIONS",
+    "url": "/pdl/graphql",
+    "headers": {
+      "Authorization": {
+        "matches": "Bearer .*"
+      }
+    }
+  },
+  "response": {
+    "status": 200
+  }
+}

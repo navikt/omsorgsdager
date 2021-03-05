@@ -1,10 +1,10 @@
 {
   "request": {
     "method": "GET",
-    "url": "/omsorgspenger-tilgangsstyring/isalive"
+    "url": "/omsorgspenger-tilgangsstyring/isready"
   },
   "response": {
     "status": 200,
-    "body": "ALIVE"
+    "body": "READY"
   }
 }

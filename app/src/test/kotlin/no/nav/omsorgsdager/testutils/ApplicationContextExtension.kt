@@ -33,7 +33,7 @@ internal class ApplicationContextExtension : ParameterResolver {
             "DATABASE_DATABASE" to "postgres",
             "DATABASE_USERNAME" to "postgres",
             "DATABASE_PASSWORD" to "postgres",
-            "TILGANGSSTYRING_URL" to mockedEnvironment.wireMockServer.tilgangApiBaseUrl(),
+            "OMSORGSPENGER_TILGANGSSTYRING_BASE_URL" to mockedEnvironment.wireMockServer.tilgangApiBaseUrl(),
             "AZURE_V2_ISSUER" to Azure.V2_0.getIssuer(),
             "AZURE_V2_JWKS_URI" to (mockedEnvironment.wireMockServer.getAzureV2JwksUrl()),
             "AZURE_APP_CLIENT_ID" to "omsorgsdager",

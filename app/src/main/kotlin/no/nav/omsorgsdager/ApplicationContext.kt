@@ -1,11 +1,7 @@
 package no.nav.omsorgsdager
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.application.*
 import io.ktor.client.*
-import io.ktor.client.features.json.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
@@ -75,9 +71,6 @@ internal class ApplicationContext(
         var onStop: (applicationContext: ApplicationContext) -> Unit = {}) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
-            val benyttetHttpClient = httpClient ?: HttpClient {
-                install(JsonFeature) { serializer = JacksonSerializer(objectMapper) }
-            }
             val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
             val benyttetBehandlingRepository = behandlingRepository ?: BehandlingRepository(
                 dataSource = benyttetDataSource
@@ -93,8 +86,7 @@ internal class ApplicationContext(
             )
 
             val benyttetOmsorgspengerTilgangsstyringGateway = omsorgspengerTilgangsstyringGateway ?: OmsorgspengerTilgangsstyringGateway(
-                httpClient = benyttetHttpClient,
-                omsorgspengerTilgangsstyringUri = URI.create(benyttetEnv.hentRequiredEnv("TILGANGSSTYRING_URL"))
+                baseUri = URI.create(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_TILGANGSSTYRING_BASE_URL"))
             )
 
             val benyttetTokenResolver = tokenResolver ?: TokenResolver(
@@ -172,11 +164,6 @@ internal class ApplicationContext(
                 onStart = onStart,
                 onStop = onStop
             )
-        }
-
-        private companion object {
-            val objectMapper: ObjectMapper = jacksonObjectMapper()
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         }
     }
 }
