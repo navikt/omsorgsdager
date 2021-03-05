@@ -10,7 +10,7 @@ on:
       - '.gitignore'
       - 'LICENSE'
       - 'CODEOWNERS'
-      - 'mock/*'
+      - 'mock/**'
   workflow_dispatch:
 
 env:
