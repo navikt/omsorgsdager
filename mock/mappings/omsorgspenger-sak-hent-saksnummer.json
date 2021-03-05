@@ -1,7 +1,7 @@
 {
   "request": {
-    "urlPattern": "/api/innvilgede-vedtak-utvidet-rett",
     "method": "POST",
+    "url": "/omsorgspenger-sak/saksnummer",
     "headers": {
       "X-Correlation-Id": {
         "matches": ".*"
@@ -17,16 +17,17 @@
       }
     },
     "bodyPatterns" : [
-      { "matchesJsonPath" : "$.identitetsnummer" },
-      { "matchesJsonPath" : "$.fom" },
-      { "matchesJsonPath" : "$.tom" }
+      { "matchesJsonPath" : "$.identitetsnummer" }
     ]
   },
   "response": {
-    "status": 200,
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "ingen-innvilgede-vedtak-response.json"
+    "status": 200,
+    "jsonBody": {
+      "saksnummer": "OP{{randomValue length=8 type='NUMERIC'}}"
+    },
+    "transformers": ["response-template"]
   }
 }

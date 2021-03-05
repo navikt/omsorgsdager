@@ -15,7 +15,7 @@ val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.19"
 val embeddedPostgres = "1.2.10"
 
-val mainClass = "no.nav.omsorgsdager.RapidsApplicationKt"
+val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
     kotlin("jvm") version "1.4.31"

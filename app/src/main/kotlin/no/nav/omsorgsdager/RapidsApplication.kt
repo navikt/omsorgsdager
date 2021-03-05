@@ -1,6 +1,5 @@
 package no.nav.omsorgsdager
 
-import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.omsorgsdager.kronisksyktbarn.InitierAvslåttKroniskSyktBarnRiver
 import no.nav.omsorgsdager.kronisksyktbarn.InitierInnvilgetKroniskSyktBarnRiver
@@ -10,15 +9,6 @@ import no.nav.omsorgsdager.midlertidigalene.InitierAvslåttMidlertidigAleneRiver
 import no.nav.omsorgsdager.midlertidigalene.InitierInnvilgetMidlertidigAleneRiver
 import no.nav.omsorgsdager.midlertidigalene.LagreAvslåttMidlertidigAleneRiver
 import no.nav.omsorgsdager.midlertidigalene.LagreInnvilgetMidlertidigAleneRiver
-
-fun main() {
-    val applicationContext = ApplicationContext.Builder().build()
-    RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(applicationContext.env))
-        .withKtorModule { omsorgsdager(applicationContext) }
-        .build()
-        .apply { registerApplicationContext(applicationContext) }
-        .start()
-}
 
 internal fun RapidsConnection.registerApplicationContext(applicationContext: ApplicationContext) {
     // Kronisk sykt barn

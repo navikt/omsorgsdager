@@ -1,10 +1,10 @@
 {
   "request": {
     "method": "GET",
-    "url": "/isready"
+    "url": "/omsorgspenger-sak/isready"
   },
   "response": {
     "status": 200,
-    "body": "READY!"
+    "body": "READY"
   }
 }
