@@ -25,6 +25,7 @@ jobs:
 
       - name: Bygg & last opp Docker image
         run: |
+          cd mock
           docker build --pull --tag ${BASE_IMAGE}:${TAG} --tag ${BASE_IMAGE}:latest .
           echo "${{ secrets.CR_PAT }}" | docker login --username "x-access-token" --password-stdin ghcr.io
           docker push ${BASE_IMAGE}:${TAG}
