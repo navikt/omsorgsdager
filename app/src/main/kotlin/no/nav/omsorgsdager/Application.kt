@@ -3,7 +3,7 @@ package no.nav.omsorgsdager
 import io.ktor.application.*
 import no.nav.helse.rapids_rivers.KtorBuilder
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.omsorgsdager.config.hentOptionalEnv
+import no.nav.k9.rapid.river.hentOptionalEnv
 import org.slf4j.LoggerFactory
 
 fun main() {

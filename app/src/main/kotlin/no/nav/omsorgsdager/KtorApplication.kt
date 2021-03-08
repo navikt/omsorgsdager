@@ -11,9 +11,8 @@ import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.helse.dusseldorf.ktor.health.HealthReporter
 import no.nav.helse.dusseldorf.ktor.health.HealthRoute
-import no.nav.omsorgsdager.CorrelationId.Companion.correlationId
+import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgsdager.Json.Companion.configured
-import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver.Companion.token
 import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakApis
 import org.slf4j.LoggerFactory

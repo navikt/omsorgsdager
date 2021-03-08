@@ -5,13 +5,12 @@ import io.ktor.client.*
 import no.nav.helse.dusseldorf.ktor.health.HealthService
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
+import no.nav.k9.rapid.river.Environment
 import no.nav.k9.rapid.river.csvTilSet
+import no.nav.k9.rapid.river.hentOptionalEnv
+import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgsdager.behandling.BehandlingService
 import no.nav.omsorgsdager.behandling.db.BehandlingRepository
-import no.nav.omsorgsdager.config.*
-import no.nav.omsorgsdager.config.DataSourceBuilder
-import no.nav.omsorgsdager.config.Environment
-import no.nav.omsorgsdager.config.hentRequiredEnv
 import no.nav.omsorgsdager.parter.db.PartRepository
 import no.nav.omsorgsdager.person.PersonInfoGateway
 import no.nav.omsorgsdager.person.pdl.PdlPersonInfoGateway
@@ -92,7 +91,7 @@ internal class ApplicationContext(
             val benyttetTokenResolver = tokenResolver ?: TokenResolver(
                 azureIssuers = setOf(benyttetEnv.hentRequiredEnv("AZURE_V2_ISSUER")),
                 openAmIssuers = setOf(benyttetEnv.hentRequiredEnv("OPEN_AM_ISSUER")),
-                openAmAuthorizedClients = benyttetEnv.hentRequiredEnv("OPEN_AM_AUTHORIZED_CLIENTS").csv()
+                openAmAuthorizedClients = benyttetEnv.hentRequiredEnv("OPEN_AM_AUTHORIZED_CLIENTS").csvTilSet()
             )
 
             val benyttetTilgangsstyring = tilgangsstyring ?: Tilgangsstyring(
