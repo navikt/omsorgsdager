@@ -76,7 +76,11 @@ internal fun Application.omsorgsdager(
         FullførAktiveRequester(this)
     ))
 
-    install(CallId) { retrieve { it.correlationId().toString() } }
+    install(CallId) {
+        fromXCorrelationIdHeader(
+            generateOnInvalid = true
+        )
+    }
 
     install(CallLogging) {
         val ignorePaths = setOf("/isalive", "/isready", "/metrics")

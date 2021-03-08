@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.omsorgsdager.ApplicationContext
+import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.omsorgsdager
@@ -188,6 +189,7 @@ internal class InnvilgedeVedtakApisTest(
                     authorizationHeader?.let {
                         addHeader(HttpHeaders.Authorization, authorizationHeader)
                     }
+                    addHeader(HttpHeaders.XCorrelationId, "${CorrelationId.genererCorrelationId()}")
                     addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                     addHeader(HttpHeaders.Accept, ContentType.Application.Json.toString())
                     setBody(body)

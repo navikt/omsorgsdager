@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager.tilgangsstyring
 
 import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.http.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
@@ -11,7 +12,6 @@ import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.*
 
 internal class TilgangsstyringTest {
     private val omsorgspengerTilgangsstyringGatewayMock = mockk<OmsorgspengerTilgangsstyringGateway>()
@@ -250,8 +250,8 @@ internal class TilgangsstyringTest {
         private fun call(authorizationHeader: String) = mockk<ApplicationCall>().also {
             every { it.request.headers }.returns(Headers.build {
                 append(HttpHeaders.Authorization, authorizationHeader)
-                append(HttpHeaders.XCorrelationId, "${CorrelationId.genererCorrelationId()}")
             })
+            every { it.callId }.returns("${CorrelationId.genererCorrelationId()}")
         }
     }
 }
