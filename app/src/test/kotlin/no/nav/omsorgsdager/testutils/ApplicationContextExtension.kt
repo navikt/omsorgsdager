@@ -47,8 +47,7 @@ internal class ApplicationContextExtension : ParameterResolver {
             "OMSORGSPENGER_SAK_BASE_URL" to mockedEnvironment.wireMockServer.omsorgspengerSakBaseUrl(),
             "OMSORGSPENGER_SAK_SCOPES" to "omsorgspenger-sak/.default",
             "PDL_BASE_URL" to mockedEnvironment.wireMockServer.pdlBaseUrl(),
-            "PDL_SCOPES" to "pdl/.default",
-            "HENT_BEHANDLINGER" to "enabled"
+            "PDL_SCOPES" to "pdl/.default"
         )
 
         init {
