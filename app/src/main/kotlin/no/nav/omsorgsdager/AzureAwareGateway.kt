@@ -1,8 +1,9 @@
 package no.nav.omsorgsdager
 
-import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
-import com.github.kittinunf.fuel.httpGet
 import com.nimbusds.jwt.SignedJWT
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.httpGet
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.Result
@@ -47,8 +48,11 @@ internal abstract class AzureAwareGateway(
         onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
     )
 
-    open suspend fun pingCheck() : Result = pingUri.toString().httpGet().awaitStringResponseResult().third.fold(
-        success = { Healthy("PingCheck", "OK: $it") },
-        failure = { UnHealthy("PingCheck", "Feil: ${it.message}") }
+    open suspend fun pingCheck() : Result = pingUri.httpGet().second.fold(
+        onSuccess = { when (it.status.isSuccess()) {
+            true -> Healthy("PingCheck", "OK: ${it.readText()}")
+            false -> UnHealthy("PingCheck", "Feil: ${it.status}")
+        }},
+        onFailure = { UnHealthy("PingCheck", "Feil: ${it.message}")}
     )
 }

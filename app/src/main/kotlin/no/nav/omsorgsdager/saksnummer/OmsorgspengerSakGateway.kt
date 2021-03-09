@@ -1,9 +1,10 @@
 package no.nav.omsorgsdager.saksnummer
 
-import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
-import com.github.kittinunf.fuel.httpPost
-import com.github.kittinunf.result.getOrNull
+import io.ktor.client.request.*
 import io.ktor.http.*
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.httpPost
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.jsonBody
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.readTextOrThrow
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.omsorgsdager.AzureAwareGateway
 import no.nav.omsorgsdager.CorrelationId
@@ -29,19 +30,18 @@ internal class OmsorgspengerSakGateway(
         identitetsnummer: Identitetsnummer,
         correlationId: CorrelationId
     ): OmsorgspengerSaksnummer? {
-        val (_, response, result) = omsorgspengerSaksnummerUrl
-            .httpPost()
-            .header(HttpHeaders.Authorization, authorizationHeader())
-            .header(HttpHeaders.Accept, "application/json")
-            .header(HttpHeaders.ContentType, "application/json")
-            .header(HttpHeaders.XCorrelationId, correlationId)
-            .body("""{"identitetsnummer":"$identitetsnummer"}""")
-            .awaitStringResponseResult()
 
-        return when (response.statusCode) {
-            404 -> null
-            200 -> JSONObject(result.get()).getString("saksnummer").somOmsorgspengerSaksnummer()
-            else -> throw IllegalStateException("HttpStatusCode=[${response.statusCode}], Response=[${result.getOrNull()}] fra omsorgspenger-sak.")
+        val (httpStatusCode, responseBody) = omsorgspengerSaksnummerUrl.httpPost {
+            it.header(HttpHeaders.Authorization, authorizationHeader())
+            it.header(HttpHeaders.Accept, "application/json")
+            it.header(HttpHeaders.XCorrelationId, correlationId)
+            it.jsonBody("""{"identitetsnummer":"$identitetsnummer"}""")
+        }.readTextOrThrow()
+
+        return when (httpStatusCode) {
+            HttpStatusCode.NotFound -> null
+            HttpStatusCode.OK -> JSONObject(responseBody).getString("saksnummer").somOmsorgspengerSaksnummer()
+            else -> throw IllegalStateException("HttpStatusCode=[${httpStatusCode.value}], Response=[$responseBody] fra omsorgspenger-sak.")
         }
     }
 }

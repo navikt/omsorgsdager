@@ -38,6 +38,8 @@ private fun WireMockServer.stubUventetFeil(): WireMockServer {
             .willReturn(
                 aResponse()
                     .withStatus(HttpStatusCode.InternalServerError.value)
+                    .withBody("Noe gikk galt")
+                    .withHeader(HttpHeaders.ContentType, "text/plain")
             )
     )
     return this

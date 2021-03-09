@@ -29,12 +29,12 @@ java {
 
 dependencies {
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
-    implementation("io.ktor:ktor-client-jackson:$ktorVersion")
-    implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-health:$dusseldorfVersion")
-    implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion") {
+        exclude(group = "com.github.kittinunf.fuel")
+    }
     implementation("no.nav.helse:dusseldorf-ktor-metrics:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")

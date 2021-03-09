@@ -1,9 +1,10 @@
 package no.nav.omsorgsdager.vedtak.infotrygd
 
-import com.github.kittinunf.fuel.coroutines.awaitStringResponseResult
-import com.github.kittinunf.fuel.httpPost
-import com.github.kittinunf.result.getOrNull
+import io.ktor.client.request.*
 import io.ktor.http.*
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.httpPost
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.jsonBody
+import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.readTextOrThrow
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.omsorgsdager.AzureAwareGateway
 import no.nav.omsorgsdager.CorrelationId
@@ -34,18 +35,17 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         correlationId: CorrelationId
     ) : List<InfotrygdInnvilgetVedtak> {
 
-        val (_, response, result) = rammevedtakUrl
-            .httpPost()
-            .header(HttpHeaders.Authorization, authorizationHeader())
-            .header(HttpHeaders.Accept, "application/json")
-            .header(HttpHeaders.ContentType, "application/json")
-            .header(HttpHeaders.XCorrelationId, correlationId)
-            .body("""{"fom":"${periode.fom}", "tom":"${periode.tom}", "personIdent": "$identitetsnummer"}""")
-            .awaitStringResponseResult()
+        val (httpStatusCode, responseBody) = rammevedtakUrl.httpPost {
+            it.header(HttpHeaders.Authorization, authorizationHeader())
+            it.header(HttpHeaders.Accept, "application/json")
+            it.header(HttpHeaders.XCorrelationId, "$correlationId")
+            it.jsonBody("""{"fom":"${periode.fom}", "tom":"${periode.tom}", "personIdent": "$identitetsnummer"}""")
+        }.readTextOrThrow()
 
-        return when (response.statusCode) {
-            200 -> {
-                val rammevedtak = JSONObject(result.get()).getJSONObject("rammevedtak")
+
+        return when (httpStatusCode) {
+            HttpStatusCode.OK -> {
+                val rammevedtak = JSONObject(responseBody).getJSONObject("rammevedtak")
                 val utvidetRett = rammevedtak.getArray("UtvidetRett").mapJSONObject().map {
                     KroniskSyktBarnInfotrygdInnvilgetVedtak(
                         kilder = it.kilder(),
@@ -69,7 +69,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
 
                 utvidetRett.plus(midlertidigAlene)
             }
-            else -> throw IllegalStateException("HttpStatusCode=[${response.statusCode}], Response=[${result.getOrNull()}] fra omsorgspenger-infotrygd-rammevedtak.")
+            else -> throw IllegalStateException("HttpStatusCode=[${httpStatusCode.value}], Response=[${responseBody}] fra omsorgspenger-infotrygd-rammevedtak.")
         }
     }
 
