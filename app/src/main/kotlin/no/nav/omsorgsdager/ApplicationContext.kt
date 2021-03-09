@@ -66,7 +66,9 @@ internal class ApplicationContext(
         var innvilgedeVedtakService: InnvilgedeVedtakService? = null,
         var personInfoGatway: PersonInfoGateway? = null,
         var configure: (application: Application) -> Unit = {},
-        var onStart: (applicationContext: ApplicationContext) -> Unit = {}, // TODO: Migrate
+        var onStart: (applicationContext: ApplicationContext) -> Unit = {
+            it.dataSource.migrate()
+        },
         var onStop: (applicationContext: ApplicationContext) -> Unit = {}) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
@@ -126,8 +128,7 @@ internal class ApplicationContext(
             val benyttetInnvilgedeVedtakService = innvilgedeVedtakService ?: InnvilgedeVedtakService(
                 behandlingService = benyttetBehandlingService,
                 omsorgspengerSaksnummerService = benyttetOmsorgspengerSaksnummerService,
-                infotrygdInnvilgetVedtakService = benyttetInfotrygdInnvilgetVedtakService,
-                hentBehandlinger = benyttetEnv.hentOptionalEnv("HENT_BEHANDLINGER") == "enabled"
+                infotrygdInnvilgetVedtakService = benyttetInfotrygdInnvilgetVedtakService
             )
 
             val benyttetPersonInfoGateway = personInfoGatway ?: PdlPersonInfoGateway(

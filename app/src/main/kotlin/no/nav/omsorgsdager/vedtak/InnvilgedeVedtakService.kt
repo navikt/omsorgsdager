@@ -29,8 +29,7 @@ import java.time.Duration
 internal class InnvilgedeVedtakService(
     private val behandlingService: BehandlingService,
     private val omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService,
-    private val infotrygdInnvilgetVedtakService: InfotrygdInnvilgetVedtakService,
-    private val hentBehandlinger: Boolean) {
+    private val infotrygdInnvilgetVedtakService: InfotrygdInnvilgetVedtakService) {
 
     private val cache: Cache<Pair<Identitetsnummer, Periode>, InnvilgedeVedtak> =
         Caffeine.newBuilder()
@@ -54,13 +53,10 @@ internal class InnvilgedeVedtakService(
             correlationId = correlationId
         )
 
-        val omsorgspengerSaksnummer = when (hentBehandlinger) {
-            true -> omsorgspengerSaksnummerService.hentSaksnummer(
-                identitetsnummer = identitetsnummer,
-                correlationId = correlationId
-            )
-            false -> logger.info("HentBehandlinger er disabled").let { null }
-        }
+        val omsorgspengerSaksnummer = omsorgspengerSaksnummerService.hentSaksnummer(
+            identitetsnummer = identitetsnummer,
+            correlationId = correlationId
+        )
 
         return when (omsorgspengerSaksnummer) {
             null -> fraInfotrygd.slåSammenMed(GjeldendeBehandlinger()).also { logger.info("Ingen behandligner i K9-Sak") }
