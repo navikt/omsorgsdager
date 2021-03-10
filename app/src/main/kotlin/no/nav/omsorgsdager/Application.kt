@@ -17,8 +17,7 @@ fun main() {
             .readiness { true }
             .module {
                 omsorgsdager(applicationContext)
-                environment.monitor.subscribe(ApplicationStarting) { applicationContext.start() }
-                environment.monitor.subscribe(ApplicationStopping) { applicationContext.stop() }
+                environment.monitor.subscribe(ApplicationStarted) { applicationContext.start() }
             }
             .build()
             .start(wait = false)
