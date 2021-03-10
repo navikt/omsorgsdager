@@ -21,7 +21,7 @@ internal abstract class InitierBehandlingRiver(
     private val støttedeVersjoner: Set<String>,
     aktørIdKeys: Set<String>,
     private val personInfoGateway: PersonInfoGateway
-) : BehovssekvensPacketListener(logger = logger) {
+) : BehovssekvensPacketListener(logger = logger, mdcPaths = packetMdcPath(behov)) {
     private val aktørIdKeysFullPath = aktørIdKeys.map { "@behov.$behov.$it" }
     private val versjonKey = "@behov.$behov.versjon"
 

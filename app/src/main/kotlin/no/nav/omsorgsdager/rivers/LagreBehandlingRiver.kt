@@ -23,7 +23,7 @@ internal abstract class LagreBehandlingRiver(
     private val behov: String,
     private val behandlingType: BehandlingType,
     private val behandlingStatus: BehandlingStatus,
-    private val behandlingService: BehandlingService) : BehovssekvensPacketListener(logger = logger) {
+    private val behandlingService: BehandlingService) : BehovssekvensPacketListener(logger = logger, mdcPaths = packetMdcPath(behov)) {
 
     private val BehovKey = "@behov.$behov"
 
@@ -63,6 +63,7 @@ internal abstract class LagreBehandlingRiver(
 
         packet.leggTilLøsning(behov)
         logger.info("Behandling lagret")
+        secureLogger.info("SuccessPacket=${packet.toJson()}")
         return true
     }
 }
