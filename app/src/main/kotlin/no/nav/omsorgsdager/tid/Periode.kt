@@ -1,10 +1,12 @@
 package no.nav.omsorgsdager.tid
 
 import java.time.*
+import java.time.temporal.ChronoUnit.DAYS
+
 
 internal data class Periode(
-    internal val fom : LocalDate,
-    internal val tom : LocalDate) {
+    internal val fom: LocalDate,
+    internal val tom: LocalDate) {
 
     constructor(iso: String) : this(LocalDate.parse(iso.split("/")[0]), LocalDate.parse(iso.split("/")[1]))
     constructor(år: Int) : this("$år-01-01/$år-12-31")
@@ -13,6 +15,8 @@ internal data class Periode(
     init {
         require(tom.isAfter(fom) || fom.isEqual(tom)) {"Ugylidg periode. fom=$fom, tom=$tom"}
     }
+    internal val antallDager = DAYS.between(fom, tom.plusDays(1))
+
     internal fun erFør(periode: Periode) = tom.isBefore(periode.fom)
     internal fun erEtter(periode: Periode) = fom.isAfter(periode.tom)
     internal fun inneholder(dato: LocalDate) = dato in fom..tom
@@ -23,6 +27,7 @@ internal data class Periode(
     override fun toString() = "$fom/$tom"
 
     internal companion object {
+        internal val TidenesEnde = LocalDate.parse("9999-12-31")
         internal fun utcNå() = ZonedDateTime.now(ZoneOffset.UTC)
         internal fun String.dato() = LocalDate.parse(this)
         internal fun String.periode() = Periode(this)
@@ -36,6 +41,6 @@ internal data class Periode(
         internal fun LocalDate.forrigeDag() = minusDays(1)
         internal fun Pair<LocalDate?, LocalDate?>.periodeOrNull() = kotlin.runCatching {
             Periode(fom = first!!, tom = second!!)
-        }.fold(onSuccess = {it}, onFailure = {null})
+        }.fold(onSuccess = { it }, onFailure = { null })
     }
 }
