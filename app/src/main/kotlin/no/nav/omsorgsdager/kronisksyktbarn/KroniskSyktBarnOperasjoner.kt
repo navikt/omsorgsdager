@@ -16,10 +16,15 @@ import no.nav.omsorgsdager.parter.Part
 import no.nav.omsorgsdager.parter.Søker
 import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm18År
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
 internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBarnBehandling> {
+    private val UgydigTom = LocalDate.parse("9999-12-31")
+    private val logger = LoggerFactory.getLogger(KroniskSyktBarnOperasjoner::class.java)
+
     override fun mapTilEksisterendeBehandling(
         dbBehandling: DbBehandling,
         parter: List<Part>): KroniskSyktBarnBehandling {
@@ -73,7 +78,12 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
             tidspunkt = dto.tidspunkt,
             periode = Periode(
                 fom = dto.periode.fom,
-                tom = dto.periode.tom
+                tom = when (dto.periode.tom == UgydigTom) {
+                    true -> barnet.fødselsdato.sisteDagIÅretOm18År().also {
+                        logger.warn("Overstyrer tom dato til $it ettersom den i meldingen var ${dto.periode.tom}")
+                    }
+                    false -> dto.periode.tom
+                }
             ),
             type = BehandlingType.KRONISK_SYKT_BARN,
             grunnlag = grunnlag,
