@@ -27,7 +27,6 @@ internal data class Periode(
     override fun toString() = "$fom/$tom"
 
     internal companion object {
-        internal val TidenesEnde = LocalDate.parse("9999-12-31")
         internal fun utcNå() = ZonedDateTime.now(ZoneOffset.UTC)
         internal fun String.dato() = LocalDate.parse(this)
         internal fun String.periode() = Periode(this)
