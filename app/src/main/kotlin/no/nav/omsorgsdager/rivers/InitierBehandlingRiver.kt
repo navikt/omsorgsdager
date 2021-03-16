@@ -11,7 +11,7 @@ import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.person.PersonInfoGateway
 import no.nav.omsorgsdager.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgsdager.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
-import no.nav.omsorgsdager.rivers.meldinger.HentPersonInfoMelding
+import no.nav.omsorgsdager.rivers.meldinger.HentUtvidetRettParterMelding
 import org.slf4j.Logger
 
 internal abstract class InitierBehandlingRiver(
@@ -51,7 +51,7 @@ internal abstract class InitierBehandlingRiver(
 
         logger.info("Henter personinfo for involverte aktører.")
         val personInfo = runBlocking { personInfoGateway.hent(aktørIder = aktørIder, correlationId = correlationId) }
-        packet.leggTilBehovMedLøsninger(behov, HentPersonInfoMelding.behovMedLøsning(personInfo))
+        packet.leggTilBehovMedLøsninger(behov, HentUtvidetRettParterMelding.behovMedLøsning(personInfo))
 
         logger.info("Legger til behov $HentOmsorgspengerSaksnummer")
         packet.leggTilBehov(behov, HentOmsorgspengerSaksnummerMelding.behov(
