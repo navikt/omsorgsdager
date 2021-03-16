@@ -1,6 +1,8 @@
 package no.nav.omsorgsdager.tid
 
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldende
+import no.nav.omsorgsdager.tid.Periode.Companion.dato
+import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm18År
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
@@ -65,6 +67,36 @@ internal class GjeldendeTest {
             gjeldende3,
             gjeldende2.copy(periode = Periode("2021-12-01/2021-12-30")),
             gjeldende1.copy(periode = Periode("2021-01-01/2021-11-30"))
+        ))
+    }
+
+    @Test
+    fun `revurdering innvilgede perioder`() {
+        val tidspunkt = ZonedDateTime.now()
+        val barnetFødt = "2012-05-05".dato()
+        val barnetFyller18 = barnetFødt.sisteDagIÅretOm18År()
+
+        val fraInfotrygd = TestGjeldende(
+            tidspunkt = tidspunkt,
+            barn = 1,
+            periode = Periode(fom = barnetFødt, tom = barnetFyller18)
+        )
+
+        val behandling1 = fraInfotrygd.copy(
+            tidspunkt = tidspunkt.plusDays(1),
+            periode = Periode(fom = "2021-04-01".dato(), tom = barnetFyller18)
+        )
+
+        val behandling2 = fraInfotrygd.copy(
+            tidspunkt = tidspunkt.plusDays(2),
+            periode = Periode("2021-05-06".dato(), tom = barnetFyller18)
+        )
+
+        val gjeldende = listOf(fraInfotrygd, behandling1, behandling2)
+        assertThat(gjeldende.gjeldende()).hasSameElementsAs(setOf(
+            behandling2,
+            behandling1.copy(periode = Periode(fom = "2021-04-01".dato(), tom = "2021-05-05".dato())),
+            fraInfotrygd.copy(periode = Periode(fom = barnetFødt, tom = "2021-03-31".dato()))
         ))
     }
 

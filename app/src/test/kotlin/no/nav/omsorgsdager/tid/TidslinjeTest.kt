@@ -1,5 +1,5 @@
-import no.nav.omsorgsdager.tid.Periode
-import no.nav.omsorgsdager.tid.Tidslinje
+package no.nav.omsorgsdager.tid
+
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -43,5 +43,4 @@ internal class TidslinjeTest {
             Periode(LocalDate.parse("2022-01-02"))
         ))
     }
-
 }
