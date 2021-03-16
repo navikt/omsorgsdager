@@ -2,14 +2,14 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitJupiterVersion = "5.7.1"
 val k9rapidVersion = "1.db39724"
-val dusseldorfVersion = "1.5.2.7462190"
+val dusseldorfVersion = "1.5.2.80a27ba"
 val ktorVersion = "1.5.2"
 val jsonassertVersion = "1.5.0"
 val mockkVersion = "1.10.6"
 val assertjVersion = "3.19.0"
 
 // Database
-val flywayVersion = "7.6.0"
+val flywayVersion = "7.7.0"
 val hikariVersion = "4.0.3"
 val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.19"
