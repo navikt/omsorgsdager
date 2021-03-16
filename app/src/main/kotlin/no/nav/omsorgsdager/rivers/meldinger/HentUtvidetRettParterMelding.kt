@@ -9,26 +9,26 @@ import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.person.PersonInfo
 import no.nav.omsorgsdager.tid.Periode.Companion.dato
 
-internal object HentPersonInfoMelding {
-    internal const val HentPersonInfo = "HentPersonInfo"
-    private const val PersonInfoKey = "@løsninger.$HentPersonInfo.personInfo"
+internal object HentUtvidetRettParterMelding {
+    internal const val HentUtvidetRettParter = "HentUtvidetRettParter"
+    private const val ParterKey = "@løsninger.$HentUtvidetRettParter.parter"
 
     internal fun behovMedLøsning(personInfo: Map<AktørId, PersonInfo>) = Behov(
-        navn = HentPersonInfo,
+        navn = HentUtvidetRettParter,
         input = mapOf(
             "aktørIder" to personInfo.keys.map { "$it" }
         )
     ) to personInfo.mapKeys { "${it.key}" }.mapValues { mapOf(
         "identitetsnummer" to "${it.value.identitetsnummer}",
         "fødselsdato" to "${it.value.fødselsdato}"
-    )}.let { mapOf("personInfo" to it) }
+    )}.let { mapOf("parter" to it) }
 
     internal fun validateLøsning(packet: JsonMessage) {
-        packet.interestedIn(PersonInfoKey)
+        packet.interestedIn(ParterKey)
     }
 
     internal fun hentLøsning(packet: JsonMessage): Map<AktørId, PersonInfo> {
-        return (packet[PersonInfoKey] as ObjectNode)
+        return (packet[ParterKey] as ObjectNode)
             .fields()
             .asSequence()
             .map { Pair(it.key.somAktørId(), PersonInfo(

@@ -13,8 +13,8 @@ import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.BehandlingType
 import no.nav.omsorgsdager.rivers.meldinger.HentOmsorgspengerSaksnummerMelding
 import no.nav.omsorgsdager.rivers.meldinger.HentOmsorgspengerSaksnummerMelding.HentOmsorgspengerSaksnummer
-import no.nav.omsorgsdager.rivers.meldinger.HentPersonInfoMelding
-import no.nav.omsorgsdager.rivers.meldinger.HentPersonInfoMelding.HentPersonInfo
+import no.nav.omsorgsdager.rivers.meldinger.HentUtvidetRettParterMelding
+import no.nav.omsorgsdager.rivers.meldinger.HentUtvidetRettParterMelding.HentUtvidetRettParter
 import org.slf4j.Logger
 
 internal abstract class LagreBehandlingRiver(
@@ -31,17 +31,17 @@ internal abstract class LagreBehandlingRiver(
         River(rapidsConnection).apply {
             validate {
                 it.skalLøseBehov(behov)
-                it.harLøsningPåBehov(HentOmsorgspengerSaksnummer, HentPersonInfo)
+                it.harLøsningPåBehov(HentOmsorgspengerSaksnummer, HentUtvidetRettParter)
                 it.require(BehovKey) { behov -> behov.requireObject() }
                 HentOmsorgspengerSaksnummerMelding.validateLøsning(it)
-                HentPersonInfoMelding.validateLøsning(it)
+                HentUtvidetRettParterMelding.validateLøsning(it)
             }
         }.register(this)
     }
 
     override fun handlePacket(id: String, packet: JsonMessage): Boolean {
         val saksnummer = HentOmsorgspengerSaksnummerMelding.hentLøsning(packet)
-        val personInfo = HentPersonInfoMelding.hentLøsning(packet)
+        val personInfo = HentUtvidetRettParterMelding.hentLøsning(packet)
 
         val grunnlag = (packet[BehovKey] as ObjectNode).somJson()
 
