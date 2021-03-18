@@ -5,6 +5,8 @@ on:
   push:
     branches: 
       - main
+  pull_request:
+
 jobs:
   security:
     runs-on: ubuntu-latest
