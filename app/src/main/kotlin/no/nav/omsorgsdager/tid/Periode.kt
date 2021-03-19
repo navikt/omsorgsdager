@@ -3,7 +3,6 @@ package no.nav.omsorgsdager.tid
 import java.time.*
 import java.time.temporal.ChronoUnit.DAYS
 
-
 internal data class Periode(
     internal val fom: LocalDate,
     internal val tom: LocalDate) {
@@ -24,6 +23,14 @@ internal data class Periode(
     internal fun overlapperMedMinstEnDag(periode: Periode) = !erFør(periode) && !erEtter(periode)
     internal fun inneholder(periode: Periode) = inneholder(periode.fom) && inneholder(periode.tom)
 
+    internal fun sanitized() : Periode {
+        val sisteDagIÅretOm20År = fom.sisteDagIÅretOm20År()
+        return when (tom.isAfter(sisteDagIÅretOm20År)) {
+            true -> Periode(fom = fom, tom = sisteDagIÅretOm20År)
+            false -> this
+        }
+    }
+
     override fun toString() = "$fom/$tom"
 
     internal companion object {
@@ -34,6 +41,8 @@ internal data class Periode(
         internal fun ZonedDateTime.toLocalDateOslo() = withZoneSameInstant(Oslo).toLocalDate()
         internal fun LocalDate.startenAvDagenOslo() = ZonedDateTime.of(this, LocalTime.MIDNIGHT, Oslo)
         internal fun LocalDate.sisteDagIÅretOm18År() = plusYears(18).withMonth(12).withDayOfMonth(31)
+        private fun LocalDate.sisteDagIÅretOm20År() = plusYears(20).withMonth(12).withDayOfMonth(31)
+
         internal fun LocalDate.erFørEllerLik(annen: LocalDate) = isBefore(annen) || isEqual(annen)
         internal fun LocalDate.erEtterEllerLik(annen: LocalDate) = isAfter(annen) || isEqual(annen)
         internal fun LocalDate.nesteDag() = plusDays(1)
@@ -41,5 +50,6 @@ internal data class Periode(
         internal fun Pair<LocalDate?, LocalDate?>.periodeOrNull() = kotlin.runCatching {
             Periode(fom = first!!, tom = second!!)
         }.fold(onSuccess = { it }, onFailure = { null })
+
     }
 }

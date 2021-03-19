@@ -27,7 +27,7 @@ internal fun Route.InnvilgedeVedtakApis(
         val identitetsnummer = map["identitetsnummer"]?.toString()?.somIdentitetsnummer()
         val fom = map["fom"]?.toString()?.let { LocalDate.parse(it) }
         val tom = map["tom"]?.toString()?.let { LocalDate.parse(it) }
-        val periode = (fom to tom).periodeOrNull()
+        val periode = (fom to tom).periodeOrNull()?.sanitized()
         requireNotNull(identitetsnummer) to requireNotNull(periode)
     }.fold(
         onSuccess = { it },
