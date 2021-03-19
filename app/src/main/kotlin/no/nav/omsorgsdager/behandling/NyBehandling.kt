@@ -16,10 +16,10 @@ internal data class NyBehandling(
     internal val status: BehandlingStatus,
     internal val periode: Periode,
     internal val grunnlag: Json) {
-    init { require(periode.antallDager <= MaksAntallDagerIPeriode) {
-        "Støtter ikke behandling med ${periode.antallDager} dager. Maks 20 år ($MaksAntallDagerIPeriode dager)"
-    }}
-    private companion object {
-        private const val MaksAntallDagerIPeriode = 365 * 20
+    init {
+        val sanitized = periode.sanitized()
+        require(periode == sanitized) {
+            "Ugyldig periode for behandling. Periode=[$periode], MaksPeriode=[$sanitized]"
+        }
     }
 }
