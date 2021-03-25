@@ -1,6 +1,7 @@
 package no.nav.omsorgsdager
 
 import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.k9.rapid.river.RapidsStateListener
 import no.nav.omsorgsdager.kronisksyktbarn.InitierAvslåttKroniskSyktBarnRiver
 import no.nav.omsorgsdager.kronisksyktbarn.InitierInnvilgetKroniskSyktBarnRiver
 import no.nav.omsorgsdager.kronisksyktbarn.LagreAvslåttKroniskSyktBarnRiver
@@ -31,4 +32,6 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
             applicationContext.stop()
         }
     })
+
+    register(RapidsStateListener(onStateChange = { state -> applicationContext.rapidsState = state }))
 }
