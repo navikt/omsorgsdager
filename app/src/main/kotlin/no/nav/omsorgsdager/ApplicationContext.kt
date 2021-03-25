@@ -1,13 +1,11 @@
 package no.nav.omsorgsdager
 
 import io.ktor.application.*
-import io.ktor.client.*
-import no.nav.helse.dusseldorf.ktor.health.HealthService
+import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.k9.rapid.river.Environment
 import no.nav.k9.rapid.river.csvTilSet
-import no.nav.k9.rapid.river.hentOptionalEnv
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgsdager.behandling.BehandlingService
 import no.nav.omsorgsdager.behandling.db.BehandlingRepository
@@ -28,7 +26,7 @@ import javax.sql.DataSource
 internal class ApplicationContext(
     internal val env: Environment,
     internal val dataSource: DataSource,
-    internal val healthService: HealthService,
+    internal val healthChecks: Set<HealthCheck>,
     internal val omsorgspengerTilgangsstyringGateway: OmsorgspengerTilgangsstyringGateway,
     internal val tokenResolver: TokenResolver,
     internal val tilgangsstyring: Tilgangsstyring,
@@ -47,11 +45,11 @@ internal class ApplicationContext(
 
     internal fun start() = onStart(this)
     internal fun stop() = onStop(this)
+    internal var rapidsState = RapidsStateListener.RapidsState.initialState()
 
     internal class Builder(
         var env: Environment? = null,
         var dataSource: DataSource? = null,
-        var httpClient: HttpClient? = null,
         var accessTokenClient: AccessTokenClient? = null,
         var omsorgspengerTilgangsstyringGateway: OmsorgspengerTilgangsstyringGateway? = null,
         var tokenResolver: TokenResolver? = null,
@@ -140,13 +138,11 @@ internal class ApplicationContext(
             return ApplicationContext(
                 env = benyttetEnv,
                 dataSource = benyttetDataSource,
-                healthService = HealthService(
-                    healthChecks = setOf(
-                        benyttetOmsorgspengerTilgangsstyringGateway,
-                        benyttetOmsorgspengerInfotrygdRammevedtakGateway,
-                        benyttetOmsorgspengerSakGateway,
-                        benyttetPersonInfoGateway
-                    )
+                healthChecks = setOf(
+                    benyttetOmsorgspengerTilgangsstyringGateway,
+                    benyttetOmsorgspengerInfotrygdRammevedtakGateway,
+                    benyttetOmsorgspengerSakGateway,
+                    benyttetPersonInfoGateway
                 ),
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
                 tokenResolver = benyttetTokenResolver,

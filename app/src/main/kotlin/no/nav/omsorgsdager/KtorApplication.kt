@@ -5,21 +5,15 @@ import io.ktor.auth.*
 import io.ktor.features.*
 import io.ktor.http.auth.*
 import io.ktor.jackson.*
-import io.ktor.request.*
 import io.ktor.routing.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
-import no.nav.helse.dusseldorf.ktor.health.HealthReporter
-import no.nav.helse.dusseldorf.ktor.health.HealthRoute
+import no.nav.helse.dusseldorf.ktor.health.*
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgsdager.Json.Companion.configured
 import no.nav.omsorgsdager.tilgangsstyring.TokenResolver.Companion.token
 import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakApis
-import org.slf4j.LoggerFactory
-import org.slf4j.event.Level
 import java.net.URI
-
-private val appLogger = LoggerFactory.getLogger("no.nav.omsorgsdager.omsorgsdager")
 
 internal fun Application.omsorgsdager(
     applicationContext: ApplicationContext = ApplicationContext.Builder().build()) {
@@ -66,9 +60,21 @@ internal fun Application.omsorgsdager(
 
     applicationContext.configure(this)
 
+    val healthService = HealthService(
+        healthChecks = applicationContext.healthChecks.plus(object : HealthCheck {
+            override suspend fun check() : Result {
+                val currentState = applicationContext.rapidsState
+                return when (currentState.isHealthy()) {
+                    true -> Healthy("RapidsConnection", currentState.asMap)
+                    false -> UnHealthy("RapidsConnection", currentState.asMap)
+                }
+            }
+        })
+    )
+
     HealthReporter(
         app = "omsorgsdager",
-        healthService = applicationContext.healthService
+        healthService = healthService
     )
 
     preStopOnApplicationStopPreparing(preStopActions = listOf(
@@ -82,16 +88,13 @@ internal fun Application.omsorgsdager(
     }
 
     install(CallLogging) {
-        val ignorePaths = setOf("/isalive", "/isready", "/metrics")
-        level = Level.INFO
-        logger = appLogger
-        filter { call -> !ignorePaths.contains(call.request.path().toLowerCase()) }
-        callIdMdc("correlation_id")
+        logRequests()
+        correlationIdAndRequestIdInMdc()
         callIdMdc("callId")
     }
 
     routing {
-        HealthRoute(healthService = applicationContext.healthService)
+        HealthRoute(healthService = healthService)
         authenticate(*issuers.allIssuers()) {
             route("/api") {
                 InnvilgedeVedtakApis(
