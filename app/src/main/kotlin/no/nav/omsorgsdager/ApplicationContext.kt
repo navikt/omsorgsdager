@@ -5,6 +5,7 @@ import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
 import no.nav.k9.rapid.river.Environment
+import no.nav.k9.rapid.river.RapidsStateListener
 import no.nav.k9.rapid.river.csvTilSet
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgsdager.behandling.BehandlingService
