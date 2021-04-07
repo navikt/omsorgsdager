@@ -10,6 +10,7 @@ import no.nav.omsorgsdager.midlertidigalene.InitierAvslåttMidlertidigAleneRiver
 import no.nav.omsorgsdager.midlertidigalene.InitierInnvilgetMidlertidigAleneRiver
 import no.nav.omsorgsdager.midlertidigalene.LagreAvslåttMidlertidigAleneRiver
 import no.nav.omsorgsdager.midlertidigalene.LagreInnvilgetMidlertidigAleneRiver
+import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakRiver
 
 internal fun RapidsConnection.registerApplicationContext(applicationContext: ApplicationContext) {
     // Kronisk sykt barn
@@ -23,6 +24,9 @@ internal fun RapidsConnection.registerApplicationContext(applicationContext: App
     LagreInnvilgetMidlertidigAleneRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
     InitierAvslåttMidlertidigAleneRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
     LagreAvslåttMidlertidigAleneRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
+
+    // Hente Innvilgede Vedtak
+    InnvilgedeVedtakRiver(rapidsConnection = this, innvilgedeVedtakService = applicationContext.innvilgedeVedtakService)
 
     register(object : RapidsConnection.StatusListener {
         override fun onStartup(rapidsConnection: RapidsConnection) {

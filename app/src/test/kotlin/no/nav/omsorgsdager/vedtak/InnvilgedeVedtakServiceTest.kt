@@ -92,7 +92,7 @@ internal class InnvilgedeVedtakServiceTest(
         applicationContext.behandlingService.lagre(behandling1, parter)
         applicationContext.behandlingService.lagre(behandling2, parter)
         applicationContext.behandlingService.lagre(behandling3, parter)
-        applicationContext.behandlingService.lagre(behandling4, parter) // Denne skal ikke ha noen innvirkning på re sultatet ettersom tidspunktet er satt før både vedtatt i Infotrygd & før andre behandligner i K9-Sak
+        applicationContext.behandlingService.lagre(behandling4, parter) // Denne skal ikke ha noen innvirkning på resultatet ettersom tidspunktet er satt før både vedtatt i Infotrygd & før andre behandligner i K9-Sak
 
         val innvilgedeVedtakKroniskSyktBarn = hentInnvilgedeVedtak("11111111111".somIdentitetsnummer(), Periode("2020-01-01/2050-01-01")).kroniskSyktBarn
 
