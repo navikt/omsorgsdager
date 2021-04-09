@@ -16,6 +16,8 @@ import no.nav.omsorgsdager.parter.Part
 import no.nav.omsorgsdager.parter.Søker
 import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm18År
+import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
@@ -66,6 +68,7 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
             omsorgspengerSaksnummer = personInfoForBarnet.value.saksnummer,
             aktørId = personInfoForBarnet.value.aktørId
         )
+        val sisteDagIÅretBarnetFyller18 = barnet.fødselsdato.sisteDagIÅretOm18År()
 
         val behandling = NyBehandling(
             behovssekvensId = behovssekvensId,
@@ -80,6 +83,10 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
             grunnlag = grunnlag,
             status = behandlingStatus
         )
+
+        if (behandling.periode.tom != sisteDagIÅretBarnetFyller18) {
+            logger.warn("Forventet at perioden skulle vare ut året barnet fyller 18. Forventet=[$sisteDagIÅretBarnetFyller18], Var=[${behandling.periode.tom}]")
+        }
 
         return behandling to listOf(søkeren, barnet)
     }
@@ -99,4 +106,6 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
             val tom: LocalDate
         )
     }
+
+    private val logger = LoggerFactory.getLogger(KroniskSyktBarnOperasjoner::class.java)
 }

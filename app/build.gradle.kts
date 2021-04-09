@@ -2,14 +2,14 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitJupiterVersion = "5.7.1"
 val k9rapidVersion = "1.04849d5"
-val dusseldorfVersion = "1.5.2.1303b90"
-val ktorVersion = "1.5.2"
+val dusseldorfVersion = "1.5.2.d73b2af"
+val ktorVersion = "1.5.3"
 val jsonassertVersion = "1.5.0"
 val mockkVersion = "1.11.0"
 val assertjVersion = "3.19.0"
 
 // Database
-val flywayVersion = "7.7.1"
+val flywayVersion = "7.7.3"
 val hikariVersion = "4.0.3"
 val kotliqueryVersion = "1.3.1"
 val postgresVersion = "42.2.19"
@@ -18,7 +18,7 @@ val embeddedPostgres = "1.2.10"
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.4.31"
+    kotlin("jvm") version "1.4.32"
     id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
