@@ -63,6 +63,20 @@ internal class SlåSammenKroniskSykeBarnTest {
     }
 
     @Test
+    fun `Har kun vedtak i Infotrygd, tvillinger uten identitetsnummer`() {
+        val tvilling = KroniskSyktBarnInnvilgetVedtak(
+            barn = Barn(identitetsnummer = null, fødselsdato = "1990-09-20".dato()),
+            periode = Periode(2020),
+            tidspunkt = ZonedDateTime.now(),
+            kilder = emptySet()
+        )
+
+        val slåttSammen = InnvilgedeVedtak(
+            kroniskSyktBarn = listOf(tvilling, tvilling)
+        ).slåSammenMed(GjeldendeBehandlinger())
+    }
+
+    @Test
     fun `Har kun behandlinger i K9-sak`() {
         val identitetsnummer1 = "11111111111".somIdentitetsnummer()
         val identitetsnummer2 = "11111111112".somIdentitetsnummer()
