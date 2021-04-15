@@ -47,7 +47,7 @@ jobs:
       - name: Bygg & last opp Docker image
         run: |
           docker build --pull --tag ${BASE_IMAGE}:${TAG} --tag ${BASE_IMAGE}:latest .
-          echo "${{ secrets.CR_PAT }}" | docker login --username "x-access-token" --password-stdin ghcr.io
+          echo ${GITHUB_TOKEN} | docker login ghcr.io --username ${GITHUB_REPOSITORY} --password-stdin
           docker push ${BASE_IMAGE}:${TAG}
           docker push ${BASE_IMAGE}:latest
 

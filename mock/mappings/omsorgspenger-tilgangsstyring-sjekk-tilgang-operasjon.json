@@ -1,0 +1,24 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/omsorgspenger-tilgangsstyring/api/tilgang",
+    "headers": {
+      "X-Correlation-Id": {
+        "matches": ".*"
+      },
+      "Authorization": {
+        "matches": "Bearer .*"
+      },
+      "Content-Type": {
+        "equalTo": "application/json"
+      }
+    },
+    "bodyPatterns" : [
+      { "matchesJsonPath" : "$.operasjon" },
+      { "matchesJsonPath" : "$.beskrivelse" }
+    ]
+  },
+  "response": {
+    "status": 204
+  }
+}
