@@ -74,6 +74,8 @@ internal class SlåSammenKroniskSykeBarnTest {
         val slåttSammen = InnvilgedeVedtak(
             kroniskSyktBarn = listOf(tvilling, tvilling)
         ).slåSammenMed(GjeldendeBehandlinger())
+
+        assertThat(slåttSammen.kroniskSyktBarn).hasSize(1)
     }
 
     @Test

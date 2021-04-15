@@ -67,7 +67,7 @@ data class Barn private constructor(
             // Om alle barn har fødselsnummer (ingen D-nummer eller andre identitetsnummer) kan vi sammenligne på identitetsnummer
             all { it.identitetsnummer != null && it.identitetsnummer.erFnr() } -> "identitetsnummer ettersom alle barn har fødselsnummer" to { barn: Barn -> barn.identitetsnummer!! }
             // Kun samme identitetsnummer
-            all { it.identitetsnummer == first().identitetsnummer } -> "identitetsnummer ettersom alle barn har samme identitetsnummer" to { barn: Barn -> barn.identitetsnummer!! }
+            all { it.identitetsnummer != null && it.identitetsnummer == first().identitetsnummer } -> "identitetsnummer ettersom alle barn har samme identitetsnummer" to { barn: Barn -> barn.identitetsnummer!! }
             // Om det eneste som er satt er fødselsdato eller identitetsnummer er en blanding av forskjellige type identitetsnummer
             // Sammenligner vi kun på fødselsdato
             else -> "fødselsdato ettersom vi ikke har noe annet å sammenligne på" to { barn: Barn -> barn.fødselsdato }
