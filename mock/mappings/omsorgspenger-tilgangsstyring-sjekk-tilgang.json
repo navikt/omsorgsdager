@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "POST",
-    "url": "/omsorgspenger-tilgangsstyring/api/tilgang/personer",
+    "urlPattern": "/omsorgspenger-tilgangsstyring/api/tilgang.*",
     "headers": {
       "X-Correlation-Id": {
         "matches": ".*"
