@@ -14,7 +14,6 @@
       }
     },
     "bodyPatterns" : [
-      { "matchesJsonPath" : "$.identitetsnummer" },
       { "matchesJsonPath" : "$.operasjon" },
       { "matchesJsonPath" : "$.beskrivelse" }
     ]
