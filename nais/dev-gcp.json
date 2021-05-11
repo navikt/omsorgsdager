@@ -3,6 +3,7 @@
   "minReplicas": "2",
   "maxReplicas": "4",
   "azureTenant": "trygdeetaten.no",
+  "kafkaPool": "nav-dev",
   "clusterFss": "dev-fss",
   "ingresses": [
     "https://omsorgsdager.dev.intern.nav.no"
@@ -17,10 +18,6 @@
     "omsorgspenger-proxy.dev-fss-pub.nais.io"
   ],
   "env": {
-    "AZURE_V2_JWKS_URI": "https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/discovery/v2.0/keys",
-    "AZURE_V2_ISSUER": "https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/v2.0",
-    "AZURE_APP_TOKEN_ENDPOINT": "https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/oauth2/v2.0/token",
-    "KAFKA_BOOTSTRAP_SERVERS": "b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443",
     "OPEN_AM_ISSUER": "https://isso-q.adeo.no:443/isso/oauth2",
     "OPEN_AM_JWKS_URI": "https://omsorgspenger-proxy.dev-fss-pub.nais.io/open-am/keys",
     "OPEN_AM_AUTHORIZED_CLIENTS": "k9-sak-q1",

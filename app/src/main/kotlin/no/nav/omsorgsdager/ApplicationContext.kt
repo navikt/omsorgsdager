@@ -82,7 +82,7 @@ internal class ApplicationContext(
             val benyttetAccessTokenClient = accessTokenClient?: ClientSecretAccessTokenClient(
                 clientId = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_ID"),
                 clientSecret = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_SECRET"),
-                tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_APP_TOKEN_ENDPOINT"))
+                tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"))
             )
 
             val benyttetOmsorgspengerTilgangsstyringGateway = omsorgspengerTilgangsstyringGateway ?: OmsorgspengerTilgangsstyringGateway(
@@ -90,7 +90,7 @@ internal class ApplicationContext(
             )
 
             val benyttetTokenResolver = tokenResolver ?: TokenResolver(
-                azureIssuers = setOf(benyttetEnv.hentRequiredEnv("AZURE_V2_ISSUER")),
+                azureIssuers = setOf(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_ISSUER")),
                 openAmIssuers = setOf(benyttetEnv.hentRequiredEnv("OPEN_AM_ISSUER")),
                 openAmAuthorizedClients = benyttetEnv.hentRequiredEnv("OPEN_AM_AUTHORIZED_CLIENTS").csvTilSet()
             )

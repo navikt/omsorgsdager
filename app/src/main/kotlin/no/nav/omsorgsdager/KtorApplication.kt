@@ -30,8 +30,8 @@ internal fun Application.omsorgsdager(
     }
 
     val azureV2 = Issuer(
-        issuer = applicationContext.env.hentRequiredEnv("AZURE_V2_ISSUER"),
-        jwksUri = URI(applicationContext.env.hentRequiredEnv("AZURE_V2_JWKS_URI")),
+        issuer = applicationContext.env.hentRequiredEnv("AZURE_OPENID_CONFIG_ISSUER"),
+        jwksUri = URI(applicationContext.env.hentRequiredEnv("AZURE_OPENID_CONFIG_JWKS_URI")),
         audience = applicationContext.env.hentRequiredEnv("AZURE_APP_CLIENT_ID"),
         alias = "azure-v2"
     )
