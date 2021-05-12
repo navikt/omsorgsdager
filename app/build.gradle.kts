@@ -1,25 +1,25 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 val junitJupiterVersion = "5.7.1"
-val k9rapidVersion = "1.04849d5"
-val dusseldorfVersion = "1.5.3.facbbe4"
-val ktorVersion = "1.5.3"
+val k9rapidVersion = "1.592c7c1"
+val dusseldorfVersion = "1.5.4.f9a29f3"
+val ktorVersion = "1.5.4"
 val jsonassertVersion = "1.5.0"
 val mockkVersion = "1.11.0"
 val assertjVersion = "3.19.0"
 
 // Database
-val flywayVersion = "7.7.3"
+val flywayVersion = "7.8.2"
 val hikariVersion = "4.0.3"
 val kotliqueryVersion = "1.3.1"
-val postgresVersion = "42.2.19"
+val postgresVersion = "42.2.20"
 val embeddedPostgres = "1.2.10"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.4.32"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
+    kotlin("jvm") version "1.5.0"
+    id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 java {
@@ -49,7 +49,9 @@ dependencies {
 
     // Test
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
-    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
+    testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion") {
+        exclude(group = "com.github.jknack")
+    }
     testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
@@ -60,6 +62,7 @@ dependencies {
 }
 
 repositories {
+    mavenLocal()
     maven {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/navikt/k9-rapid")
@@ -68,7 +71,7 @@ repositories {
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
-    mavenLocal()
+    maven { url = uri("https://jitpack.io") }
     mavenCentral()
 }
 
@@ -101,6 +104,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.0"
+        gradleVersion = "7.0.1"
     }
 }
