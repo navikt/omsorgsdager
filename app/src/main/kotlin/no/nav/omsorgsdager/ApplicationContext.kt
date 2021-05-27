@@ -79,14 +79,17 @@ internal class ApplicationContext(
                 dataSource = benyttetDataSource
             )
 
-            val benyttetAccessTokenClient = accessTokenClient?: ClientSecretAccessTokenClient(
+            val benyttetAccessTokenClient = accessTokenClient ?: ClientSecretAccessTokenClient(
                 clientId = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_ID"),
                 clientSecret = benyttetEnv.hentRequiredEnv("AZURE_APP_CLIENT_SECRET"),
-                tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"))
+                tokenEndpoint = URI(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")),
+                authenticationMode = ClientSecretAccessTokenClient.AuthenticationMode.POST
             )
 
             val benyttetOmsorgspengerTilgangsstyringGateway = omsorgspengerTilgangsstyringGateway ?: OmsorgspengerTilgangsstyringGateway(
-                baseUri = URI.create(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_TILGANGSSTYRING_BASE_URL"))
+                baseUri = URI.create(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_TILGANGSSTYRING_BASE_URL")),
+                scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_TILGANGSSTYRING_SCOPES").csvTilSet(),
+                accessTokenClient = benyttetAccessTokenClient
             )
 
             val benyttetTokenResolver = tokenResolver ?: TokenResolver(

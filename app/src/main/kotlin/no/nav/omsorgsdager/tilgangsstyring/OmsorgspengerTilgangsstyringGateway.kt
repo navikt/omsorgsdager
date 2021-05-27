@@ -1,5 +1,6 @@
 package no.nav.omsorgsdager.tilgangsstyring
 
+import com.nimbusds.jwt.SignedJWT
 import io.ktor.client.features.ResponseException
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
@@ -12,13 +13,18 @@ import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.jsonBody
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.ktor.health.Healthy
 import no.nav.helse.dusseldorf.ktor.health.UnHealthy
+import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
+import no.nav.helse.dusseldorf.oauth2.client.CachedAccessTokenClient
 import no.nav.omsorgsdager.CorrelationId
 import org.slf4j.LoggerFactory
 import java.net.URI
 
 internal class OmsorgspengerTilgangsstyringGateway(
-    baseUri: URI
+    baseUri: URI,
+    private val accessTokenClient: AccessTokenClient,
+    private val scopes: Set<String>
 ): HealthCheck {
+    private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
     private val tilgangUri = URI("$baseUri/api/tilgang/personer")
     private val pingUri = URI("$baseUri/isready")
 
@@ -27,7 +33,10 @@ internal class OmsorgspengerTilgangsstyringGateway(
         operasjon: Operasjon,
         correlationId: CorrelationId): Boolean {
         return tilgangUri.httpPost {
-            it.header(HttpHeaders.Authorization, token.authorizationHeader)
+            it.header(HttpHeaders.Authorization, cachedAccessTokenClient.getAccessToken(
+                scopes = scopes,
+                onBehalfOf = token.jwt
+            ).asAuthoriationHeader())
             it.header(HttpHeaders.XCorrelationId, "$correlationId")
             it.jsonBody(operasjon.somJsonBody())
         }.second.håndterResponse()
@@ -52,16 +61,38 @@ internal class OmsorgspengerTilgangsstyringGateway(
         }
     }
 
-    override suspend fun check() = pingUri.httpGet().second.fold(
+    override suspend fun check(): no.nav.helse.dusseldorf.ktor.health.Result {
+        return no.nav.helse.dusseldorf.ktor.health.Result.merge(
+            name = Navn,
+            pingCheck(),
+            accessTokenCheck()
+        )
+    }
+
+    private suspend fun pingCheck() = pingUri.httpGet().second.fold(
         onSuccess = { response ->
             when (HttpStatusCode.OK == response.status) {
-                true -> Healthy(Navn, "OK")
-                false -> UnHealthy(Navn, "Feil: Mottok Http Status Code ${response.status.value}")
+                true -> Healthy("PingCheck", "OK")
+                false -> UnHealthy("PingCheck", "Feil: Mottok Http Status Code ${response.status.value}")
             }
         },
         onFailure = {
-            UnHealthy(Navn, "Feil: ${it.message}")
+            UnHealthy("PingCheck", "Feil: ${it.message}")
         }
+    )
+
+    private fun accessTokenCheck() = kotlin.runCatching {
+        val accessTokenResponse = accessTokenClient.getAccessToken(scopes)
+        (SignedJWT.parse(accessTokenResponse.accessToken).jwtClaimsSet.getStringArrayClaim("roles")?.toList()
+            ?: emptyList()).contains("access_as_application")
+    }.fold(
+        onSuccess = {
+            when (it) {
+                true -> Healthy("AccessTokenCheck", "OK")
+                false -> UnHealthy("AccessTokenCheck", "Feil: Mangler rettigheter")
+            }
+        },
+        onFailure = { UnHealthy("AccessTokenCheck", "Feil: ${it.message}") }
     )
 
     private companion object {
