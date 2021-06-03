@@ -81,7 +81,10 @@ internal class Tidslinje(
     private fun håndterTidenesEnde() {
         nyePerioder.firstOrNull { it.tom == EtterTidslinjeMaks }?.apply {
             nyePerioder.remove(this)
-            nyePerioder.add(this.copy(tom = TidenesEnde))
+            this.copy(tom = TidenesEnde).also { korrigertPeriode ->
+                nyePerioder.add(korrigertPeriode)
+                logger.info("Håndterer tidenes ende. Bytter ut $this med $korrigertPeriode")
+            }
         }
     }
 
