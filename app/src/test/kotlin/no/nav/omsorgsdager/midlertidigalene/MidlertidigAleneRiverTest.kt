@@ -12,6 +12,7 @@ import no.nav.omsorgsdager.testutils.*
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension.Companion.buildStarted
 import no.nav.omsorgsdager.testutils.rapid.mockHentOmsorgsdagerSaksnummer
+import no.nav.omsorgsdager.tid.Periode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -37,6 +38,30 @@ internal class MidlertidigAleneRiverTest(
             behandlingId = behandlingId,
             søkersAktørId = søkerssAktørId,
             annenForeldersAktørId = annenForeldersAktørId
+        )
+        val (_, behovssekvens) = MidlertidigAleneMeldinger.innvilget(melding).keyValue
+        rapid.sendTestMessage(behovssekvens)
+        rapid.mockHentOmsorgsdagerSaksnummer(setOf(søkerssAktørId.somMockedIdentetsnummer(), annenForeldersAktørId.somMockedIdentetsnummer()))
+        rapid.sisteMeldingHarLøsningPå("InnvilgetMidlertidigAlene")
+
+        val behandling = applicationContext.behandlingService.hentAlle(behandlingId = behandlingId.somK9BehandlingId()).first()
+        assertNotNull(behandling)
+        assertTrue(behandling is MidlertidigAleneBehandling)
+        assertEquals(behandlingId.somK9BehandlingId(), behandling.k9behandlingId)
+        assertEquals(BehandlingStatus.INNVILGET, behandling.status)
+    }
+
+    @Test
+    fun `innvilget midlertidig alene til tidenes ende`() {
+        val behandlingId = "${K9BehandlingId.generateK9BehandlingId()}"
+        val søkerssAktørId = "29099011113".somAktørId()
+        val annenForeldersAktørId = "29099011114".somAktørId()
+
+        val melding = MidlertidigAleneMeldinger.melding(
+            behandlingId = behandlingId,
+            søkersAktørId = søkerssAktørId,
+            annenForeldersAktørId = annenForeldersAktørId,
+            periode = Periode("2020-01-01/9999-12-31")
         )
         val (_, behovssekvens) = MidlertidigAleneMeldinger.innvilget(melding).keyValue
         rapid.sendTestMessage(behovssekvens)

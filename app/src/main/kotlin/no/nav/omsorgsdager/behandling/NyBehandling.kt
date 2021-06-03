@@ -15,11 +15,4 @@ internal data class NyBehandling(
     internal val type: BehandlingType,
     internal val status: BehandlingStatus,
     internal val periode: Periode,
-    internal val grunnlag: Json) {
-    init {
-        val sanitized = periode.sanitized()
-        require(periode == sanitized) {
-            "Ugyldig periode for behandling. Periode=[$periode], MaksPeriode=[$sanitized]"
-        }
-    }
-}
+    internal val grunnlag: Json)

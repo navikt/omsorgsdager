@@ -1,7 +1,9 @@
 package no.nav.omsorgsdager.tid
 
+import no.nav.omsorgsdager.tid.Periode.Companion.dato
 import no.nav.omsorgsdager.tid.Periode.Companion.erFørEllerLik
 import no.nav.omsorgsdager.tid.Periode.Companion.nesteDag
+import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm18År
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 
@@ -10,11 +12,20 @@ internal class Tidslinje(
     private val nyePerioder = mutableListOf<Periode>()
     internal fun nyePerioder() : List<Periode> = nyePerioder
 
+    private val TidslinjeMaks = (initiellePerioder.minByOrNull { it.fom }?.fom?: LocalDate.now()).sisteDagIÅretOm18År()
+    private val EtterTidslinjeMaks = TidslinjeMaks.plusDays(1)
+    private fun Periode.sanitize() = when {
+        tom.erFørEllerLik(TidslinjeMaks) -> this
+        tom == TidenesEnde -> this.copy(tom = EtterTidslinjeMaks)
+        else -> throw IllegalStateException("Ugyldig tilOgMed-dato $tom")
+    }
+
     init {
         logger.trace("InitiellePerioder=$initiellePerioder")
     }
 
-    internal fun leggTil(periode: Periode) : Tidslinje {
+    internal fun leggTil(periodeInn: Periode) : Tidslinje {
+        val periode = periodeInn.sanitize()
         val (leggTilPerioder, beskrivelse) = when {
             periode.finnesITidslinje() -> emptyList<Periode>().let { it to "Hele perioden finnes allerede i tidslinjen." }
             !periode.overlapperMedMinstEnDagITidslinje() -> listOf(periode).let { it to "Overlapper ikke med noen dager i tidslinjen, legges til i sin helhet." }
@@ -30,8 +41,11 @@ internal class Tidslinje(
                 dagerIkkeITidslinje.periodiser() to "Kalkulert nye perioder som skal legges til."
             }
         }
+
         nyePerioder.addAll(leggTilPerioder)
         logger.trace("Periode=[$periode], LeggesTil=${leggTilPerioder}, NyePerioder=${nyePerioder} Beskrivelse=[$beskrivelse]")
+
+        håndterTidenesEnde()
         return this
     }
 
@@ -64,7 +78,18 @@ internal class Tidslinje(
         return Periode(fom = fom, tom = tom)
     }
 
+    private fun håndterTidenesEnde() {
+        nyePerioder.firstOrNull { it.tom == EtterTidslinjeMaks }?.apply {
+            nyePerioder.remove(this)
+            this.copy(tom = TidenesEnde).also { korrigertPeriode ->
+                nyePerioder.add(korrigertPeriode)
+                logger.info("Håndterer tidenes ende. Bytter ut $this med $korrigertPeriode")
+            }
+        }
+    }
+
     private companion object {
         private val logger = LoggerFactory.getLogger(Tidslinje::class.java)
+        private val TidenesEnde = "9999-12-31".dato()
     }
 }
