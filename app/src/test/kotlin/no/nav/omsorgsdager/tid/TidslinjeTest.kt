@@ -43,4 +43,29 @@ internal class TidslinjeTest {
             Periode(LocalDate.parse("2022-01-02"))
         ))
     }
+
+    @Test
+    fun `Legge til periode med tidenes ende`() {
+        val År2021 = Periode(2021)
+        val EvigTid = Periode("2020-06-01/9999-12-31")
+        val tidslinje = Tidslinje(listOf(År2021))
+            .leggTil(EvigTid)
+
+        assertThat(tidslinje.nyePerioder()).hasSameElementsAs(setOf(
+            Periode("2020-06-01/2020-12-31"),
+            Periode("2022-01-01/9999-12-31")
+        ))
+    }
+
+    @Test
+    fun `Utgangspunkt i tidenes ende`() {
+        val År1999TilTideneseEnde = Periode("1999-06-02/9999-12-31")
+        val År2020TilTidenesEnde = Periode("2020-06-01/9999-12-31")
+        val tidslinje = Tidslinje(listOf(År2020TilTidenesEnde))
+            .leggTil(År1999TilTideneseEnde)
+
+        assertThat(tidslinje.nyePerioder()).hasSameElementsAs(setOf(
+            Periode("1999-06-02/2020-05-31"),
+        ))
+    }
 }

@@ -55,8 +55,13 @@ internal abstract class InnvilgedeVedtakKontrakt(
     }
 
     @Test
-    fun `Person som ikke har 2 av hvert vedtak`() {
+    fun `Person som har 2 av hvert vedtak`() {
         assertEquals(ForventetResponseMedToAvHver, hentInnvilgedeVedtak(RequestMedToAvHver))
+    }
+
+    @Test
+    fun `Person som har 2 av hvert vedtak requestes med tidenes ende`() {
+        assertEquals(ForventetResponseMedToAvHver, hentInnvilgedeVedtak(RequestMedToAvHverTidenesEnde))
     }
 
     abstract fun hentInnvilgedeVedtak(jsonRequest: Json) : Json
@@ -71,6 +76,8 @@ internal abstract class InnvilgedeVedtakKontrakt(
 
         private val IdentitetsnummerMedToAvHver = "29099011110".somIdentitetsnummer()
         private val RequestMedToAvHver = InnvilgedeVedtakRequest(identitetsnummer = IdentitetsnummerMedToAvHver, periode = Periode(2021)).jsonRequest
+        private val RequestMedToAvHverTidenesEnde = InnvilgedeVedtakRequest(identitetsnummer = IdentitetsnummerMedToAvHver, periode = Periode("2021-01-01/9999-12-31")).jsonRequest
+
         @Language("JSON")
         private val ForventetResponseMedToAvHver = """
         {

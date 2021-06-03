@@ -23,14 +23,6 @@ internal data class Periode(
     internal fun overlapperMedMinstEnDag(periode: Periode) = !erFør(periode) && !erEtter(periode)
     internal fun inneholder(periode: Periode) = inneholder(periode.fom) && inneholder(periode.tom)
 
-    internal fun sanitized() : Periode {
-        val sisteDagIÅretOm20År = fom.sisteDagIÅretOm20År()
-        return when (tom.isAfter(sisteDagIÅretOm20År)) {
-            true -> Periode(fom = fom, tom = sisteDagIÅretOm20År)
-            false -> this
-        }
-    }
-
     override fun toString() = "$fom/$tom"
 
     internal companion object {
