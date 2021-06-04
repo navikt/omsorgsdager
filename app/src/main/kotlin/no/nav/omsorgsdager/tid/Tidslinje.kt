@@ -9,8 +9,7 @@ import java.time.LocalDate
 
 internal class Tidslinje(
     private val initiellePerioder : List<Periode>) {
-    private val nyePerioder = mutableListOf<Periode>()
-    internal fun nyePerioder() : List<Periode> = nyePerioder
+    private val dagerIkkeIInitiellePerioder = mutableSetOf<LocalDate>()
 
     private val TidslinjeMaks = (initiellePerioder.minByOrNull { it.fom }?.fom?: LocalDate.now()).sisteDagIÅretOm18År()
     private val EtterTidslinjeMaks = TidslinjeMaks.plusDays(1)
@@ -26,40 +25,23 @@ internal class Tidslinje(
 
     internal fun leggTil(periodeInn: Periode) : Tidslinje {
         val periode = periodeInn.sanitize()
-        val (leggTilPerioder, beskrivelse) = when {
-            periode.finnesITidslinje() -> emptyList<Periode>().let { it to "Hele perioden finnes allerede i tidslinjen." }
-            !periode.overlapperMedMinstEnDagITidslinje() -> listOf(periode).let { it to "Overlapper ikke med noen dager i tidslinjen, legges til i sin helhet." }
-            else -> {
-                val dagerIkkeITidslinje = mutableListOf<LocalDate>()
-                var current = periode.fom
-                while (current.erFørEllerLik(periode.tom)) {
-                    if (!current.finnesITidlinje()) {
-                        dagerIkkeITidslinje.add(current)
-                    }
-                    current = current.nesteDag()
-                }
-                dagerIkkeITidslinje.periodiser() to "Kalkulert nye perioder som skal legges til."
+
+        var current = periode.fom
+        while (current.erFørEllerLik(periode.tom)) {
+            if (!current.finnesIInitiellePerioder()) {
+                dagerIkkeIInitiellePerioder.add(current)
             }
+            current = current.nesteDag()
         }
 
-        nyePerioder.addAll(leggTilPerioder)
-        logger.trace("Periode=[$periode], LeggesTil=${leggTilPerioder}, NyePerioder=${nyePerioder} Beskrivelse=[$beskrivelse]")
-
-        håndterTidenesEnde()
         return this
     }
 
-    private fun Periode.overlapperMedMinstEnDagITidslinje() =
-        initiellePerioder.any { it.overlapperMedMinstEnDag(this) } || nyePerioder.any { it.overlapperMedMinstEnDag(this) }
+    private fun LocalDate.finnesIInitiellePerioder() =
+        initiellePerioder.any { it.inneholder(this) }
 
-    private fun Periode.finnesITidslinje() =
-        initiellePerioder.any { it.inneholder(this) } || nyePerioder.any { it.inneholder(this) }
-
-    private fun LocalDate.finnesITidlinje() =
-        initiellePerioder.any { it.inneholder(this) } || nyePerioder.any { it.inneholder(this) }
-
-    private fun List<LocalDate>.periodiser() : List<Periode> {
-        val sortert = toSet().sorted()
+    private fun Set<LocalDate>.periodiser() : MutableList<Periode> {
+        val sortert = sorted()
         val perioder = mutableListOf<Periode>()
         for (fom in sortert) {
             if (perioder.any { it.inneholder(fom) }) continue
@@ -78,14 +60,16 @@ internal class Tidslinje(
         return Periode(fom = fom, tom = tom)
     }
 
-    private fun håndterTidenesEnde() {
-        nyePerioder.firstOrNull { it.tom == EtterTidslinjeMaks }?.apply {
-            nyePerioder.remove(this)
-            this.copy(tom = TidenesEnde).also { korrigertPeriode ->
+    internal fun nyePerioder() : List<Periode> {
+        val nyePerioder = dagerIkkeIInitiellePerioder.periodiser()
+        nyePerioder.firstOrNull { it.tom == EtterTidslinjeMaks }?.also { periode ->
+            nyePerioder.remove(periode)
+            periode.copy(tom = TidenesEnde).also { korrigertPeriode ->
                 nyePerioder.add(korrigertPeriode)
                 logger.info("Håndterer tidenes ende. Bytter ut $this med $korrigertPeriode")
             }
         }
+        return nyePerioder
     }
 
     private companion object {
