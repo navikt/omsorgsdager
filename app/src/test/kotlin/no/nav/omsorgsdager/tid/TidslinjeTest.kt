@@ -4,6 +4,7 @@ import no.nav.omsorgsdager.tid.Periode.Companion.dato
 import no.nav.omsorgsdager.tid.Periode.Companion.periode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
 internal class TidslinjeTest {
@@ -118,5 +119,20 @@ internal class TidslinjeTest {
         assertThat(tidslinje.leggTil(periode4).nyePerioder()).hasSameElementsAs(setOf(
             "2021-02-03/2021-03-03".periode()
         ))
+    }
+
+    @Test
+    fun `Feiler om det legges til en periode med tom lengre enn 18 år frem i tid`() {
+        val start = "1999-01-01".dato()
+        val sisteOk = "2017-12-31".dato()
+        // Tidslinje initaliseres ugylidig
+        assertThrows<IllegalArgumentException> {
+            Tidslinje(listOf(Periode(start), Periode(sisteOk.plusDays(1))))
+        }
+        // Ugylidg periode legges til
+        val tidslinje = Tidslinje(listOf(Periode(start), Periode(sisteOk)))
+        assertThrows<IllegalArgumentException> {
+            tidslinje.leggTil(Periode(fom = sisteOk.minusDays(30), tom = sisteOk.plusDays(2)))
+        }
     }
 }

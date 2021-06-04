@@ -13,14 +13,18 @@ internal class Tidslinje(
 
     private val TidslinjeMaks = (initiellePerioder.minByOrNull { it.fom }?.fom?: LocalDate.now()).sisteDagIÅretOm18År()
     private val EtterTidslinjeMaks = TidslinjeMaks.plusDays(1)
+
     private fun Periode.sanitize() = when {
         tom.erFørEllerLik(TidslinjeMaks) -> this
         tom == TidenesEnde -> this.copy(tom = EtterTidslinjeMaks)
-        else -> throw IllegalStateException("Ugyldig tilOgMed-dato $tom")
+        else -> throw IllegalArgumentException("Ugyldig tilOgMed-dato $tom i perioden $this")
     }
 
     init {
-        logger.trace("InitiellePerioder=$initiellePerioder")
+        logger.trace("InitiellePerioder=$initiellePerioder, TidslinjeMaks=[$TidslinjeMaks]")
+        kotlin.runCatching { initiellePerioder.forEach { it.sanitize() } }.onFailure { throwable ->
+            throw IllegalArgumentException("Initielle perioder inneholder ugyldig periode. InitiellePerioder=$initiellePerioder, TidslinjeMaks=[$TidslinjeMaks]", throwable)
+        }
     }
 
     internal fun leggTil(periodeInn: Periode) : Tidslinje {
@@ -66,7 +70,7 @@ internal class Tidslinje(
             nyePerioder.remove(periode)
             periode.copy(tom = TidenesEnde).also { korrigertPeriode ->
                 nyePerioder.add(korrigertPeriode)
-                logger.info("Håndterer tidenes ende. Bytter ut $this med $korrigertPeriode")
+                logger.info("Håndterer tidenes ende. Bytter ut $periode med $korrigertPeriode")
             }
         }
         return nyePerioder
