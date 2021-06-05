@@ -32,7 +32,7 @@ internal fun Route.InnvilgedeVedtakApis(
     }.fold(
         onSuccess = { it },
         onFailure = {
-            SecureLogger.warn("Ugylidg request for henting av innvilgede vedtak: $this")
+            SecureLogger.warn("Ugyldig request for henting av innvilgede vedtak: $this")
             null
         }
     )

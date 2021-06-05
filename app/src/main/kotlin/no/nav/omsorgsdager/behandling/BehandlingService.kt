@@ -8,6 +8,7 @@ import no.nav.omsorgsdager.OmsorgspengerSaksnummer
 import no.nav.omsorgsdager.behandling.db.BehandlingRepository
 import no.nav.omsorgsdager.behandling.db.BehandlingRepository.Companion.lagreBehandling
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnBehandling
+import no.nav.omsorgsdager.aleneomsorg.AleneOmsorgBehandling
 import no.nav.omsorgsdager.midlertidigalene.MidlertidigAleneBehandling
 import no.nav.omsorgsdager.parter.Involvering
 import no.nav.omsorgsdager.parter.Part
@@ -62,7 +63,8 @@ internal class BehandlingService(
         val eksisterendeBehandlinger = hentAlle(saksnummer)
         return GjeldendeBehandlinger(
             alleKroniskSyktBarn = eksisterendeBehandlinger.filterIsInstance<KroniskSyktBarnBehandling>(),
-            alleMidlertidigAlene = eksisterendeBehandlinger.filterIsInstance<MidlertidigAleneBehandling>()
+            alleMidlertidigAlene = eksisterendeBehandlinger.filterIsInstance<MidlertidigAleneBehandling>(),
+            alleAleneOmsorg = eksisterendeBehandlinger.filterIsInstance<AleneOmsorgBehandling>()
         )
     }
 
@@ -96,7 +98,8 @@ internal class BehandlingService(
     internal fun hentAlleGjeldende(saksnummer: OmsorgspengerSaksnummer, periode: Periode) : Map<Involvering, GjeldendeBehandlinger> {
         return hentAlle(saksnummer, periode).mapValues { GjeldendeBehandlinger(
             alleKroniskSyktBarn = it.value.filterIsInstance<KroniskSyktBarnBehandling>(),
-            alleMidlertidigAlene = it.value.filterIsInstance<MidlertidigAleneBehandling>()
+            alleMidlertidigAlene = it.value.filterIsInstance<MidlertidigAleneBehandling>(),
+            alleAleneOmsorg = it.value.filterIsInstance<AleneOmsorgBehandling>()
         )}
     }
 }

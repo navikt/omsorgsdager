@@ -66,8 +66,8 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
                     )
 
                 }
-
                 utvidetRett.plus(midlertidigAlene)
+
             }
             else -> throw IllegalStateException("HttpStatusCode=[${httpStatusCode.value}], Response=[${responseBody}] fra omsorgspenger-infotrygd-rammevedtak.")
         }

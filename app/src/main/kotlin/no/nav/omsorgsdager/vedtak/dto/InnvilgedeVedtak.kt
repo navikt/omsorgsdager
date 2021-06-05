@@ -17,7 +17,8 @@ import java.time.temporal.TemporalAccessor
 
 internal data class InnvilgedeVedtak(
     val kroniskSyktBarn: List<KroniskSyktBarnInnvilgetVedtak> = emptyList(),
-    val midlertidigAlene: List<MidlertidigAleneInnvilgetVedtak> = emptyList()
+    val midlertidigAlene: List<MidlertidigAleneInnvilgetVedtak> = emptyList(),
+    val aleneOmsorg: List<AleneOmsorgInnvilgetVedtak> = emptyList()
 )
 
 data class Kilde(
@@ -100,5 +101,16 @@ internal data class MidlertidigAleneInnvilgetVedtak(
     @get:JsonIgnore override val enPer = MidlertidigAleneInnvilgetVedtak::class
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
         periode = nyPeriode
+    )
+}
+
+internal data class AleneOmsorgInnvilgetVedtak(
+    val barn: Barn,
+    override val kilder: Set<Kilde>,
+    @get:JsonIgnore override val tidspunkt: ZonedDateTime,
+    @get:JsonIgnore override val periode: Periode) : InnvilgetVedtak {
+    @get:JsonIgnore override val enPer = AleneOmsorgInnvilgetVedtak::class
+    override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
+            periode = nyPeriode
     )
 }
