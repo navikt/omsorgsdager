@@ -17,7 +17,7 @@ internal data class AleneOmsorgBehandling (
     internal val barn: Barn,
     internal val søker: Søker,
     override val status: BehandlingStatus) : EksisterendeBehandling {
-    override val enPer: K9Saksnummer = k9Saksnummer
+    override val enPer: Barn = barn
     override val involverteIdentitetsnummer = setOf(søker.identitetsnummer, barn.identitetsnummer)
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(periode = nyPeriode)
 }
