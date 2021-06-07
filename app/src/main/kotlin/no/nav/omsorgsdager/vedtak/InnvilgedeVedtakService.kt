@@ -17,6 +17,8 @@ import no.nav.omsorgsdager.tid.Gjeldende.flatten
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldende
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldendePer
 import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakService.Companion.medMestInfo
+import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakService.Companion.somBarn
 import no.nav.omsorgsdager.vedtak.dto.*
 import no.nav.omsorgsdager.vedtak.dto.AleneOmsorgInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.dto.Barn.Companion.sammenlignPå
@@ -139,16 +141,29 @@ internal class InnvilgedeVedtakService(
             val avslåtteKilder = aleneOmsorgBehandlinger.filter {
                 it.status == BehandlingStatus.AVSLÅTT }.map { it.k9behandlingId.somKilde() }
 
+            // Slår sammen alle vedtakene vi sammenligner
             // Fjerner til slutt alle avslåtte behandlinger slik at vi kun sitter igjen med innvilgede perioder.
-            return plus(aleneOmsorgBehandlinger.map {
+            val alle = plus(aleneOmsorgBehandlinger.map {
                 AleneOmsorgInnvilgetVedtak(
-                        tidspunkt = it.tidspunkt,
-                        barn = it.somBarn(),
-                        periode = it.periode,
-                        kilder = it.k9behandlingId.somKilder()
+                    tidspunkt = it.tidspunkt,
+                    barn = it.somBarn(),
+                    periode = it.periode,
+                    kilder = it.k9behandlingId.somKilder()
                 )
-            }).gjeldende().filterNot { avslåtteKilder.contains(it.kilder.first()) }
+            })
+
+            // Finner ut hvordan vi kan sammenligne denne samlingen med barn
+            val sammenlignBarnPå = alle.map { it.barn }.sammenlignPå()
+
+            // 1. Lager en kopi av alle vedtak med sammenligningsmåten utledet over
+            // 2. Plukker ut barnet med mest info på seg og setter det på alle vedtak
+            // 3. Fjerner til slutt alle avslåtte behandlinger slik at vi kun sitter igjen med innvilgede perioder.
+            return alle.map { it.copy(enPer = sammenlignBarnPå(it.barn)) }.gjeldendePer().mapValues {
+                val barnMedMestInfo = it.value.map { vedtak -> vedtak.barn }.medMestInfo()
+                it.value.map { vedtak -> vedtak.copy(barn = barnMedMestInfo) }
+            }.flatten().filterNot { avslåtteKilder.contains(it.kilder.firstOrNull()) }
         }
+
         internal fun InnvilgedeVedtak.slåSammenMed(gjeldendeBehandlinger: GjeldendeBehandlinger) = InnvilgedeVedtak(
             kroniskSyktBarn = kroniskSyktBarn.slåSammenKroniskSykeBarn(gjeldendeBehandlinger.kroniskSyktBarn),
             midlertidigAlene = midlertidigAlene.slåSammenMidlertidigAlene(gjeldendeBehandlinger.midlertidigAlene),
