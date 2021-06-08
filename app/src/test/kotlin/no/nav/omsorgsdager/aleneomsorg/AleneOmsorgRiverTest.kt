@@ -30,7 +30,7 @@ internal class AleneOmsorgRiverTest(
     }
 
     @Test
-    fun `innvilget midlertidig alene`() {
+    fun `innvilget aleneomsorg`() {
         val behandlingId = "${K9BehandlingId.generateK9BehandlingId()}"
         val søkerssAktørId = "29099011113".somAktørId()
         val barnsAktørId = "29099011114".somAktørId()
@@ -53,7 +53,7 @@ internal class AleneOmsorgRiverTest(
     }
 
     @Test
-    fun `innvilget midlertidig alene til tidenes ende`() {
+    fun `innvilget aleneomsorg til tidenes ende`() {
         val behandlingId = "${K9BehandlingId.generateK9BehandlingId()}"
         val søkerssAktørId = "29099011113".somAktørId()
         val barnsAktørId = "29099011114".somAktørId()
@@ -77,7 +77,7 @@ internal class AleneOmsorgRiverTest(
     }
 
     @Test
-    fun `avslått midlertidig alene`() {
+    fun `avslått aleneomsorg`() {
         val behandlingId = "${K9BehandlingId.generateK9BehandlingId()}"
         val søkersAktørId = "29099011115".somAktørId()
         val barnsAktørId = "29099011116".somAktørId()
