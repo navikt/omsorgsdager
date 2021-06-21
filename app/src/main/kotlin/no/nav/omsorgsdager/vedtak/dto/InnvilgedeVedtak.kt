@@ -111,6 +111,6 @@ internal data class AleneOmsorgInnvilgetVedtak(
     @get:JsonIgnore override val periode: Periode,
     @get:JsonIgnore override val enPer: Any = barn) : InnvilgetVedtak {
     override fun kopiMedNyPeriode(nyPeriode: Periode) = copy(
-            periode = nyPeriode
+        periode = nyPeriode
     )
 }

@@ -17,8 +17,6 @@ import no.nav.omsorgsdager.tid.Gjeldende.flatten
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldende
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldendePer
 import no.nav.omsorgsdager.tid.Periode
-import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakService.Companion.medMestInfo
-import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakService.Companion.somBarn
 import no.nav.omsorgsdager.vedtak.dto.*
 import no.nav.omsorgsdager.vedtak.dto.AleneOmsorgInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.dto.Barn.Companion.sammenlignPå
@@ -27,13 +25,15 @@ import no.nav.omsorgsdager.vedtak.dto.Kilde.Companion.somKilde
 import no.nav.omsorgsdager.vedtak.dto.Kilde.Companion.somKilder
 import no.nav.omsorgsdager.vedtak.dto.KroniskSyktBarnInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.dto.MidlertidigAleneInnvilgetVedtak
+import no.nav.omsorgsdager.vedtak.rammemeldinger.RammemeldingerGateway
 import org.slf4j.LoggerFactory
 import java.time.Duration
 
 internal class InnvilgedeVedtakService(
     private val behandlingService: BehandlingService,
     private val omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService,
-    private val infotrygdInnvilgetVedtakService: InfotrygdInnvilgetVedtakService) {
+    private val infotrygdInnvilgetVedtakService: InfotrygdInnvilgetVedtakService,
+    private val rammemeldingerGateway: RammemeldingerGateway) {
 
     private val cache: Cache<Pair<Identitetsnummer, Periode>, InnvilgedeVedtak> =
         Caffeine.newBuilder()
@@ -62,9 +62,21 @@ internal class InnvilgedeVedtakService(
             correlationId = correlationId
         )
 
+        val fraRammemeldinger = when (omsorgspengerSaksnummer) {
+            null -> emptyList()
+            else -> rammemeldingerGateway.hentAleneOmsorg(
+                saksnummer = omsorgspengerSaksnummer,
+                correlationId = correlationId
+            )
+        }
+        val fraAndreKilder = fraInfotrygd.copy(
+            aleneOmsorg = fraInfotrygd.aleneOmsorg.plus(fraRammemeldinger)
+        )
+
+
         return when (omsorgspengerSaksnummer) {
-            null -> fraInfotrygd.slåSammenMed(GjeldendeBehandlinger()).also { logger.info("Ingen behandlinger i K9-Sak") }
-            else -> fraInfotrygd.slåSammenMed(
+            null -> fraAndreKilder.slåSammenMed(GjeldendeBehandlinger()).also { logger.info("Ingen behandlinger i K9-Sak") }
+            else -> fraAndreKilder.slåSammenMed(
                 gjeldendeBehandlinger = behandlingService.hentAlleGjeldende(
                     saksnummer = omsorgspengerSaksnummer,
                     periode = periode
@@ -72,7 +84,7 @@ internal class InnvilgedeVedtakService(
             )
         }.also {
             logger.info(
-                "FraInfotrygd[KroniskSyktBarn=${fraInfotrygd.kroniskSyktBarn.size}, MidlertidigAlene=${fraInfotrygd.midlertidigAlene.size}] " +
+                "FraAndreKilder[KroniskSyktBarn=${fraAndreKilder.kroniskSyktBarn.size}, MidlertidigAlene=${fraAndreKilder.midlertidigAlene.size}] " +
                 "SlåttSammen[KroniskSyktBarn=${it.kroniskSyktBarn.size}, MidlertidigAlene=${it.midlertidigAlene.size}]"
             )
             cache.put(identitetsnummer to periode, it)
