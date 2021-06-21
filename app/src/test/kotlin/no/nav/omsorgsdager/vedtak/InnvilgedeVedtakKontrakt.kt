@@ -43,6 +43,10 @@ internal abstract class InnvilgedeVedtakKontrakt(
                 midlertidigAlene = listOf(
                     MidlertidigAleneInnvilgetVedtak(tidspunkt = ZonedDateTime.parse("1999-11-10T12:00:00.00Z"), periode = Periode(LocalDate.parse("2005-01-01")), kilder = setOf(Kilde(id = "3", type = "Infotrygd"))),
                     MidlertidigAleneInnvilgetVedtak(tidspunkt = ZonedDateTime.parse("2020-11-10T12:00:00.00Z"), periode = Periode("2020-05-05/2030-03-03"), kilder = setOf(Kilde(id = "4", type = "K9-Sak")))
+                ),
+                aleneOmsorg = listOf(
+                    AleneOmsorgInnvilgetVedtak(barn = Barn(identitetsnummer = IdentitetsnummerBarn1, fødselsdato = LocalDate.parse("2020-01-01"), omsorgspengerSaksnummer = IdentitetsnummerBarn1.somMocketOmsorgspengerSaksnummer()), tidspunkt = ZonedDateTime.parse("2020-11-10T12:00:00.00Z"), periode = Periode("2020-01-01/2020-12-31"), kilder = setOf(Kilde(id ="5", type = "K9-Sak"))),
+                    AleneOmsorgInnvilgetVedtak(barn = Barn(identitetsnummer = null, fødselsdato = LocalDate.parse("2019-01-01")), tidspunkt = ZonedDateTime.parse("2021-02-19T23:30:00.00Z"), periode = Periode("2018-01-01/2025-12-31"), kilder = setOf(Kilde(id ="6", type = "Infotrygd")))
                 )
             ))
 
@@ -125,7 +129,33 @@ internal abstract class InnvilgedeVedtakKontrakt(
                 "gyldigFraOgMed": "2020-05-05",
                 "gyldigTilOgMed": "2030-03-03"
             }],
-            "aleneOmsorg": []
+            "aleneOmsorg": [{
+                "barn": {
+                    "identitetsnummer": "11111111111",
+                    "fødselsdato": "2020-01-01",
+                    "omsorgspengerSaksnummer": "OP11111111111"
+                },
+                "kilder": [{
+                    "id": "5",
+                    "type": "K9-Sak"
+                }],
+                "vedtatt": "2020-11-10",
+                "gyldigFraOgMed": "2020-01-01",
+                "gyldigTilOgMed": "2020-12-31"
+            }, {
+                "barn": {
+                    "identitetsnummer": null,
+                    "fødselsdato": "2019-01-01",
+                    "omsorgspengerSaksnummer": null
+                },
+                "kilder": [{
+                    "id": "6",
+                    "type": "Infotrygd"
+                }],
+                "vedtatt": "2021-02-20",
+                "gyldigFraOgMed": "2018-01-01",
+                "gyldigTilOgMed": "2025-12-31"
+            }]
         }
         """.trimIndent().somJson()
     }
