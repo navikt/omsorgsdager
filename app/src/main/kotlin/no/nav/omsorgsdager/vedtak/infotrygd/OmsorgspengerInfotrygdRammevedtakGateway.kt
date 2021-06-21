@@ -46,6 +46,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         return when (httpStatusCode) {
             HttpStatusCode.OK -> {
                 val rammevedtak = JSONObject(responseBody).getJSONObject("rammevedtak")
+
                 val utvidetRett = rammevedtak.getArray("UtvidetRett").mapJSONObject().map {
                     KroniskSyktBarnInfotrygdInnvilgetVedtak(
                         kilder = it.kilder(),
@@ -64,9 +65,20 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
                         gyldigFraOgMed = it.periode().fom,
                         gyldigTilOgMed = it.periode().tom
                     )
-
                 }
-                utvidetRett.plus(midlertidigAlene)
+
+                val aleneOmsorg = rammevedtak.getArray("AleneOmOmsorgen").mapJSONObject().map {
+                    AleneOmsorgInfotrygdInnvilgetVedtak(
+                        kilder = it.kilder(),
+                        vedtatt = it.vedtatt(),
+                        gyldigFraOgMed = it.periode().fom,
+                        gyldigTilOgMed = it.periode().tom,
+                        barnetsIdentitetsnummer = it.barn().identitetsnummer(),
+                        barnetsFødselsdato = it.barn().fødselsdato()
+                    )
+                }
+
+                utvidetRett.plus(midlertidigAlene).plus(aleneOmsorg)
 
             }
             else -> throw IllegalStateException("HttpStatusCode=[${httpStatusCode.value}], Response=[${responseBody}] fra omsorgspenger-infotrygd-rammevedtak.")

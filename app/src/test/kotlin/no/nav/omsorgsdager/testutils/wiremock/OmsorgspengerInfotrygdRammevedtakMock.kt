@@ -80,6 +80,21 @@ private fun WireMockServer.stubUtvidetOchMidlAlene(): WireMockServer {
                                 "gyldigFraOgMed": "1998-06-25",
                                 "gyldigTilOgMed": "2001-06-25",
                                 "lengde": "PT408H"
+                            }],
+                            "AleneOmOmsorgen": [{
+                                "vedtatt": "1998-06-21",
+                                "kilder": [{
+                                    "id": "alene.om*9d*29099011111",
+                                    "type": "Personkort"
+                                }],
+                                "barn": {
+                                    "id": "29099011111",
+                                    "type": "PersonIdent",
+                                    "fødselsdato": "1990-09-29"
+                                },
+                                "gyldigFraOgMed": "1998-06-25",
+                                "gyldigTilOgMed": "2001-06-25",
+                                "lengde": "PT216H"
                             }]
                            }
                         }
