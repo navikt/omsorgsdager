@@ -4,7 +4,8 @@ import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.tid.Periode.Companion.startenAvDagenOslo
-import no.nav.omsorgsdager.vedtak.dto.Barn
+import no.nav.omsorgsdager.vedtak.dto.*
+import no.nav.omsorgsdager.vedtak.dto.AleneOmsorgInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.dto.InnvilgedeVedtak
 import no.nav.omsorgsdager.vedtak.dto.KroniskSyktBarnInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.dto.MidlertidigAleneInnvilgetVedtak
@@ -39,9 +40,13 @@ internal class InfotrygdInnvilgetVedtakService(
             )
         )}
 
+        // TODO: har vi noe fra infotrygd å slå sammen?
+        val aleneOmsorg = emptyList<AleneOmsorgInnvilgetVedtak>()
+
         return InnvilgedeVedtak(
             kroniskSyktBarn = kroniskSyktBarn,
-            midlertidigAlene = midlertidigAlene
+            midlertidigAlene = midlertidigAlene,
+            aleneOmsorg = aleneOmsorg
         )
     }
 }

@@ -2,28 +2,27 @@ package no.nav.omsorgsdager
 
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.k9.rapid.river.RapidsStateListener
-import no.nav.omsorgsdager.kronisksyktbarn.InitierAvslåttKroniskSyktBarnRiver
-import no.nav.omsorgsdager.kronisksyktbarn.InitierInnvilgetKroniskSyktBarnRiver
-import no.nav.omsorgsdager.kronisksyktbarn.LagreAvslåttKroniskSyktBarnRiver
-import no.nav.omsorgsdager.kronisksyktbarn.LagreInnvilgetKroniskSyktBarnRiver
-import no.nav.omsorgsdager.midlertidigalene.InitierAvslåttMidlertidigAleneRiver
-import no.nav.omsorgsdager.midlertidigalene.InitierInnvilgetMidlertidigAleneRiver
-import no.nav.omsorgsdager.midlertidigalene.LagreAvslåttMidlertidigAleneRiver
-import no.nav.omsorgsdager.midlertidigalene.LagreInnvilgetMidlertidigAleneRiver
 import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakRiver
 
 internal fun RapidsConnection.registerApplicationContext(applicationContext: ApplicationContext) {
+
     // Kronisk sykt barn
-    InitierInnvilgetKroniskSyktBarnRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
-    LagreInnvilgetKroniskSyktBarnRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
-    InitierAvslåttKroniskSyktBarnRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
-    LagreAvslåttKroniskSyktBarnRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
+    no.nav.omsorgsdager.kronisksyktbarn.InitierInnvilgetKroniskSyktBarnRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
+    no.nav.omsorgsdager.kronisksyktbarn.LagreInnvilgetKroniskSyktBarnRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
+    no.nav.omsorgsdager.kronisksyktbarn.InitierAvslåttKroniskSyktBarnRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
+    no.nav.omsorgsdager.kronisksyktbarn.LagreAvslåttKroniskSyktBarnRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
 
     // Midlertidig alene
-    InitierInnvilgetMidlertidigAleneRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
-    LagreInnvilgetMidlertidigAleneRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
-    InitierAvslåttMidlertidigAleneRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
-    LagreAvslåttMidlertidigAleneRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
+    no.nav.omsorgsdager.midlertidigalene.InitierInnvilgetMidlertidigAleneRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
+    no.nav.omsorgsdager.midlertidigalene.LagreInnvilgetMidlertidigAleneRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
+    no.nav.omsorgsdager.midlertidigalene.InitierAvslåttMidlertidigAleneRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
+    no.nav.omsorgsdager.midlertidigalene.LagreAvslåttMidlertidigAleneRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
+
+    // Alene omsorg
+    no.nav.omsorgsdager.aleneomsorg.InitierInnvilgetAleneOmsorgRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
+    no.nav.omsorgsdager.aleneomsorg.LagreInnvilgetAleneOmsorgRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
+    no.nav.omsorgsdager.aleneomsorg.InitierAvslåttAleneOmsorgRiver(rapidsConnection = this, personInfoGateway = applicationContext.personInfoGatway)
+    no.nav.omsorgsdager.aleneomsorg.LagreAvslåttAleneOmsorgRiver(rapidsConnection = this, behandlingService = applicationContext.behandlingService)
 
     // Hente Innvilgede Vedtak
     InnvilgedeVedtakRiver(rapidsConnection = this, innvilgedeVedtakService = applicationContext.innvilgedeVedtakService)

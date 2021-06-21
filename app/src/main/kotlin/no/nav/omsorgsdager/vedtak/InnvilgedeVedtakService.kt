@@ -8,6 +8,7 @@ import no.nav.omsorgsdager.behandling.BehandlingService
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.behandling.GjeldendeBehandlinger
 import no.nav.omsorgsdager.kronisksyktbarn.KroniskSyktBarnBehandling
+import no.nav.omsorgsdager.aleneomsorg.AleneOmsorgBehandling
 import no.nav.omsorgsdager.midlertidigalene.MidlertidigAleneBehandling
 import no.nav.omsorgsdager.vedtak.infotrygd.InfotrygdInnvilgetVedtakService
 import no.nav.omsorgsdager.parter.Involvering
@@ -16,7 +17,10 @@ import no.nav.omsorgsdager.tid.Gjeldende.flatten
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldende
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldendePer
 import no.nav.omsorgsdager.tid.Periode
-import no.nav.omsorgsdager.vedtak.dto.Barn
+import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakService.Companion.medMestInfo
+import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakService.Companion.somBarn
+import no.nav.omsorgsdager.vedtak.dto.*
+import no.nav.omsorgsdager.vedtak.dto.AleneOmsorgInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.dto.Barn.Companion.sammenlignPå
 import no.nav.omsorgsdager.vedtak.dto.InnvilgedeVedtak
 import no.nav.omsorgsdager.vedtak.dto.Kilde.Companion.somKilde
@@ -59,7 +63,7 @@ internal class InnvilgedeVedtakService(
         )
 
         return when (omsorgspengerSaksnummer) {
-            null -> fraInfotrygd.slåSammenMed(GjeldendeBehandlinger()).also { logger.info("Ingen behandligner i K9-Sak") }
+            null -> fraInfotrygd.slåSammenMed(GjeldendeBehandlinger()).also { logger.info("Ingen behandlinger i K9-Sak") }
             else -> fraInfotrygd.slåSammenMed(
                 gjeldendeBehandlinger = behandlingService.hentAlleGjeldende(
                     saksnummer = omsorgspengerSaksnummer,
@@ -79,6 +83,7 @@ internal class InnvilgedeVedtakService(
         private val logger = LoggerFactory.getLogger(InnvilgedeVedtakService::class.java)
 
         private fun KroniskSyktBarnBehandling.somBarn() = Barn(identitetsnummer = barn.identitetsnummer, omsorgspengerSaksnummer = barn.omsorgspengerSaksnummer, fødselsdato = barn.fødselsdato)
+        private fun AleneOmsorgBehandling.somBarn() = Barn(identitetsnummer = barn.identitetsnummer, omsorgspengerSaksnummer = barn.omsorgspengerSaksnummer, fødselsdato = barn.fødselsdato)
 
         // Gjøres etter at vi har funnet `gjeldende` som sorterer vedtakene descending på tidspunkt, derfor tar vi den første (som har nyest tidspunkt)
         private fun List<Barn>.medMestInfo() =
@@ -124,16 +129,45 @@ internal class InnvilgedeVedtakService(
             // Fjerner til slutt alle avslåtte behandlinger slik at vi kun sitter igjen med innvilgede perioder.
             return plus(midlertidigAlenebehandlinger.map {
                 MidlertidigAleneInnvilgetVedtak(
-                    tidspunkt = it.tidspunkt,
-                    periode = it.periode,
-                    kilder = it.k9behandlingId.somKilder()
+                        tidspunkt = it.tidspunkt,
+                        periode = it.periode,
+                        kilder = it.k9behandlingId.somKilder()
                 )
             }).gjeldende().filterNot { avslåtteKilder.contains(it.kilder.first()) }
         }
 
+        private fun List<AleneOmsorgInnvilgetVedtak>.slåSammenAleneOmsorg(aleneOmsorgBehandlinger: List<AleneOmsorgBehandling>) : List<AleneOmsorgInnvilgetVedtak> {
+            // Finner først alle kilder for avslåtte behandlinger slik at de kan filtreres bort i det ferdige resultatet
+            val avslåtteKilder = aleneOmsorgBehandlinger.filter {
+                it.status == BehandlingStatus.AVSLÅTT }.map { it.k9behandlingId.somKilde() }
+
+            // Slår sammen alle vedtakene vi sammenligner
+            // Fjerner til slutt alle avslåtte behandlinger slik at vi kun sitter igjen med innvilgede perioder.
+            val alle = plus(aleneOmsorgBehandlinger.map {
+                AleneOmsorgInnvilgetVedtak(
+                    tidspunkt = it.tidspunkt,
+                    barn = it.somBarn(),
+                    periode = it.periode,
+                    kilder = it.k9behandlingId.somKilder()
+                )
+            })
+
+            // Finner ut hvordan vi kan sammenligne denne samlingen med barn
+            val sammenlignBarnPå = alle.map { it.barn }.sammenlignPå()
+
+            // 1. Lager en kopi av alle vedtak med sammenligningsmåten utledet over
+            // 2. Plukker ut barnet med mest info på seg og setter det på alle vedtak
+            // 3. Fjerner til slutt alle avslåtte behandlinger slik at vi kun sitter igjen med innvilgede perioder.
+            return alle.map { it.copy(enPer = sammenlignBarnPå(it.barn)) }.gjeldendePer().mapValues {
+                val barnMedMestInfo = it.value.map { vedtak -> vedtak.barn }.medMestInfo()
+                it.value.map { vedtak -> vedtak.copy(barn = barnMedMestInfo) }
+            }.flatten().filterNot { avslåtteKilder.contains(it.kilder.firstOrNull()) }
+        }
+
         internal fun InnvilgedeVedtak.slåSammenMed(gjeldendeBehandlinger: GjeldendeBehandlinger) = InnvilgedeVedtak(
             kroniskSyktBarn = kroniskSyktBarn.slåSammenKroniskSykeBarn(gjeldendeBehandlinger.kroniskSyktBarn),
-            midlertidigAlene = midlertidigAlene.slåSammenMidlertidigAlene(gjeldendeBehandlinger.midlertidigAlene)
+            midlertidigAlene = midlertidigAlene.slåSammenMidlertidigAlene(gjeldendeBehandlinger.midlertidigAlene),
+            aleneOmsorg = aleneOmsorg.slåSammenAleneOmsorg(gjeldendeBehandlinger.aleneOmsorg)
         )
     }
 }

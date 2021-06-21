@@ -72,7 +72,7 @@ internal abstract class InnvilgedeVedtakKontrakt(
 
         protected val IdentitetsnummerUtenVedtak = "29099011111".somIdentitetsnummer()
         private val RequestUtenVedtak = InnvilgedeVedtakRequest(identitetsnummer = IdentitetsnummerUtenVedtak, periode = Periode(2021)).jsonRequest
-        private val ForventetResponseUtenVedtak = """{"kroniskSyktBarn": [], "midlertidigAlene": []}""".somJson()
+        private val ForventetResponseUtenVedtak = """{"kroniskSyktBarn": [], "midlertidigAlene": [], "aleneOmsorg": []}""".somJson()
 
         private val IdentitetsnummerMedToAvHver = "29099011110".somIdentitetsnummer()
         private val RequestMedToAvHver = InnvilgedeVedtakRequest(identitetsnummer = IdentitetsnummerMedToAvHver, periode = Periode(2021)).jsonRequest
@@ -124,7 +124,8 @@ internal abstract class InnvilgedeVedtakKontrakt(
                 "vedtatt": "2020-11-10",
                 "gyldigFraOgMed": "2020-05-05",
                 "gyldigTilOgMed": "2030-03-03"
-            }]
+            }],
+            "aleneOmsorg": []
         }
         """.trimIndent().somJson()
     }
