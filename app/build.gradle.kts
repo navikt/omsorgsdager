@@ -2,19 +2,19 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
 val junitJupiterVersion = "5.7.2"
-val k9rapidVersion = "1.f20388f"
-val dusseldorfVersion = "2.1.6.0-d31132e"
+val k9rapidVersion = "1.20210621113727-637d57e"
+val dusseldorfVersion = "2.1.6.0-ef0acb6"
 val ktorVersion = "1.6.0"
 val jsonassertVersion = "1.5.0"
 val mockkVersion = "1.11.0"
-val assertjVersion = "3.19.0"
+val assertjVersion = "3.20.2"
 
 // Database
-val flywayVersion = "7.9.1"
+val flywayVersion = "7.10.0"
 val hikariVersion = "4.0.3"
 val kotliqueryVersion = "1.3.1"
-val postgresVersion = "42.2.20"
-val embeddedPostgres = "1.2.10"
+val postgresVersion = "42.2.22"
+val embeddedPostgres = "1.3.0"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
@@ -105,6 +105,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.0.2"
+        gradleVersion = "7.1"
     }
 }

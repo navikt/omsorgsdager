@@ -45,7 +45,7 @@ internal class ApplicationContextExtension : ParameterResolver {
             "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak",
             "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL" to mockedEnvironment.wireMockServer.infotrygdRammevedtakBaseUrl(),
             "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES" to "omsorgspenger-infotrygd-rammevedtak/.default",
-            "OMSORGSPENGER_RAMMEMELDINGER_BASE_URL" to mockedEnvironment.wireMockServer.infotrygdRammevedtakBaseUrl(), // TODO: Bytt & legg i nais
+            "OMSORGSPENGER_RAMMEMELDINGER_BASE_URL" to mockedEnvironment.wireMockServer.infotrygdRammevedtakBaseUrl(), // TODO: Bytt & legg i nais + outgoing
             "OMSORGSPENGER_RAMMEMELDINGER_SCOPES" to "omsorgspenger-rammemeldinger/.default",
             "OMSORGSPENGER_SAK_BASE_URL" to mockedEnvironment.wireMockServer.omsorgspengerSakBaseUrl(),
             "OMSORGSPENGER_SAK_SCOPES" to "omsorgspenger-sak/.default",
