@@ -1,10 +1,9 @@
-package no.nav.omsorgsdager.AleneOmsorg
+package no.nav.omsorgsdager.aleneomsorg
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import no.nav.omsorgsdager.ApplicationContext
 import no.nav.omsorgsdager.K9BehandlingId
 import no.nav.omsorgsdager.K9BehandlingId.Companion.somK9BehandlingId
-import no.nav.omsorgsdager.aleneomsorg.AleneOmsorgBehandling
 import no.nav.omsorgsdager.behandling.BehandlingStatus
 import no.nav.omsorgsdager.person.AktørId.Companion.somAktørId
 import no.nav.omsorgsdager.person.MockedPersonInfoGateway
