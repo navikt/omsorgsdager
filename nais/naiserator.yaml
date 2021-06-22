@@ -19,6 +19,7 @@ spec:
       rules:
         - application: omsorgspenger-tilgangsstyring
         - application: omsorgspenger-sak
+        - application: omsorgspenger-rammemeldinger
       external:
       {{#each externalHosts as |host|}}
          - host: {{host}}

@@ -21,6 +21,7 @@ internal class MockedEnvironment {
         .stubTilgangApi()
         .stubOmsorgspengerInfotrygdRammevedtak()
         .stubOmsorgspengerSakApi()
+        .stubOmsorgspengerRammemeldinger()
         .stubPdl()
 
     internal fun start() = this

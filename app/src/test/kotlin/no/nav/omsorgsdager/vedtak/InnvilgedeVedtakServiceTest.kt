@@ -23,6 +23,7 @@ import no.nav.omsorgsdager.vedtak.dto.Kilde
 import no.nav.omsorgsdager.vedtak.dto.KroniskSyktBarnInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.infotrygd.KroniskSyktBarnInfotrygdInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
+import no.nav.omsorgsdager.vedtak.rammemeldinger.RammemeldingerGateway
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
@@ -38,6 +39,10 @@ internal class InnvilgedeVedtakServiceTest(
 
     private val mockedOmsorgspengerSakGateway = mockk<OmsorgspengerSakGateway>().also {
         coEvery { it.hentSaksnummer(Identitetsnummer1, any()) }.returns(OmsorgspengerSaksnummer1)
+    }
+
+    private val mockedRammemeldingerGateway = mockk<RammemeldingerGateway>().also {
+        coEvery { it.hentAleneOmsorg(OmsorgspengerSaksnummer1, any()) }.returns(emptyList())
     }
 
     private val mockedOmsorgspengerInfotrygdRammevedtakGateway = mockk<OmsorgspengerInfotrygdRammevedtakGateway>().also {
@@ -60,6 +65,7 @@ internal class InnvilgedeVedtakServiceTest(
     private val applicationContext = applicationContextBuilder.also {
         it.omsorgspengerSakGateway = mockedOmsorgspengerSakGateway
         it.omsorgspengerInfotrygdRammevedtakGateway = mockedOmsorgspengerInfotrygdRammevedtakGateway
+        it.rammemeldingerGateway = mockedRammemeldingerGateway
     }.buildStarted()
 
     @Test
