@@ -1,0 +1,31 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/omsorgspenger-rammemeldinger/alene-om-omsorgen",
+    "headers": {
+      "X-Correlation-Id": {
+        "matches": ".*"
+      },
+      "Authorization": {
+        "matches": "Bearer .*"
+      },
+      "Accept": {
+        "equalTo": "application/json"
+      }
+    },
+    "queryParameters" : {
+      "saksnummer" : {
+        "matches" : ".*"
+      }
+    }
+  },
+  "response": {
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "status": 200,
+    "jsonBody": {
+      "aleneOmOmsorgen": []
+    }
+  }
+}

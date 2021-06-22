@@ -1,0 +1,10 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/omsorgspenger-rammemeldinger/isready"
+  },
+  "response": {
+    "status": 200,
+    "body": "READY"
+  }
+}

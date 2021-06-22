@@ -49,7 +49,10 @@ private val responseUten = """
 private fun WireMockServer.stubMedAleneOmsorg() : WireMockServer {
     WireMock.stubFor(
         WireMock.get(WireMock.urlPathMatching(".*$basePath.*/alene-om-omsorgen"))
-            .withQueryParam("saksnummer", equalTo("SAKMED")).willReturn(
+            .withQueryParam("saksnummer", equalTo("SAKMED"))
+            .withHeader("accept", equalTo("application/json"))
+            .withHeader("Authorization", WireMock.matching("Bearer e.*"))
+            .withHeader("X-Correlation-ID", WireMock.matching(".*")).willReturn(
                 aResponse()
                     .withStatus(200)
                     .withHeader("content-type", "application/json")
@@ -62,7 +65,10 @@ private fun WireMockServer.stubMedAleneOmsorg() : WireMockServer {
 private fun WireMockServer.stubUtenAleneOmsorg() : WireMockServer {
     WireMock.stubFor(
         WireMock.get(WireMock.urlPathMatching(".*$basePath.*/alene-om-omsorgen"))
-            .withQueryParam("saksnummer", equalTo("SAKUTEN")).willReturn(
+            .withQueryParam("saksnummer", equalTo("SAKUTEN"))
+            .withHeader("accept", equalTo("application/json"))
+            .withHeader("Authorization", WireMock.matching("Bearer e.*"))
+            .withHeader("X-Correlation-ID", WireMock.matching(".*")).willReturn(
                 aResponse()
                     .withStatus(200)
                     .withHeader("content-type", "application/json")
