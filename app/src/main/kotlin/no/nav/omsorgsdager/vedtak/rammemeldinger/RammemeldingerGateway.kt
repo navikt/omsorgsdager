@@ -49,8 +49,8 @@ internal class RammemeldingerGateway(
         return JSONObject(response).getJSONArray("aleneOmOmsorgen").map { it as JSONObject }.map { aleneOm -> AleneOmsorgInnvilgetVedtak(
             tidspunkt = aleneOm.getString("registrert").tidspunkt(),
             periode = Periode(
-                fom = aleneOm.getString("gyldigFraOgMed").dato(),
-                tom = aleneOm.getString("gyldigTilOgMed").dato()
+                fom = aleneOm.getString("gjelderFraOgMed").dato(),
+                tom = aleneOm.getString("gjelderTilOgMed").dato()
             ),
             barn = aleneOm.getJSONObject("barn").let { barn -> Barn(
                 identitetsnummer = barn.getString("identitetsnummer").somIdentitetsnummer(),
@@ -61,6 +61,5 @@ internal class RammemeldingerGateway(
                 type = kilde.getString("type")
             ))}
         )}
-
     }
 }
