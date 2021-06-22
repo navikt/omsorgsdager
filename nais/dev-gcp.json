@@ -27,6 +27,7 @@
     "OMSORGSPENGER_SAK_SCOPES": "3ebacf0c-2409-4ae7-8507-07c8da9ddd25/.default",
     "PDL_BASE_URL": "https://pdl-api.dev-fss-pub.nais.io",
     "PDL_SCOPES": "api://dev-fss.pdl.pdl-api/.default",
-    "OMSORGSPENGER_TILGANGSSTYRING_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-tilgangsstyring/.default"
+    "OMSORGSPENGER_TILGANGSSTYRING_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-tilgangsstyring/.default",
+    "OMSORGSPENGER_RAMMEMELDINGER_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-rammemeldinger/.default"
   }
 }
