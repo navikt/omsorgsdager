@@ -24,3 +24,11 @@ internal data class MidlertidigAleneInfotrygdInnvilgetVedtak(
     override val gyldigFraOgMed: LocalDate,
     override val gyldigTilOgMed: LocalDate,
     override val kilder: Set<Kilde>) : InfotrygdInnvilgetVedtak
+
+internal data class AleneOmsorgInfotrygdInnvilgetVedtak(
+    override val vedtatt: LocalDate,
+    override val gyldigFraOgMed: LocalDate,
+    override val gyldigTilOgMed: LocalDate,
+    override val kilder: Set<Kilde>,
+    internal val barnetsFødselsdato: LocalDate,
+    internal val barnetsIdentitetsnummer: Identitetsnummer?) : InfotrygdInnvilgetVedtak

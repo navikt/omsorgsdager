@@ -6,7 +6,9 @@ import no.nav.omsorgsdager.CorrelationId
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
 import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.tid.Periode.Companion.dato
 import no.nav.omsorgsdager.vedtak.dto.Kilde
+import no.nav.omsorgsdager.vedtak.infotrygd.AleneOmsorgInfotrygdInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.infotrygd.KroniskSyktBarnInfotrygdInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.infotrygd.MidlertidigAleneInfotrygdInnvilgetVedtak
 import org.assertj.core.api.Assertions.assertThat
@@ -28,7 +30,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest(
         val forventetResponseMedInfotrygdVedtak = listOf(
             KroniskSyktBarnInfotrygdInnvilgetVedtak(
                 vedtatt = LocalDate.parse("2020-06-21"),
-                kilder = setOf(Kilde(id="UTV.RETT/20D/29099022222", type= "Personkort")),
+                kilder = setOf(Kilde(id = "UTV.RETT/20D/29099022222", type = "Personkort")),
                 gyldigFraOgMed = LocalDate.parse("2020-06-21"),
                 gyldigTilOgMed = LocalDate.parse("2020-06-21"),
                 barnetsIdentitetsnummer = "01019911111".somIdentitetsnummer(),
@@ -36,7 +38,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest(
             ),
             KroniskSyktBarnInfotrygdInnvilgetVedtak(
                 vedtatt = LocalDate.parse("2020-06-22"),
-                kilder = setOf(Kilde(id="UTV.RETT/20D/010199", type= "Personkort")),
+                kilder = setOf(Kilde(id = "UTV.RETT/20D/010199", type = "Personkort")),
                 gyldigFraOgMed = LocalDate.parse("2020-06-22"),
                 gyldigTilOgMed = LocalDate.parse("2020-06-25"),
                 barnetsIdentitetsnummer = null,
@@ -44,9 +46,17 @@ internal class OmsorgspengerInfotrygdRammevedtakGatewayTest(
             ),
             MidlertidigAleneInfotrygdInnvilgetVedtak(
                 vedtatt = LocalDate.parse("1998-06-21"),
-                kilder = setOf(Kilde(id="midl.alene.om/17D", type = "Personkort")),
+                kilder = setOf(Kilde(id = "midl.alene.om/17D", type = "Personkort")),
                 gyldigFraOgMed = LocalDate.parse("1998-06-25"),
                 gyldigTilOgMed = LocalDate.parse("2001-06-25")
+            ),
+            AleneOmsorgInfotrygdInnvilgetVedtak(
+                vedtatt = LocalDate.parse("1998-06-21"),
+                kilder = setOf(Kilde(id ="alene.om*9d*29099011111", type = "Personkort")),
+                gyldigFraOgMed = "1998-06-25".dato(),
+                gyldigTilOgMed = "2001-06-25".dato(),
+                barnetsIdentitetsnummer = "29099011111".somIdentitetsnummer(),
+                barnetsFødselsdato = "1990-09-29".dato()
             )
         )
 

@@ -10,6 +10,7 @@ import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2JwksUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getAzureV2TokenUrl
 import no.nav.helse.dusseldorf.testsupport.wiremock.getNaisStsJwksUrl
 import no.nav.omsorgsdager.ApplicationContext
+import no.nav.omsorgsdager.testutils.wiremock.*
 import no.nav.omsorgsdager.testutils.wiremock.infotrygdRammevedtakBaseUrl
 import no.nav.omsorgsdager.testutils.wiremock.omsorgspengerSakBaseUrl
 import no.nav.omsorgsdager.testutils.wiremock.pdlBaseUrl
@@ -45,6 +46,8 @@ internal class ApplicationContextExtension : ParameterResolver {
             "OPEN_AM_AUTHORIZED_CLIENTS" to "k9-sak",
             "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL" to mockedEnvironment.wireMockServer.infotrygdRammevedtakBaseUrl(),
             "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES" to "omsorgspenger-infotrygd-rammevedtak/.default",
+            "OMSORGSPENGER_RAMMEMELDINGER_BASE_URL" to mockedEnvironment.wireMockServer.omsorgspengerRammemeldingerBaseUrl(),
+            "OMSORGSPENGER_RAMMEMELDINGER_SCOPES" to "omsorgspenger-rammemeldinger/.default",
             "OMSORGSPENGER_SAK_BASE_URL" to mockedEnvironment.wireMockServer.omsorgspengerSakBaseUrl(),
             "OMSORGSPENGER_SAK_SCOPES" to "omsorgspenger-sak/.default",
             "PDL_BASE_URL" to mockedEnvironment.wireMockServer.pdlBaseUrl(),

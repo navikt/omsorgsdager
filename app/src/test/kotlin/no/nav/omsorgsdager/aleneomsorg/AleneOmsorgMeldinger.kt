@@ -1,4 +1,4 @@
-package no.nav.omsorgsdager.AleneOmsorg
+package no.nav.omsorgsdager.aleneomsorg
 
 import no.nav.k9.rapid.behov.Behov
 import no.nav.k9.rapid.behov.Behovssekvens

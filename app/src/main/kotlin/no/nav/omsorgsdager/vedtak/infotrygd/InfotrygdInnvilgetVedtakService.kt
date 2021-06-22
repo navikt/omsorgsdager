@@ -40,8 +40,15 @@ internal class InfotrygdInnvilgetVedtakService(
             )
         )}
 
-        // TODO: har vi noe fra infotrygd å slå sammen?
-        val aleneOmsorg = emptyList<AleneOmsorgInnvilgetVedtak>()
+        val aleneOmsorg = fraInfotrygd.filterIsInstance<AleneOmsorgInfotrygdInnvilgetVedtak>().map { AleneOmsorgInnvilgetVedtak(
+            barn = Barn(identitetsnummer = it.barnetsIdentitetsnummer, fødselsdato = it.barnetsFødselsdato),
+            kilder = it.kilder,
+            tidspunkt = it.vedtatt.startenAvDagenOslo(),
+            periode = Periode(
+                fom = it.gyldigFraOgMed,
+                tom = it.gyldigTilOgMed
+            )
+        )}
 
         return InnvilgedeVedtak(
             kroniskSyktBarn = kroniskSyktBarn,

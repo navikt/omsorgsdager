@@ -28,6 +28,7 @@ internal data class Periode(
     internal companion object {
         internal fun utcNå() = ZonedDateTime.now(ZoneOffset.UTC)
         internal fun String.dato() = LocalDate.parse(this)
+        internal fun String.tidspunkt() = ZonedDateTime.parse(this)
         internal fun String.periode() = Periode(this)
         private val Oslo = ZoneId.of("Europe/Oslo")
         internal fun ZonedDateTime.toLocalDateOslo() = withZoneSameInstant(Oslo).toLocalDate()

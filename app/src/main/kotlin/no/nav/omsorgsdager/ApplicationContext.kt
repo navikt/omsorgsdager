@@ -21,6 +21,7 @@ import no.nav.omsorgsdager.tilgangsstyring.TokenResolver
 import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakService
 import no.nav.omsorgsdager.vedtak.infotrygd.InfotrygdInnvilgetVedtakService
 import no.nav.omsorgsdager.vedtak.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
+import no.nav.omsorgsdager.vedtak.rammemeldinger.RammemeldingerGateway
 import java.net.URI
 import javax.sql.DataSource
 
@@ -40,6 +41,7 @@ internal class ApplicationContext(
     internal val omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService,
     internal val innvilgedeVedtakService: InnvilgedeVedtakService,
     internal val personInfoGatway: PersonInfoGateway,
+    internal val rammemeldingerGateway: RammemeldingerGateway,
     internal val configure: (application: Application) -> Unit,
     private val onStart: (applicationContext: ApplicationContext) -> Unit,
     private val onStop: (applicationContext: ApplicationContext) -> Unit) {
@@ -64,6 +66,7 @@ internal class ApplicationContext(
         var omsorgspengerSaksnummerService: OmsorgspengerSaksnummerService? = null,
         var innvilgedeVedtakService: InnvilgedeVedtakService? = null,
         var personInfoGatway: PersonInfoGateway? = null,
+        var rammemeldingerGateway: RammemeldingerGateway? = null,
         var configure: (application: Application) -> Unit = {},
         var onStart: (applicationContext: ApplicationContext) -> Unit = {
             it.dataSource.migrate()
@@ -127,10 +130,17 @@ internal class ApplicationContext(
                 omsorgspengerSakGateway = benyttetOmsorgspengerSakGateway,
                 partRepository = benyttetPartRepository
             )
+            val benyttetRammemeldingerGateway = rammemeldingerGateway ?: RammemeldingerGateway(
+                accessTokenClient = benyttetAccessTokenClient,
+                scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_RAMMEMELDINGER_SCOPES").csvTilSet(),
+                baseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_RAMMEMELDINGER_BASE_URL"))
+            )
+
             val benyttetInnvilgedeVedtakService = innvilgedeVedtakService ?: InnvilgedeVedtakService(
                 behandlingService = benyttetBehandlingService,
                 omsorgspengerSaksnummerService = benyttetOmsorgspengerSaksnummerService,
-                infotrygdInnvilgetVedtakService = benyttetInfotrygdInnvilgetVedtakService
+                infotrygdInnvilgetVedtakService = benyttetInfotrygdInnvilgetVedtakService,
+                rammemeldingerGateway = benyttetRammemeldingerGateway
             )
 
             val benyttetPersonInfoGateway = personInfoGatway ?: PdlPersonInfoGateway(
@@ -146,7 +156,8 @@ internal class ApplicationContext(
                     benyttetOmsorgspengerTilgangsstyringGateway,
                     benyttetOmsorgspengerInfotrygdRammevedtakGateway,
                     benyttetOmsorgspengerSakGateway,
-                    benyttetPersonInfoGateway
+                    benyttetPersonInfoGateway,
+                    benyttetRammemeldingerGateway
                 ),
                 omsorgspengerTilgangsstyringGateway = benyttetOmsorgspengerTilgangsstyringGateway,
                 tokenResolver = benyttetTokenResolver,
@@ -161,6 +172,7 @@ internal class ApplicationContext(
                 omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway,
                 partRepository = benyttetPartRepository,
                 personInfoGatway = benyttetPersonInfoGateway,
+                rammemeldingerGateway = benyttetRammemeldingerGateway,
                 onStart = onStart,
                 onStop = onStop
             )
