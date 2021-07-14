@@ -18,10 +18,10 @@ import no.nav.omsorgsdager.vedtak.dto.Kilde
 import no.nav.omsorgsdager.vedtak.dto.Kilde.Companion.somKilder
 import no.nav.omsorgsdager.vedtak.dto.KroniskSyktBarnInnvilgetVedtak
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import kotlin.test.assertEquals
 
 import no.nav.omsorgsdager.parter.Barn as BarnPart
 

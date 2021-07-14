@@ -2,30 +2,30 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
 val junitJupiterVersion = "5.7.2"
-val k9rapidVersion = "1.20210621113727-637d57e"
-val dusseldorfVersion = "2.1.6.0-ef0acb6"
-val ktorVersion = "1.6.0"
+val k9rapidVersion = "1.20210625095239-653e3a9"
+val dusseldorfVersion = "2.1.6.0-1516d10"
+val ktorVersion = "1.6.1"
 val jsonassertVersion = "1.5.0"
-val mockkVersion = "1.11.0"
+val mockkVersion = "1.12.0"
 val assertjVersion = "3.20.2"
 
 // Database
-val flywayVersion = "7.10.0"
+val flywayVersion = "7.11.2"
 val hikariVersion = "4.0.3"
 val kotliqueryVersion = "1.3.1"
-val postgresVersion = "42.2.22"
+val postgresVersion = "42.2.23"
 val embeddedPostgres = "1.3.0"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.5.10"
+    kotlin("jvm") version "1.5.21"
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_15
-    targetCompatibility = JavaVersion.VERSION_15
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
 }
 
 dependencies {
@@ -74,11 +74,11 @@ repositories {
 
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "15"
+        kotlinOptions.jvmTarget = "16"
     }
 
     named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
-        kotlinOptions.jvmTarget = "15"
+        kotlinOptions.jvmTarget = "16"
     }
 
     withType<Test> {
@@ -105,6 +105,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.1"
+        gradleVersion = "7.1.1"
     }
 }

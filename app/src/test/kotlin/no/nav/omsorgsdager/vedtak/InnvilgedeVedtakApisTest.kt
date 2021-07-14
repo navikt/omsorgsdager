@@ -6,9 +6,9 @@ import no.nav.helse.dusseldorf.testsupport.jws.Azure
 import no.nav.omsorgsdager.*
 import no.nav.omsorgsdager.Json.Companion.somJson
 import no.nav.omsorgsdager.testutils.ApplicationContextExtension
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import kotlin.test.assertEquals
 
 @ExtendWith(ApplicationContextExtension::class)
 internal class InnvilgedeVedtakApisTest(

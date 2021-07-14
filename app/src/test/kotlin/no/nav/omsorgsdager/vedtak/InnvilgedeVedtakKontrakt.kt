@@ -12,10 +12,10 @@ import no.nav.omsorgsdager.testutils.somMocketOmsorgspengerSaksnummer
 import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.vedtak.dto.*
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import kotlin.test.assertEquals
 
 internal data class InnvilgedeVedtakRequest(
     private val identitetsnummer: String,
