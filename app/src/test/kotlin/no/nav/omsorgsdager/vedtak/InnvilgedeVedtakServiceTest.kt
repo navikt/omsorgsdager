@@ -24,12 +24,12 @@ import no.nav.omsorgsdager.vedtak.dto.KroniskSyktBarnInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.infotrygd.KroniskSyktBarnInfotrygdInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.infotrygd.OmsorgspengerInfotrygdRammevedtakGateway
 import no.nav.omsorgsdager.vedtak.rammemeldinger.RammemeldingerGateway
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
 import java.time.ZonedDateTime
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 @ExtendWith(ApplicationContextExtension::class)
 internal class InnvilgedeVedtakServiceTest(
