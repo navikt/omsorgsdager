@@ -1,7 +1,14 @@
 version: 2
+registries:
+
 updates:
   - package-ecosystem: github-actions
     directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+  - package-ecosystem: gradle
+    directory: "/app"
     schedule:
       interval: daily
     open-pull-requests-limit: 10
