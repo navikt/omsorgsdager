@@ -1,25 +1,25 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
-val junitJupiterVersion = "5.7.2"
-val k9rapidVersion = "1.20210625095239-653e3a9"
-val dusseldorfVersion = "2.1.6.0-1516d10"
-val ktorVersion = "1.6.1"
+val junitJupiterVersion = "5.8.0"
+val k9rapidVersion = "1.20210916120916-75a25d9"
+val dusseldorfVersion = "2.1.6.3-bbb6831"
+val ktorVersion = "1.6.3"
 val jsonassertVersion = "1.5.0"
 val mockkVersion = "1.12.0"
 val assertjVersion = "3.20.2"
 
 // Database
-val flywayVersion = "7.11.2"
-val hikariVersion = "4.0.3"
-val kotliqueryVersion = "1.3.1"
+val flywayVersion = "7.15.0"
+val hikariVersion = "5.0.0"
+val kotliqueryVersion = "1.6.1"
 val postgresVersion = "42.2.23"
-val embeddedPostgres = "1.3.0"
+val embeddedPostgres = "1.3.1"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "1.5.30"
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
@@ -68,7 +68,7 @@ repositories {
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
-    maven { url = uri("https://jitpack.io") }
+    maven("https://jitpack.io")
     mavenCentral()
 }
 
@@ -105,6 +105,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.1.1"
+        gradleVersion = "7.2"
     }
 }
