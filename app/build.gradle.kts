@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
-val junitJupiterVersion = "5.8.0"
+val junitJupiterVersion = "5.8.1"
 val k9rapidVersion = "1.20210916120916-75a25d9"
 val dusseldorfVersion = "2.1.6.3-bbb6831"
 val ktorVersion = "1.6.3"
