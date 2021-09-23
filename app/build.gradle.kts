@@ -13,7 +13,7 @@ val assertjVersion = "3.20.2"
 val flywayVersion = "7.15.0"
 val hikariVersion = "5.0.0"
 val kotliqueryVersion = "1.6.1"
-val postgresVersion = "42.2.23"
+val postgresVersion = "42.2.24"
 val embeddedPostgres = "1.3.1"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
