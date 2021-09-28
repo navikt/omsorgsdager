@@ -3,8 +3,9 @@ on:
   schedule:
     - cron:  '0 0 * * 1'
   push:
-    branches: 
+    branches:
       - main
+  workflow_dispatch:
 jobs:
   security:
     runs-on: ubuntu-latest
