@@ -17,6 +17,8 @@ import no.nav.omsorgsdager.tid.Gjeldende.flatten
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldende
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldendePer
 import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm12År
+import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm18År
 import no.nav.omsorgsdager.vedtak.dto.*
 import no.nav.omsorgsdager.vedtak.dto.AleneOmsorgInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.dto.Barn.Companion.sammenlignPå
@@ -148,7 +150,7 @@ internal class InnvilgedeVedtakService(
             }).gjeldende().filterNot { avslåtteKilder.contains(it.kilder.first()) }
         }
 
-        private fun List<AleneOmsorgInnvilgetVedtak>.slåSammenAleneOmsorg(aleneOmsorgBehandlinger: List<AleneOmsorgBehandling>) : List<AleneOmsorgInnvilgetVedtak> {
+        private fun List<AleneOmsorgInnvilgetVedtak>.slåSammenAleneOmsorg(aleneOmsorgBehandlinger: List<AleneOmsorgBehandling>, kroniskSykeBarn: List<Barn>) : List<AleneOmsorgInnvilgetVedtak> {
             // Finner først alle kilder for avslåtte behandlinger slik at de kan filtreres bort i det ferdige resultatet
             val avslåtteKilder = aleneOmsorgBehandlinger.filter {
                 it.status == BehandlingStatus.AVSLÅTT }.map { it.k9behandlingId.somKilde() }
@@ -159,7 +161,7 @@ internal class InnvilgedeVedtakService(
                 AleneOmsorgInnvilgetVedtak(
                     tidspunkt = it.tidspunkt,
                     barn = it.somBarn(),
-                    periode = it.periode,
+                    periode = if (it.status == BehandlingStatus.INNVILGET) utledPeriode(it, kroniskSykeBarn) else it.periode,
                     kilder = it.k9behandlingId.somKilder()
                 )
             })
@@ -176,10 +178,39 @@ internal class InnvilgedeVedtakService(
             }.flatten().filterNot { avslåtteKilder.contains(it.kilder.firstOrNull()) }
         }
 
-        internal fun InnvilgedeVedtak.slåSammenMed(gjeldendeBehandlinger: GjeldendeBehandlinger) = InnvilgedeVedtak(
-            kroniskSyktBarn = kroniskSyktBarn.slåSammenKroniskSykeBarn(gjeldendeBehandlinger.kroniskSyktBarn),
-            midlertidigAlene = midlertidigAlene.slåSammenMidlertidigAlene(gjeldendeBehandlinger.midlertidigAlene),
-            aleneOmsorg = aleneOmsorg.slåSammenAleneOmsorg(gjeldendeBehandlinger.aleneOmsorg)
-        )
+        private fun utledPeriode (aleneOmsorgBehandling: AleneOmsorgBehandling, kroniskSykeBarn: List<Barn>): Periode {
+            val aleneOmsorgPeriode = aleneOmsorgBehandling.periode
+            val åretAleneBarnetFyller18 = aleneOmsorgBehandling.barn.fødselsdato.sisteDagIÅretOm18År()
+            val åretAleneBarnetFyller12 = aleneOmsorgBehandling.barn.fødselsdato.sisteDagIÅretOm12År()
+
+            val erBarnetKroniskSykt = kroniskSykeBarn.any { barn -> barn.fødselsdato == aleneOmsorgBehandling.barn.fødselsdato }
+
+            if (!erBarnetKroniskSykt) {
+                return if (aleneOmsorgPeriode.tom.isAfter(åretAleneBarnetFyller12)) {
+                    // barnet er ikke kronisk syk og tom settes alltid maks til året fyller 12
+                    Periode(fom = aleneOmsorgPeriode.fom, tom = åretAleneBarnetFyller12 )
+                } else {
+                    // barnet er ikke kronisk syk og tom er satt eksplisitt til en dato før barnet fyller 12
+                    Periode(fom = aleneOmsorgPeriode.fom, tom = aleneOmsorgPeriode.tom )
+                }
+            }
+            return if (aleneOmsorgPeriode.tom.isBefore(åretAleneBarnetFyller18)) {
+                // barnet er kronisk syk og tom er satt eksplisitt til en dato før barnet fyller 18
+                Periode(fom = aleneOmsorgPeriode.fom, tom = aleneOmsorgPeriode.tom )
+            } else {
+                // barnet er kronisk syk og tom settes alltid til året fyller 18
+                Periode(fom = aleneOmsorgPeriode.fom, tom = åretAleneBarnetFyller18 )
+
+            }
+       }
+
+        internal fun InnvilgedeVedtak.slåSammenMed(gjeldendeBehandlinger: GjeldendeBehandlinger): InnvilgedeVedtak {
+            val a = kroniskSyktBarn.slåSammenKroniskSykeBarn(gjeldendeBehandlinger.kroniskSyktBarn)
+            return InnvilgedeVedtak(
+                    kroniskSyktBarn = kroniskSyktBarn.slåSammenKroniskSykeBarn(gjeldendeBehandlinger.kroniskSyktBarn),
+                    midlertidigAlene = midlertidigAlene.slåSammenMidlertidigAlene(gjeldendeBehandlinger.midlertidigAlene),
+                    aleneOmsorg = aleneOmsorg.slåSammenAleneOmsorg(gjeldendeBehandlinger.aleneOmsorg, a.map { it.barn })
+            )
+        }
     }
 }
