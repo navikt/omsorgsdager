@@ -7,7 +7,7 @@ val dusseldorfVersion = "3.1.6.5-0911cdd"
 val ktorVersion = "1.6.5"
 val jsonassertVersion = "1.5.0"
 val mockkVersion = "1.12.0"
-val assertjVersion = "3.21.0"
+val assertjVersion = "3.22.0"
 
 // Database
 val flywayVersion = "8.0.4"
