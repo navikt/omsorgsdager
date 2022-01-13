@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
 val junitJupiterVersion = "5.8.1"
-val k9rapidVersion = "1.20210920084849-2ac86f1"
+val k9rapidVersion = "1.20220113090933-70694df"
 val dusseldorfVersion = "3.1.6.5-0911cdd"
 val ktorVersion = "1.6.5"
 val jsonassertVersion = "1.5.0"
