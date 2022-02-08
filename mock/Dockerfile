@@ -1,4 +1,4 @@
-FROM rodolpheche/wiremock:2.28.1
+FROM rodolpheche/wiremock:2.32.0-1
 LABEL org.opencontainers.image.source=https://github.com/navikt/omsorgsdager/mock
 COPY mappings/ /home/wiremock/mappings/
 COPY __files/ /home/wiremock/__files/

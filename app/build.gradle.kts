@@ -1,27 +1,27 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
-val junitJupiterVersion = "5.8.1"
-val k9rapidVersion = "1.20210920084849-2ac86f1"
-val dusseldorfVersion = "3.1.6.5-0911cdd"
-val ktorVersion = "1.6.5"
+val junitJupiterVersion = "5.8.2"
+val k9rapidVersion = "1.20220113090933-70694df"
+val dusseldorfVersion = "3.1.6.7-3fd207a"
+val ktorVersion = "1.6.7"
 val jsonassertVersion = "1.5.0"
-val mockkVersion = "1.12.0"
-val assertjVersion = "3.21.0"
+val mockkVersion = "1.12.2"
+val assertjVersion = "3.22.0"
 
 // Database
-val flywayVersion = "8.0.4"
-val hikariVersion = "5.0.0"
+val flywayVersion = "8.4.4"
+val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.6.1"
-val postgresVersion = "42.3.1"
+val postgresVersion = "42.3.2"
 val embeddedPostgres = "1.3.1"
 val embeddedPostgresBinaries = "13.4.0"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.6.0"
-    id("com.github.johnrengelman.shadow") version "7.1.0"
+    kotlin("jvm") version "1.6.10"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 java {
@@ -66,7 +66,7 @@ repositories {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/navikt/k9-rapid")
         credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+            username = project.findProperty("gpr.user") as String? ?: "x-access-token"
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
@@ -107,6 +107,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.3"
+        gradleVersion = "7.3.3"
     }
 }
