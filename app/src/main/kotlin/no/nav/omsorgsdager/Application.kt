@@ -1,7 +1,7 @@
 package no.nav.omsorgsdager
 
 import io.ktor.application.*
-import io.ktor.server.cio.*
+import io.ktor.server.netty.*
 import no.nav.helse.rapids_rivers.KtorBuilder
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.k9.rapid.river.hentOptionalEnv
@@ -20,7 +20,7 @@ fun main() {
                 omsorgsdager(applicationContext)
                 environment.monitor.subscribe(ApplicationStarted) { applicationContext.start() }
             }
-            .build(CIO)
+            .build(Netty)
             .start(wait = false)
 
         else -> RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(applicationContext.env))
