@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val junitJupiterVersion = "5.8.2"
 val k9rapidVersion = "1.20220215091703-a5f112c"
 val dusseldorfVersion = "3.1.6.7-f2a96e8"
-val ktorVersion = "1.6.7"
+val ktorVersion = "1.6.8"
 val jsonassertVersion = "1.5.0"
 val mockkVersion = "1.12.3"
 val assertjVersion = "3.22.0"
