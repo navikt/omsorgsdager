@@ -3,15 +3,15 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.8.2"
-val k9rapidVersion = "1.20220215091703-a5f112c"
-val dusseldorfVersion = "3.1.6.7-f2a96e8"
-val ktorVersion = "1.6.7"
+val k9rapidVersion = "1.20220322130655-5752ec9"
+val dusseldorfVersion = "3.1.6.8-248832c"
+val ktorVersion = "1.6.8"
 val jsonassertVersion = "1.5.0"
 val mockkVersion = "1.12.3"
 val assertjVersion = "3.22.0"
 
 // Database
-val flywayVersion = "8.5.2"
+val flywayVersion = "8.5.4"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.6.3"
 val postgresVersion = "42.3.3"
@@ -108,6 +108,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.4"
+        gradleVersion = "7.4.1"
     }
 }
