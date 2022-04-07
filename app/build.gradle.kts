@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.8.2"
-val k9rapidVersion = "1.20220322130655-5752ec9"
+val k9rapidVersion = "1.20220406090141-f40e84a"
 val dusseldorfVersion = "3.1.6.8-248832c"
 val ktorVersion = "1.6.8"
 val jsonassertVersion = "1.5.0"
@@ -11,9 +11,9 @@ val mockkVersion = "1.12.3"
 val assertjVersion = "3.22.0"
 
 // Database
-val flywayVersion = "8.5.4"
+val flywayVersion = "8.5.6"
 val hikariVersion = "5.0.1"
-val kotliqueryVersion = "1.6.3"
+val kotliqueryVersion = "1.7.0"
 val postgresVersion = "42.3.3"
 val embeddedPostgres = "1.3.1"
 val embeddedPostgresBinaries = "12.9.0"
@@ -21,7 +21,7 @@ val embeddedPostgresBinaries = "12.9.0"
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.20"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -108,6 +108,6 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.4.1"
+        gradleVersion = "7.4.2"
     }
 }
