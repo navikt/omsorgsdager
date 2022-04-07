@@ -2,9 +2,6 @@ name: Vulnerabilities scanning of dependencies
 on:
   schedule:
     - cron:  '0 0 * * 1'
-  push:
-    branches:
-      - main
   workflow_dispatch:
 jobs:
   security:
@@ -20,4 +17,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           command: monitor
-          args: --org=omsorgspenger --all-projects --remote-repo-url=https://github.com/${{ github.repository }}.git
+          args: --org=omsorgspenger --configuration-matching=^runtimeClasspath$ --all-projects --remote-repo-url=https://github.com/${{ github.repository }}.git
