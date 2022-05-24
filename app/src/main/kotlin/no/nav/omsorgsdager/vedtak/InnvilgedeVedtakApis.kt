@@ -21,11 +21,7 @@ internal fun Route.InnvilgedeVedtakApis(
     innvilgedeVedtakService: InnvilgedeVedtakService) {
 
     fun Pair<Identitetsnummer, Periode>.henteInnvilgedeVedtakOmUtvidetRettFor() =
-        Operasjon(
-            type = Operasjon.Type.Visning,
-            identitetsnummer = setOf(first),
-            beskrivelse = "Hente innvilgede vedtak om utvidet rett for perioden $second"
-        )
+        Operasjon(type = Operasjon.Type.Visning, identitetsnummer = setOf(first), beskrivelse = "Hente innvilgede vedtak om utvidet rett for perioden $second")
 
     fun Json.identitetsnummerOgPeriode() = kotlin.runCatching {
         val identitetsnummer = map["identitetsnummer"]?.toString()?.somIdentitetsnummer()
