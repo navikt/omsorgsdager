@@ -14,7 +14,6 @@ import no.nav.omsorgsdager.tid.Periode
 import no.nav.omsorgsdager.tid.Periode.Companion.periodeOrNull
 import no.nav.omsorgsdager.tilgangsstyring.Operasjon
 import no.nav.omsorgsdager.tilgangsstyring.Tilgangsstyring
-import no.nav.omsorgsdager.vedtak.dto.InnvilgedeVedtak
 import java.time.LocalDate
 
 internal fun Route.InnvilgedeVedtakApis(
@@ -53,7 +52,6 @@ internal fun Route.InnvilgedeVedtakApis(
             return@post
         }
 
-        //utfør tilgangskontroll på søker
         tilgangsstyring.verifiserTilgang(
             call = call,
             operasjon = identitetsnummerOgPeriode.henteInnvilgedeVedtakOmUtvidetRettFor()
@@ -65,22 +63,6 @@ internal fun Route.InnvilgedeVedtakApis(
             correlationId = correlationId
         )
 
-        //utfør tilgangskontroll på barn
-        tilgangsstyring.verifiserTilgang(
-            call = call,
-            operasjon = identitetsnummerOgPeriode.henteInnvilgedeVedtakOmUtvidetRettFor().copy(identitetsnummer = identitetsnummerForBarna(innvilgedeVedtak))
-        )
         call.respond(innvilgedeVedtak)
     }
-}
-
-private fun identitetsnummerForBarna(innvilgedeVedtak: InnvilgedeVedtak): Set<Identitetsnummer> {
-    val barnIdentitetsnummer = mutableSetOf<Identitetsnummer>();
-    barnIdentitetsnummer.addAll(innvilgedeVedtak.kroniskSyktBarn
-        .filter { ks -> ks.barn.identitetsnummer != null }
-        .map { ks -> ks.barn.identitetsnummer!!.somIdentitetsnummer() })
-    barnIdentitetsnummer.addAll(innvilgedeVedtak.aleneOmsorg
-        .filter { ks -> ks.barn.identitetsnummer != null }
-        .map { ks -> ks.barn.identitetsnummer!!.somIdentitetsnummer() })
-    return barnIdentitetsnummer
 }
