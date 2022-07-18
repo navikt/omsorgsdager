@@ -77,6 +77,7 @@ internal class ApplicationContextExtension : ParameterResolver {
     private fun DataSource.cleanAndMigrate() = this.also {
         Flyway
             .configure()
+            .cleanDisabled(false)
             .dataSource(this)
             .load()
             .also {
