@@ -1,8 +1,9 @@
 package no.nav.omsorgsdager.tilgangsstyring
 
-import io.ktor.application.*
-import io.ktor.features.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.http.*
+import io.ktor.server.plugins.callid.*
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.helse.dusseldorf.testsupport.jws.Azure
@@ -172,15 +173,18 @@ internal class TilgangsstyringTest {
     private fun assertOperasjoner(
         jwt: String?,
         forventetResultatVisning: Boolean,
-        forventetResultatEndring: Boolean) {
+        forventetResultatEndring: Boolean
+    ) {
         val call = call(authorizationHeader = "Bearer $jwt")
         assertEquals(forventetResultatVisning, VisningOperasjon.kanGjøreOperasjon(call))
         assertEquals(forventetResultatEndring, EndringOperasjon.kanGjøreOperasjon(call))
     }
 
-    private fun Operasjon.kanGjøreOperasjon(call: ApplicationCall) = this.let { operasjon -> runBlocking {
-        kotlin.runCatching { tilgangsstyring.verifiserTilgang(call = call, operasjon = operasjon) }.isSuccess
-    }}
+    private fun Operasjon.kanGjøreOperasjon(call: ApplicationCall) = this.let { operasjon ->
+        runBlocking {
+            kotlin.runCatching { tilgangsstyring.verifiserTilgang(call = call, operasjon = operasjon) }.isSuccess
+        }
+    }
 
     private fun tilgangsstyringGatewayKaltAkkurat(n: Int) {
         coVerify(exactly = n) { omsorgspengerTilgangsstyringGatewayMock.harTilgang(any(), any(), any()) }
@@ -189,16 +193,21 @@ internal class TilgangsstyringTest {
     private fun mockTilgangsstyringGateway(
         jwt: String,
         tilgangVisning: Boolean,
-        tilgangEndring: Boolean) {
-        coEvery { omsorgspengerTilgangsstyringGatewayMock.harTilgang(
-            token = match { it.jwt == jwt },
-            operasjon = match { it.type == Operasjon.Type.Visning },
-            correlationId = any())
+        tilgangEndring: Boolean
+    ) {
+        coEvery {
+            omsorgspengerTilgangsstyringGatewayMock.harTilgang(
+                token = match { it.jwt == jwt },
+                operasjon = match { it.type == Operasjon.Type.Visning },
+                correlationId = any()
+            )
         }.returns(tilgangVisning)
-        coEvery { omsorgspengerTilgangsstyringGatewayMock.harTilgang(
-            token = match { it.jwt == jwt },
-            operasjon = match { it.type == Operasjon.Type.Endring },
-            correlationId = any())
+        coEvery {
+            omsorgspengerTilgangsstyringGatewayMock.harTilgang(
+                token = match { it.jwt == jwt },
+                operasjon = match { it.type == Operasjon.Type.Endring },
+                correlationId = any()
+            )
         }.returns(tilgangEndring)
     }
 
@@ -220,6 +229,7 @@ internal class TilgangsstyringTest {
             audience = "omsorgsdager",
             accessAsApplication = medTilgang
         )
+
         internal fun azurePersonToken() = Azure.V2_0.generateJwt(
             clientId = "any",
             audience = "sjekkes-ved-sjekk-på-signatur",
@@ -229,6 +239,7 @@ internal class TilgangsstyringTest {
                 "preferred_username" to "user"
             )
         )
+
         internal fun openAmSytemToken(medTilgang: Boolean) = NaisSts.generateJwt(
             application = "any",
             overridingClaims = mapOf(

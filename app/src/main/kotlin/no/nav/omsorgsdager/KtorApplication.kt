@@ -1,11 +1,14 @@
 package no.nav.omsorgsdager
 
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.features.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.http.auth.*
-import io.ktor.jackson.*
-import io.ktor.routing.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.plugins.callid.*
+import io.ktor.server.routing.*
+import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.statuspages.*
 import no.nav.helse.dusseldorf.ktor.auth.*
 import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.helse.dusseldorf.ktor.health.*
@@ -16,7 +19,8 @@ import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakApis
 import java.net.URI
 
 internal fun Application.omsorgsdager(
-    applicationContext: ApplicationContext = ApplicationContext.Builder().build()) {
+    applicationContext: ApplicationContext = ApplicationContext.Builder().build()
+) {
 
     install(ContentNegotiation) {
         jackson {
@@ -51,10 +55,12 @@ internal fun Application.omsorgsdager(
     install(Authentication) {
         multipleJwtIssuers(
             issuers = issuers,
-            extractHttpAuthHeader = { call -> when (val token = call.token()) {
-                null -> null
-                else -> HttpAuthHeader.Single("Bearer", token)
-            }}
+            extractHttpAuthHeader = { call ->
+                when (val token = call.token()) {
+                    null -> null
+                    else -> HttpAuthHeader.Single("Bearer", token)
+                }
+            }
         )
     }
 
@@ -62,7 +68,7 @@ internal fun Application.omsorgsdager(
 
     val healthService = HealthService(
         healthChecks = applicationContext.healthChecks.plus(object : HealthCheck {
-            override suspend fun check() : Result {
+            override suspend fun check(): Result {
                 val currentState = applicationContext.rapidsState
                 return when (currentState.isHealthy()) {
                     true -> Healthy("RapidsConnection", currentState.asMap)
@@ -77,9 +83,11 @@ internal fun Application.omsorgsdager(
         healthService = healthService
     )
 
-    preStopOnApplicationStopPreparing(preStopActions = listOf(
-        FullførAktiveRequester(this)
-    ))
+    preStopOnApplicationStopPreparing(
+        preStopActions = listOf(
+            FullførAktiveRequester(this)
+        )
+    )
 
     install(CallId) {
         fromXCorrelationIdHeader(

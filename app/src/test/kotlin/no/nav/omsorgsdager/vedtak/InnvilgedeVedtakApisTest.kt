@@ -12,7 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(ApplicationContextExtension::class)
 internal class InnvilgedeVedtakApisTest(
-    applicationContextBuilder: ApplicationContext.Builder) : InnvilgedeVedtakKontrakt(applicationContextBuilder) {
+    applicationContextBuilder: ApplicationContext.Builder
+) : InnvilgedeVedtakKontrakt(applicationContextBuilder) {
 
     override fun hentInnvilgedeVedtak(jsonRequest: Json): Json {
         return withTestApplication({ omsorgsdager(applicationContext) }) {
@@ -63,7 +64,8 @@ internal class InnvilgedeVedtakApisTest(
     }
 
     private companion object {
-        val ForventetResponseForbidden = """{"detail":"Requesten inneholder ikke tilstrekkelige tilganger.","instance":"about:blank","type":"/problem-details/unauthorized","title":"unauthorized","status":403}""".somJson()
+        val ForventetResponseForbidden =
+            """{"detail":"Requesten inneholder ikke tilstrekkelige tilganger.","instance":"about:blank","type":"/problem-details/unauthorized","title":"unauthorized","status":403}""".somJson()
 
         fun TestApplicationEngine.hentInnvilgedeVedtak(
             jsonRequest: Json,
@@ -71,7 +73,8 @@ internal class InnvilgedeVedtakApisTest(
                 clientId = "k9-aarskvantum",
                 audience = "omsorgsdager",
                 accessAsApplication = true
-            ).let { "Bearer $it" }) : Pair<HttpStatusCode, Json?> {
+            ).let { "Bearer $it" }
+        ): Pair<HttpStatusCode, Json?> {
             return with(this) {
                 handleRequest(HttpMethod.Post, "/api/innvilgede-vedtak-utvidet-rett") {
                     authorizationHeader?.let {

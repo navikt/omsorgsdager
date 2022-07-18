@@ -9,16 +9,18 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.fasterxml.jackson.module.kotlin.treeToValue
-import io.ktor.application.*
-import io.ktor.request.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
 import org.json.JSONObject
 import org.skyscreamer.jsonassert.JSONCompare
 import org.skyscreamer.jsonassert.JSONCompareMode
 
 internal class Json private constructor(
-    private val objectNode: ObjectNode) {
+    private val objectNode: ObjectNode
+) {
     internal val map: Map<String, Any?> = ObjectMapper.convertValue(objectNode)
     internal val raw = requireNotNull(objectNode.toString())
+
     private constructor(jsonString: String) : this(ObjectMapper.readTree(jsonString) as ObjectNode)
     internal constructor(any: Any) : this(ObjectMapper.valueToTree(any))
 
@@ -27,7 +29,7 @@ internal class Json private constructor(
         else -> JSONCompare.compareJSON(raw, other.raw, JSONCompareMode.NON_EXTENSIBLE).passed()
     }
 
-    internal inline fun <reified T>deserialize() = requireNotNull(ObjectMapper.treeToValue<T>(objectNode)) {
+    internal inline fun <reified T> deserialize() = requireNotNull(ObjectMapper.treeToValue<T>(objectNode)) {
         "Kunne ikke deserialisere Json"
     }
 
@@ -40,6 +42,7 @@ internal class Json private constructor(
             onSuccess = { it },
             onFailure = { null }
         )
+
         internal fun String.somJson() = Json(jsonString = this)
         internal fun JSONObject.somJson() = Json(jsonString = toString())
         internal fun ObjectNode.somJson() = Json(objectNode = this)
@@ -52,7 +55,7 @@ internal class Json private constructor(
             onFailure = { throw IllegalStateException("Ugyldig JSON", it) }
         )
 
-        internal fun ObjectMapper.configured() : ObjectMapper {
+        internal fun ObjectMapper.configured(): ObjectMapper {
             registerKotlinModule()
             disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)

@@ -25,7 +25,8 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
     navn = "OmsorgspengerInfotrygdRammevedtakGateway",
     accessTokenClient = accessTokenClient,
     scopes = scopes,
-    pingUri = URI("$omsorgspengerInfotrygdRammevedtakBaseUrl/isready")) {
+    pingUri = URI("$omsorgspengerInfotrygdRammevedtakBaseUrl/isready")
+) {
 
     private val rammevedtakUrl = "$omsorgspengerInfotrygdRammevedtakBaseUrl/rammevedtak"
 
@@ -33,7 +34,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
         identitetsnummer: Identitetsnummer,
         periode: Periode,
         correlationId: CorrelationId
-    ) : List<InfotrygdInnvilgetVedtak> {
+    ): List<InfotrygdInnvilgetVedtak> {
 
         val (httpStatusCode, responseBody) = rammevedtakUrl.httpPost {
             it.header(HttpHeaders.Authorization, authorizationHeader())
@@ -111,6 +112,7 @@ internal class OmsorgspengerInfotrygdRammevedtakGateway(
             "PersonIdent" -> getString("id").somIdentitetsnummer()
             else -> null
         }
+
         private fun JSONObject.fødselsdato(): LocalDate = LocalDate.parse(getString("fødselsdato"))
         private fun JSONArray.mapJSONObject() = map { it as JSONObject }
     }

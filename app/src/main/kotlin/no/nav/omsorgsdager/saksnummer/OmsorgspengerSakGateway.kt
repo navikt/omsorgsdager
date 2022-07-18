@@ -22,7 +22,8 @@ internal class OmsorgspengerSakGateway(
     navn = "OmsorgspengerSakGateway",
     accessTokenClient = accessTokenClient,
     scopes = scopes,
-    pingUri = URI("$omsorgspengerSakUrl/isready")) {
+    pingUri = URI("$omsorgspengerSakUrl/isready")
+) {
 
     private val omsorgspengerSaksnummerUrl = "$omsorgspengerSakUrl/saksnummer"
 
