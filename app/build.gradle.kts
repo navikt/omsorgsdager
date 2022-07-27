@@ -7,7 +7,7 @@ val k9rapidVersion = "1.20220708075341-87c2b3c"
 val dusseldorfVersion = "3.1.6.8-248832c"
 val ktorVersion = "1.6.8"
 val jsonassertVersion = "1.5.1"
-val mockkVersion = "1.12.4"
+val mockkVersion = "1.12.5"
 val assertjVersion = "3.23.1"
 
 // Database
