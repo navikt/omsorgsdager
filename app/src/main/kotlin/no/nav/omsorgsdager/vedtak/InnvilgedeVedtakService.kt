@@ -17,6 +17,7 @@ import no.nav.omsorgsdager.tid.Gjeldende.flatten
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldende
 import no.nav.omsorgsdager.tid.Gjeldende.gjeldendePer
 import no.nav.omsorgsdager.tid.Periode
+import no.nav.omsorgsdager.tid.Periode.Companion.periodeOrNull
 import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm12År
 import no.nav.omsorgsdager.tid.Periode.Companion.sisteDagIÅretOm18År
 import no.nav.omsorgsdager.vedtak.dto.*
@@ -30,6 +31,7 @@ import no.nav.omsorgsdager.vedtak.dto.MidlertidigAleneInnvilgetVedtak
 import no.nav.omsorgsdager.vedtak.rammemeldinger.RammemeldingerGateway
 import org.slf4j.LoggerFactory
 import java.time.Duration
+import java.time.LocalDate
 
 internal class InnvilgedeVedtakService(
     private val behandlingService: BehandlingService,
@@ -155,13 +157,18 @@ internal class InnvilgedeVedtakService(
             val avslåtteKilder = aleneOmsorgBehandlinger.filter {
                 it.status == BehandlingStatus.AVSLÅTT }.map { it.k9behandlingId.somKilde() }
 
+            // Fjerner først aleneomsorg-vedtakene fra k9 som er over 12år og ikke kronisk syke
             // Slår sammen alle vedtakene vi sammenligner
             // Fjerner til slutt alle avslåtte behandlinger slik at vi kun sitter igjen med innvilgede perioder.
-            val alle = plus(aleneOmsorgBehandlinger.map {
+            val alle = plus(aleneOmsorgBehandlinger.filter {
+                val periode = if (it.status == BehandlingStatus.INNVILGET) utledPeriode(it.periode, it.barn.fødselsdato, kroniskSykeBarn) else it.periode
+                periode != null
+            }.map {
+                val periode = if (it.status == BehandlingStatus.INNVILGET) utledPeriode(it.periode, it.barn.fødselsdato, kroniskSykeBarn) else it.periode
                 AleneOmsorgInnvilgetVedtak(
                     tidspunkt = it.tidspunkt,
                     barn = it.somBarn(),
-                    periode = if (it.status == BehandlingStatus.INNVILGET) utledPeriode(it, kroniskSykeBarn) else it.periode,
+                    periode = periode!!,
                     kilder = it.k9behandlingId.somKilder()
                 )
             })
@@ -172,23 +179,25 @@ internal class InnvilgedeVedtakService(
             // 1. Lager en kopi av alle vedtak med sammenligningsmåten utledet over
             // 2. Plukker ut barnet med mest info på seg og setter det på alle vedtak
             // 3. Fjerner til slutt alle avslåtte behandlinger slik at vi kun sitter igjen med innvilgede perioder.
+            // 4. Fjerner aleneomsorg-vedtakene fra Infotrygd som er over 12år og ikke kronisk syke
             return alle.map { it.copy(enPer = sammenlignBarnPå(it.barn)) }.gjeldendePer().mapValues {
                 val barnMedMestInfo = it.value.map { vedtak -> vedtak.barn }.medMestInfo()
                 it.value.map { vedtak -> vedtak.copy(barn = barnMedMestInfo) }
-            }.flatten().filterNot { avslåtteKilder.contains(it.kilder.firstOrNull()) }
+            }.flatten().filterNot { avslåtteKilder.contains(it.kilder.firstOrNull()) }.filter {
+                utledPeriode(it.periode, it.barn.fødselsdato, kroniskSykeBarn) != null
+            }
         }
 
-        private fun utledPeriode (aleneOmsorgBehandling: AleneOmsorgBehandling, kroniskSykeBarn: List<Barn>): Periode {
-            val aleneOmsorgPeriode = aleneOmsorgBehandling.periode
-            val åretAleneBarnetFyller18 = aleneOmsorgBehandling.barn.fødselsdato.sisteDagIÅretOm18År()
-            val åretAleneBarnetFyller12 = aleneOmsorgBehandling.barn.fødselsdato.sisteDagIÅretOm12År()
+        private fun utledPeriode (aleneOmsorgPeriode: Periode, aleneomsorgBarnFødselsdato: LocalDate, kroniskSykeBarn: List<Barn>): Periode? {
+            val åretAleneBarnetFyller18 = aleneomsorgBarnFødselsdato.sisteDagIÅretOm18År()
+            val åretAleneBarnetFyller12 = aleneomsorgBarnFødselsdato.sisteDagIÅretOm12År()
 
-            val erBarnetKroniskSykt = kroniskSykeBarn.any { barn -> barn.fødselsdato == aleneOmsorgBehandling.barn.fødselsdato }
+            val erBarnetKroniskSykt = kroniskSykeBarn.any { barn -> barn.fødselsdato == aleneomsorgBarnFødselsdato }
 
             if (!erBarnetKroniskSykt) {
                 return if (aleneOmsorgPeriode.tom.isAfter(åretAleneBarnetFyller12)) {
                     // barnet er ikke kronisk syk og tom settes alltid maks til året fyller 12
-                    Periode(fom = aleneOmsorgPeriode.fom, tom = åretAleneBarnetFyller12 )
+                    (aleneOmsorgPeriode.fom to åretAleneBarnetFyller12).periodeOrNull()
                 } else {
                     // barnet er ikke kronisk syk og tom er satt eksplisitt til en dato før barnet fyller 12
                     Periode(fom = aleneOmsorgPeriode.fom, tom = aleneOmsorgPeriode.tom )
@@ -200,7 +209,6 @@ internal class InnvilgedeVedtakService(
             } else {
                 // barnet er kronisk syk og tom settes alltid til året fyller 18
                 Periode(fom = aleneOmsorgPeriode.fom, tom = åretAleneBarnetFyller18 )
-
             }
        }
 
