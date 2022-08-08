@@ -282,6 +282,59 @@ internal class SlåSammenAleneOmsorgTest {
     }
 
     @Test
+    fun `Aleneomsorg fom og tom har blitt satt eksplisitt til barnet fyller 15, men blir justert til året fyller 12 da barnet ikke er kronisk syk`() {
+        val barnetsIdentitetsnummer = "11111111111".somIdentitetsnummer()
+        val søkersIdentitetsnummer = "22222222222".somIdentitetsnummer()
+        val barnetsFødselsdato = "2006-05-05".dato()
+        val nå = ZonedDateTime.now()
+
+        val barnet = Barn(identitetsnummer = barnetsIdentitetsnummer, fødselsdato = barnetsFødselsdato)
+
+        val aleneomsorg = AleneOmsorgInnvilgetVedtak(
+                tidspunkt = nå.plusMinutes(1),
+                kilder = setOf(),
+                periode = "2021-05-05/2021-12-31".periode(),
+                barn = barnet
+        )
+
+
+        val slåttSammenUtenBehandlingerIK9 = InnvilgedeVedtak(
+                aleneOmsorg = listOf(aleneomsorg)
+        ).slåSammenMed(GjeldendeBehandlinger())
+
+        assertThat(slåttSammenUtenBehandlingerIK9.aleneOmsorg).isEmpty()
+
+        val søker = Søker(
+                identitetsnummer = søkersIdentitetsnummer,
+                omsorgspengerSaksnummer = søkersIdentitetsnummer.somMocketOmsorgspengerSaksnummer(),
+                aktørId = "55555".somAktørId()
+        )
+
+        val innvilgetAleneomsorg = AleneOmsorgBehandling(
+                k9Saksnummer = mocketK9Saksnummer(),
+                k9behandlingId = K9BehandlingId.generateK9BehandlingId(),
+                tidspunkt = nå.plusMinutes(2),
+                periode = Periode("2021-05-05/2021-12-31"),
+                søker = søker,
+                barn = no.nav.omsorgsdager.parter.Barn(
+                        identitetsnummer = barnetsIdentitetsnummer,
+                        fødselsdato = barnetsFødselsdato,
+                        omsorgspengerSaksnummer = barnetsIdentitetsnummer.somMocketOmsorgspengerSaksnummer(),
+                        aktørId = "66666".somAktørId()
+                ),
+                status = BehandlingStatus.INNVILGET
+        )
+
+        val slåttSammenMedInnvilgelseIK9 = InnvilgedeVedtak(
+                aleneOmsorg = listOf(aleneomsorg)
+        ).slåSammenMed(GjeldendeBehandlinger(
+                alleAleneOmsorg = listOf(innvilgetAleneomsorg)
+        ))
+
+        assertThat(slåttSammenMedInnvilgelseIK9.aleneOmsorg).isEmpty()
+    }
+
+    @Test
     fun `Aleneomsorg tom blir satt automatisk til året fyller 18, og blir stående da barnet er kronisk syk`() {
         val barnetsIdentitetsnummer = "11111111111".somIdentitetsnummer()
         val søkersIdentitetsnummer = "22222222222".somIdentitetsnummer()

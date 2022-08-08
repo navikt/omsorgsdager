@@ -12,7 +12,7 @@ internal data class Periode(
     constructor(enkeltdag: LocalDate) : this(fom = enkeltdag, tom = enkeltdag)
 
     init {
-        require(tom.isAfter(fom) || fom.isEqual(tom)) {"Ugylidg periode. fom=$fom, tom=$tom"}
+        require(tom.isAfter(fom) || fom.isEqual(tom)) {"Ugyldig periode. fom=$fom, tom=$tom"}
     }
     internal val antallDager = DAYS.between(fom, tom.plusDays(1))
 
