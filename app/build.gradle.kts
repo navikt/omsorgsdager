@@ -2,19 +2,19 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val junitJupiterVersion = "5.8.2"
-val k9rapidVersion = "1.20220708075341-87c2b3c"
-val dusseldorfVersion = "3.1.6.8-248832c"
-val ktorVersion = "1.6.8"
+val junitJupiterVersion = "5.9.0"
+val k9rapidVersion = "1.20220711113850-0593e9e"
+val dusseldorfVersion = "3.2.0.3-d4fdef9"
+val ktorVersion = "2.0.3"
 val jsonassertVersion = "1.5.1"
-val mockkVersion = "1.12.4"
+val mockkVersion = "1.12.5"
 val assertjVersion = "3.23.1"
 
 // Database
-val flywayVersion = "8.5.13"
+val flywayVersion = "9.1.3"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.8.0"
-val postgresVersion = "42.4.0"
+val postgresVersion = "42.4.1"
 val embeddedPostgres = "2.0.0"
 val embeddedPostgresBinaries = "12.9.0"
 
@@ -32,13 +32,15 @@ java {
 
 dependencies {
     implementation("no.nav.k9.rapid:river:$k9rapidVersion")
-    implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("no.nav.helse:dusseldorf-ktor-core:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-health:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-client:$dusseldorfVersion")
+    implementation("no.nav.helse:dusseldorf-ktor-jackson:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-metrics:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-ktor-auth:$dusseldorfVersion")
     implementation("no.nav.helse:dusseldorf-oauth2-client:$dusseldorfVersion")
+    implementation("io.ktor:ktor-server-cors:$ktorVersion")
+    implementation("io.ktor:ktor-server-call-logging:$ktorVersion")
     implementation ("org.skyscreamer:jsonassert:$jsonassertVersion")
 
     // Database
@@ -53,11 +55,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
     testImplementation("no.nav.helse:dusseldorf-test-support:$dusseldorfVersion")
     testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
+    testImplementation("org.assertj:assertj-core:$assertjVersion")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:$ktorVersion") {
         exclude(group = "org.eclipse.jetty")
     }
-    testImplementation("org.assertj:assertj-core:$assertjVersion")
-
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
 }
 

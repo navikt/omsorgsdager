@@ -1,6 +1,6 @@
 package no.nav.omsorgsdager
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import no.nav.helse.dusseldorf.ktor.health.HealthCheck
 import no.nav.helse.dusseldorf.oauth2.client.AccessTokenClient
 import no.nav.helse.dusseldorf.oauth2.client.ClientSecretAccessTokenClient
@@ -44,7 +44,8 @@ internal class ApplicationContext(
     internal val rammemeldingerGateway: RammemeldingerGateway,
     internal val configure: (application: Application) -> Unit,
     private val onStart: (applicationContext: ApplicationContext) -> Unit,
-    private val onStop: (applicationContext: ApplicationContext) -> Unit) {
+    private val onStop: (applicationContext: ApplicationContext) -> Unit
+) {
 
     internal fun start() = onStart(this)
     internal fun stop() = onStop(this)
@@ -71,7 +72,8 @@ internal class ApplicationContext(
         var onStart: (applicationContext: ApplicationContext) -> Unit = {
             it.dataSource.migrate()
         },
-        var onStop: (applicationContext: ApplicationContext) -> Unit = {}) {
+        var onStop: (applicationContext: ApplicationContext) -> Unit = {}
+    ) {
         internal fun build(): ApplicationContext {
             val benyttetEnv = env ?: System.getenv()
             val benyttetDataSource = dataSource ?: DataSourceBuilder(benyttetEnv).build()
@@ -89,11 +91,12 @@ internal class ApplicationContext(
                 authenticationMode = ClientSecretAccessTokenClient.AuthenticationMode.POST
             )
 
-            val benyttetOmsorgspengerTilgangsstyringGateway = omsorgspengerTilgangsstyringGateway ?: OmsorgspengerTilgangsstyringGateway(
-                baseUri = URI.create(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_TILGANGSSTYRING_BASE_URL")),
-                scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_TILGANGSSTYRING_SCOPES").csvTilSet(),
-                accessTokenClient = benyttetAccessTokenClient
-            )
+            val benyttetOmsorgspengerTilgangsstyringGateway =
+                omsorgspengerTilgangsstyringGateway ?: OmsorgspengerTilgangsstyringGateway(
+                    baseUri = URI.create(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_TILGANGSSTYRING_BASE_URL")),
+                    scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_TILGANGSSTYRING_SCOPES").csvTilSet(),
+                    accessTokenClient = benyttetAccessTokenClient
+                )
 
             val benyttetTokenResolver = tokenResolver ?: TokenResolver(
                 azureIssuers = setOf(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_ISSUER")),
@@ -112,24 +115,27 @@ internal class ApplicationContext(
                 dataSource = benyttetDataSource
             )
 
-            val benyttetOmsorgspengerInfotrygdRammevedtakGateway = omsorgspengerInfotrygdRammevedtakGateway ?: OmsorgspengerInfotrygdRammevedtakGateway(
-                accessTokenClient = benyttetAccessTokenClient,
-                scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES").csvTilSet(),
-                omsorgspengerInfotrygdRammevedtakBaseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL"))
-            )
+            val benyttetOmsorgspengerInfotrygdRammevedtakGateway =
+                omsorgspengerInfotrygdRammevedtakGateway ?: OmsorgspengerInfotrygdRammevedtakGateway(
+                    accessTokenClient = benyttetAccessTokenClient,
+                    scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES").csvTilSet(),
+                    omsorgspengerInfotrygdRammevedtakBaseUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL"))
+                )
 
-            val benyttetInfotrygdInnvilgetVedtakService = infotrygdInnvilgetVedtakService ?: InfotrygdInnvilgetVedtakService(
-                omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway
-            )
+            val benyttetInfotrygdInnvilgetVedtakService =
+                infotrygdInnvilgetVedtakService ?: InfotrygdInnvilgetVedtakService(
+                    omsorgspengerInfotrygdRammevedtakGateway = benyttetOmsorgspengerInfotrygdRammevedtakGateway
+                )
             val benyttetOmsorgspengerSakGateway = omsorgspengerSakGateway ?: OmsorgspengerSakGateway(
                 accessTokenClient = benyttetAccessTokenClient,
                 scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_SAK_SCOPES").csvTilSet(),
                 omsorgspengerSakUrl = URI(benyttetEnv.hentRequiredEnv("OMSORGSPENGER_SAK_BASE_URL"))
             )
-            val benyttetOmsorgspengerSaksnummerService = omsorgspengerSaksnummerService ?: OmsorgspengerSaksnummerService(
-                omsorgspengerSakGateway = benyttetOmsorgspengerSakGateway,
-                partRepository = benyttetPartRepository
-            )
+            val benyttetOmsorgspengerSaksnummerService =
+                omsorgspengerSaksnummerService ?: OmsorgspengerSaksnummerService(
+                    omsorgspengerSakGateway = benyttetOmsorgspengerSakGateway,
+                    partRepository = benyttetPartRepository
+                )
             val benyttetRammemeldingerGateway = rammemeldingerGateway ?: RammemeldingerGateway(
                 accessTokenClient = benyttetAccessTokenClient,
                 scopes = benyttetEnv.hentRequiredEnv("OMSORGSPENGER_RAMMEMELDINGER_SCOPES").csvTilSet(),

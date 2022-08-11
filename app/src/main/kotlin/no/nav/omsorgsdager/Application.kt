@@ -1,6 +1,6 @@
 package no.nav.omsorgsdager
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import no.nav.helse.rapids_rivers.KtorBuilder
 import no.nav.helse.rapids_rivers.RapidApplication

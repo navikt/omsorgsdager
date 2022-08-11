@@ -14,7 +14,8 @@ private const val apiPath = "/omsorgspenger-sak-mock"
 private fun WireMockServer.stubDefaultTomtSvar(): WireMockServer {
     WireMock.stubFor(
         WireMock.post(
-            WireMock.urlPathMatching(".*$apiPath.*/saksnummer"))
+            WireMock.urlPathMatching(".*$apiPath.*/saksnummer")
+        )
             .atPriority(catchAllPriority)
             .withHeader("Authorization", containing("Bearer"))
             .withHeader("Content-Type", equalTo("application/json"))
@@ -30,7 +31,8 @@ private fun WireMockServer.stubDefaultTomtSvar(): WireMockServer {
 private fun WireMockServer.stubUventetFeil(): WireMockServer {
     WireMock.stubFor(
         WireMock.post(
-            WireMock.urlPathMatching(".*$apiPath.*/saksnummer"))
+            WireMock.urlPathMatching(".*$apiPath.*/saksnummer")
+        )
             .atPriority(catchAllPriority)
             .withHeader("Authorization", containing("Bearer"))
             .withHeader("Content-Type", equalTo("application/json"))
@@ -48,7 +50,8 @@ private fun WireMockServer.stubUventetFeil(): WireMockServer {
 private fun WireMockServer.stubPersonSomHarSaksnummer(): WireMockServer {
     WireMock.stubFor(
         WireMock.post(
-            WireMock.urlPathMatching(".*$apiPath.*/saksnummer"))
+            WireMock.urlPathMatching(".*$apiPath.*/saksnummer")
+        )
             .withHeader("Authorization", containing("Bearer"))
             .withHeader("Content-Type", equalTo("application/json"))
             .withRequestBody(matchingJsonPath("$.identitetsnummer", equalTo("11111111111")))
@@ -56,7 +59,8 @@ private fun WireMockServer.stubPersonSomHarSaksnummer(): WireMockServer {
                 aResponse()
                     .withStatus(200)
                     .withHeader("Content-Type", "application/json")
-                    .withBody("""
+                    .withBody(
+                        """
                         {
                            "saksnummer": "a1b2c3"
                         }
@@ -70,10 +74,12 @@ private fun WireMockServer.stubPersonSomHarSaksnummer(): WireMockServer {
 private fun WireMockServer.stubInfotrygdRammevedtakHelsesjekk(): WireMockServer {
     WireMock.stubFor(
         WireMock.any(WireMock.urlPathMatching(".*$apiPath.*/isalive"))
-            .willReturn(aResponse().withStatus(200)))
+            .willReturn(aResponse().withStatus(200))
+    )
     WireMock.stubFor(
         WireMock.any(WireMock.urlPathMatching(".*$apiPath.*/isready"))
-            .willReturn(aResponse().withStatus(200)))
+            .willReturn(aResponse().withStatus(200))
+    )
     return this
 }
 
@@ -81,4 +87,5 @@ internal fun WireMockServer.stubOmsorgspengerSakApi() = stubInfotrygdRammevedtak
     .stubDefaultTomtSvar()
     .stubPersonSomHarSaksnummer()
     .stubUventetFeil()
+
 internal fun WireMockServer.omsorgspengerSakBaseUrl() = baseUrl() + apiPath

@@ -1,9 +1,9 @@
 package no.nav.omsorgsdager.tilgangsstyring
 
 import com.nimbusds.jwt.SignedJWT
-import io.ktor.client.features.ResponseException
+import io.ktor.client.plugins.ResponseException
 import io.ktor.client.request.*
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.util.toByteArray
@@ -23,20 +23,23 @@ internal class OmsorgspengerTilgangsstyringGateway(
     baseUri: URI,
     private val accessTokenClient: AccessTokenClient,
     private val scopes: Set<String>
-): HealthCheck {
+) : HealthCheck {
     private val cachedAccessTokenClient = CachedAccessTokenClient(accessTokenClient)
-    private val tilgangUri = URI("$baseUri/api/tilgang/personer")
-    private val pingUri = URI("$baseUri/isready")
+    private val tilgangUri = URI("$baseUri/api/tilgang/personer").toString()
+    private val pingUri = URI("$baseUri/isready").toString()
 
     internal suspend fun harTilgang(
         token: Token,
         operasjon: Operasjon,
-        correlationId: CorrelationId): Boolean {
+        correlationId: CorrelationId
+    ): Boolean {
         return tilgangUri.httpPost {
-            it.header(HttpHeaders.Authorization, cachedAccessTokenClient.getAccessToken(
-                scopes = scopes,
-                onBehalfOf = token.jwt
-            ).asAuthoriationHeader())
+            it.header(
+                HttpHeaders.Authorization, cachedAccessTokenClient.getAccessToken(
+                    scopes = scopes,
+                    onBehalfOf = token.jwt
+                ).asAuthoriationHeader()
+            )
             it.header(HttpHeaders.XCorrelationId, "$correlationId")
             it.jsonBody(operasjon.somJsonBody())
         }.second.håndterResponse()
@@ -46,7 +49,9 @@ internal class OmsorgspengerTilgangsstyringGateway(
         onSuccess = { response -> response.håndterResponse() },
         onFailure = { cause ->
             when (cause is ResponseException) {
-                true -> { cause.response.håndterResponse() }
+                true -> {
+                    cause.response.håndterResponse()
+                }
                 else -> throw cause
             }
         }
@@ -56,7 +61,7 @@ internal class OmsorgspengerTilgangsstyringGateway(
         HttpStatusCode.NoContent -> true
         HttpStatusCode.Forbidden -> false
         else -> {
-            logger.error("HTTP ${status.value} fra omsorgspenger-tilgangsstyring, response: ${String(content.toByteArray())}")
+            logger.error("HTTP ${status.value} fra omsorgspenger-tilgangsstyring, response: ${String(this.bodyAsText().toByteArray())}")
             throw IllegalStateException("Uventet feil ved sjekk om omsorgspenger-tilgangsstyring")
         }
     }

@@ -31,7 +31,8 @@ internal class PdlPersonInfoGateway(
     navn = "PdlPersonInfoGateway",
     accessTokenClient = accessTokenClient,
     scopes = scopes,
-    pingUri = URI("$baseUri/graphql")) {
+    pingUri = URI("$baseUri/graphql")
+) {
     private val graphqlEndpoint = "$baseUri/graphql"
 
     override suspend fun hent(aktørIder: Set<AktørId>, correlationId: CorrelationId): Map<AktørId, PersonInfo> {
@@ -55,25 +56,29 @@ internal class PdlPersonInfoGateway(
             val hentPersonBolk = data.getJSONArray("hentPersonBolk").also { it.inneholderKunOkCodes() }
             val hentIdenterBolk = data.getJSONArray("hentIdenterBolk").also { it.inneholderKunOkCodes() }
 
-            aktørIder.associateWith { aktørId -> PersonInfo(
-                identitetsnummer = (hentIdenterBolk.tilhørende(aktørId).getJSONArray("identer").first() as JSONObject).getString("ident").somIdentitetsnummer(),
-                fødselsdato = (hentPersonBolk.tilhørende(aktørId).getJSONObject("person").getJSONArray("foedsel").first() as JSONObject).getString("foedselsdato").dato()
-            )}
+            aktørIder.associateWith { aktørId ->
+                PersonInfo(
+                    identitetsnummer = (hentIdenterBolk.tilhørende(aktørId).getJSONArray("identer")
+                        .first() as JSONObject).getString("ident").somIdentitetsnummer(),
+                    fødselsdato = (hentPersonBolk.tilhørende(aktørId).getJSONObject("person").getJSONArray("foedsel")
+                        .first() as JSONObject).getString("foedselsdato").dato()
+                )
+            }
         }.fold(
             onSuccess = { it },
             onFailure = {
-                SecureLogger.error("PdlRequest=$pdlRequest, PdlResponse=${response.somJsonOrNull()?:response}")
+                SecureLogger.error("PdlRequest=$pdlRequest, PdlResponse=${response.somJsonOrNull() ?: response}")
                 throw IllegalStateException("Feil ved oppslag mot PDL. Se sikker log former detaljer.", it)
             }
         )
     }
 
     override suspend fun pingCheck(): Result {
-        return pingUri.toString().httpOptions{
+        return pingUri.toString().httpOptions {
             it.header(HttpHeaders.Authorization, authorizationHeader())
         }.second.fold(
-            onSuccess = { Healthy("PingCheck", "OK!")},
-            onFailure = { UnHealthy("PingCheck", "Feil: ${it.message}")}
+            onSuccess = { Healthy("PingCheck", "OK!") },
+            onFailure = { UnHealthy("PingCheck", "Feil: ${it.message}") }
         )
     }
 
@@ -103,18 +108,19 @@ internal class PdlPersonInfoGateway(
         }
         """.trimIndent().replace("\n", "").replace("  ", "")
 
-        internal fun hentPersonInfoRequest(aktørIder: Set<AktørId>) : String {
+        internal fun hentPersonInfoRequest(aktørIder: Set<AktørId>): String {
             val request = JSONObject()
             request.put("query", Query)
             request.put("variables", JSONObject().also { it.put("identer", aktørIder.map { "$it" }) })
             return request.toString()
         }
 
-        private fun JSONArray.inneholderKunOkCodes() = require(all { (it as JSONObject).getString("code") == "ok"}) {
+        private fun JSONArray.inneholderKunOkCodes() = require(all { (it as JSONObject).getString("code") == "ok" }) {
             "Response fra PDL inneholder ikke bare ok codes."
         }
 
-        private fun JSONArray.tilhørende(aktørId: AktørId) = first { (it as JSONObject).getString("ident") == "$aktørId" } as JSONObject
+        private fun JSONArray.tilhørende(aktørId: AktørId) =
+            first { (it as JSONObject).getString("ident") == "$aktørId" } as JSONObject
     }
 
 }

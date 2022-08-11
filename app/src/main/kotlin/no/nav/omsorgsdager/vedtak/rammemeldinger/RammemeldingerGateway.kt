@@ -26,13 +26,15 @@ internal class RammemeldingerGateway(
     navn = "RammemeldingerGateway",
     accessTokenClient = accessTokenClient,
     scopes = scopes,
-    pingUri = URI("$baseUrl/isready")) {
+    pingUri = URI("$baseUrl/isready")
+) {
 
     private val hentAleneOmsorgUrl = "$baseUrl/alene-om-omsorgen?saksnummer="
 
     internal suspend fun hentAleneOmsorg(
         saksnummer: OmsorgspengerSaksnummer,
-        correlationId: CorrelationId) : List<AleneOmsorgInnvilgetVedtak> {
+        correlationId: CorrelationId
+    ): List<AleneOmsorgInnvilgetVedtak> {
 
         val urlMedSaksnummer = "${hentAleneOmsorgUrl}${saksnummer}"
 
@@ -46,20 +48,28 @@ internal class RammemeldingerGateway(
             "HTTP ${httpStatusCode.value} fra $urlMedSaksnummer. Response=$response"
         }
 
-        return JSONObject(response).getJSONArray("aleneOmOmsorgen").map { it as JSONObject }.map { aleneOm -> AleneOmsorgInnvilgetVedtak(
-            tidspunkt = aleneOm.getString("registrert").tidspunkt(),
-            periode = Periode(
-                fom = aleneOm.getString("gjelderFraOgMed").dato(),
-                tom = aleneOm.getString("gjelderTilOgMed").dato()
-            ),
-            barn = aleneOm.getJSONObject("barn").let { barn -> Barn(
-                identitetsnummer = barn.getString("identitetsnummer").somIdentitetsnummer(),
-                fødselsdato = barn.getString("fødselsdato").dato()
-            )},
-            kilder = aleneOm.getJSONObject("kilde").let { kilde -> setOf(Kilde(
-                id = kilde.getString("id"),
-                type = kilde.getString("type")
-            ))}
-        )}
+        return JSONObject(response).getJSONArray("aleneOmOmsorgen").map { it as JSONObject }.map { aleneOm ->
+            AleneOmsorgInnvilgetVedtak(
+                tidspunkt = aleneOm.getString("registrert").tidspunkt(),
+                periode = Periode(
+                    fom = aleneOm.getString("gjelderFraOgMed").dato(),
+                    tom = aleneOm.getString("gjelderTilOgMed").dato()
+                ),
+                barn = aleneOm.getJSONObject("barn").let { barn ->
+                    Barn(
+                        identitetsnummer = barn.getString("identitetsnummer").somIdentitetsnummer(),
+                        fødselsdato = barn.getString("fødselsdato").dato()
+                    )
+                },
+                kilder = aleneOm.getJSONObject("kilde").let { kilde ->
+                    setOf(
+                        Kilde(
+                            id = kilde.getString("id"),
+                            type = kilde.getString("type")
+                        )
+                    )
+                }
+            )
+        }
     }
 }

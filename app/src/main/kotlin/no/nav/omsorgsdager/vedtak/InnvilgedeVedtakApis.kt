@@ -1,9 +1,9 @@
 package no.nav.omsorgsdager.vedtak
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.omsorgsdager.CorrelationId.Companion.correlationId
 import no.nav.omsorgsdager.Identitetsnummer
 import no.nav.omsorgsdager.Identitetsnummer.Companion.somIdentitetsnummer
@@ -18,10 +18,15 @@ import java.time.LocalDate
 
 internal fun Route.InnvilgedeVedtakApis(
     tilgangsstyring: Tilgangsstyring,
-    innvilgedeVedtakService: InnvilgedeVedtakService) {
+    innvilgedeVedtakService: InnvilgedeVedtakService
+) {
 
     fun Pair<Identitetsnummer, Periode>.henteInnvilgedeVedtakOmUtvidetRettFor() =
-        Operasjon(type = Operasjon.Type.Visning, identitetsnummer = setOf(first), beskrivelse = "Hente innvilgede vedtak om utvidet rett for perioden $second")
+        Operasjon(
+            type = Operasjon.Type.Visning,
+            identitetsnummer = setOf(first),
+            beskrivelse = "Hente innvilgede vedtak om utvidet rett for perioden $second"
+        )
 
     fun Json.identitetsnummerOgPeriode() = kotlin.runCatching {
         val identitetsnummer = map["identitetsnummer"]?.toString()?.somIdentitetsnummer()
