@@ -6,7 +6,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.util.toByteArray
 import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.httpGet
 import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.httpPost
 import no.nav.helse.dusseldorf.ktor.client.SimpleHttpClient.jsonBody
