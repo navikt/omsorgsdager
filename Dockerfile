@@ -26,7 +26,7 @@ RUN adduser --no-create-home -u 1000 -D someone
 RUN mkdir /app && chown -R someone /app
 USER 1000
 
-COPY --chown=1000:1000 build/libs/app.jar /app/app.jar
+COPY --chown=1000:1000 app/build/libs/app.jar /app/app.jar
 WORKDIR /app
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/jre/bin/java", "-jar", "/app/app.jar" ]
