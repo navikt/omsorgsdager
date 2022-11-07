@@ -5,13 +5,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val junitJupiterVersion = "5.9.1"
 val k9rapidVersion = "1.20221007103720-75312fe"
 val dusseldorfVersion = "3.2.1.2-ce40a5b"
-val ktorVersion = "2.1.2"
+val ktorVersion = "2.1.3"
 val jsonassertVersion = "1.5.1"
 val mockkVersion = "1.13.2"
 val assertjVersion = "3.23.1"
 
 // Database
-val flywayVersion = "9.4.0"
+val flywayVersion = "9.7.0"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.5.0"
