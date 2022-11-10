@@ -27,7 +27,7 @@ spec:
     inbound:
       rules:
         - application: k9-aarskvantum
-          namespace: default
+          namespace: k9saksbehandling
           cluster: {{clusterFss}}
   gcp:
     sqlInstances:
