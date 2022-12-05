@@ -99,9 +99,7 @@ internal class ApplicationContext(
                 )
 
             val benyttetTokenResolver = tokenResolver ?: TokenResolver(
-                azureIssuers = setOf(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_ISSUER")),
-                openAmIssuers = setOf(benyttetEnv.hentRequiredEnv("OPEN_AM_ISSUER")),
-                openAmAuthorizedClients = benyttetEnv.hentRequiredEnv("OPEN_AM_AUTHORIZED_CLIENTS").csvTilSet()
+                azureIssuers = setOf(benyttetEnv.hentRequiredEnv("AZURE_OPENID_CONFIG_ISSUER"))
             )
 
             val benyttetTilgangsstyring = tilgangsstyring ?: Tilgangsstyring(
