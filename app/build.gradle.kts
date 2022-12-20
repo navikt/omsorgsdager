@@ -4,24 +4,24 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.9.1"
 val k9rapidVersion = "1.20221124140732-e07f6f7"
-val dusseldorfVersion = "3.2.1.3-bd71b5a"
-val ktorVersion = "2.1.3"
+val dusseldorfVersion = "3.2.2.1-4942135"
+val ktorVersion = "2.2.1"
 val jsonassertVersion = "1.5.1"
-val mockkVersion = "1.13.2"
+val mockkVersion = "1.13.3"
 val assertjVersion = "3.23.1"
 
 // Database
-val flywayVersion = "9.8.3"
+val flywayVersion = "9.10.1"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.5.1"
-val embeddedPostgres = "2.0.1"
+val embeddedPostgres = "2.0.2"
 val embeddedPostgresBinaries = "12.9.0"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "1.7.22"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
