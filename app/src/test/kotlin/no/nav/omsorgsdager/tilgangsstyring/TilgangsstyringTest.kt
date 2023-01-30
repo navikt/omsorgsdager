@@ -19,9 +19,7 @@ internal class TilgangsstyringTest {
 
     private val tilgangsstyring = Tilgangsstyring(
         tokenResolver = TokenResolver(
-            azureIssuers = setOf(Azure.V2_0.getIssuer()),
-            openAmIssuers = setOf(NaisSts.getIssuer()),
-            openAmAuthorizedClients = setOf("k9-sak")
+            azureIssuers = setOf(Azure.V2_0.getIssuer())
         ),
         omsorgspengerTilgangsstyringGateway = omsorgspengerTilgangsstyringGatewayMock
     )
@@ -102,74 +100,6 @@ internal class TilgangsstyringTest {
         tilgangsstyringGatewayKaltAkkurat(2)
     }
 
-    @Test
-    fun `Open AM system token med tilgang`() {
-        assertOperasjoner(
-            jwt = openAmSytemToken(medTilgang = true),
-            forventetResultatVisning = true,
-            forventetResultatEndring = true
-        )
-        tilgangsstyringGatewayKaltAkkurat(0)
-    }
-
-    @Test
-    fun `Open AM system token uten tilgang`() {
-        assertOperasjoner(
-            jwt = openAmSytemToken(medTilgang = false),
-            forventetResultatVisning = false,
-            forventetResultatEndring = false
-        )
-        tilgangsstyringGatewayKaltAkkurat(0)
-    }
-
-    @Test
-    fun `Open AM person token som kun kan lese`() {
-        val jwt = openAmPersonToken()
-        mockTilgangsstyringGateway(
-            jwt = jwt,
-            tilgangVisning = true,
-            tilgangEndring = false
-        )
-        assertOperasjoner(
-            jwt = jwt,
-            forventetResultatVisning = true,
-            forventetResultatEndring = false
-        )
-        tilgangsstyringGatewayKaltAkkurat(2)
-    }
-
-    @Test
-    fun `Open AM person token som kan lese og skrive`() {
-        val jwt = openAmPersonToken()
-        mockTilgangsstyringGateway(
-            jwt = jwt,
-            tilgangVisning = true,
-            tilgangEndring = true
-        )
-        assertOperasjoner(
-            jwt = jwt,
-            forventetResultatVisning = true,
-            forventetResultatEndring = true
-        )
-        tilgangsstyringGatewayKaltAkkurat(2)
-    }
-
-    @Test
-    fun `Open AM person token som uten tilgang`() {
-        val jwt = openAmPersonToken()
-        mockTilgangsstyringGateway(
-            jwt = jwt,
-            tilgangVisning = false,
-            tilgangEndring = false
-        )
-        assertOperasjoner(
-            jwt = jwt,
-            forventetResultatVisning = false,
-            forventetResultatEndring = false
-        )
-        tilgangsstyringGatewayKaltAkkurat(2)
-    }
-
     private fun assertOperasjoner(
         jwt: String?,
         forventetResultatVisning: Boolean,
@@ -237,24 +167,6 @@ internal class TilgangsstyringTest {
             overridingClaims = mapOf(
                 "oid" to "something",
                 "preferred_username" to "user"
-            )
-        )
-
-        internal fun openAmSytemToken(medTilgang: Boolean) = NaisSts.generateJwt(
-            application = "any",
-            overridingClaims = mapOf(
-                "azp" to when (medTilgang) {
-                    true -> "k9-sak"
-                    false -> "k9-noe-annet"
-                }
-            )
-        )
-
-        internal fun openAmPersonToken() = NaisSts.generateJwt(
-            application = "any",
-            overridingClaims = mapOf(
-                "azp" to "any",
-                "tokenName" to "id_token"
             )
         )
 

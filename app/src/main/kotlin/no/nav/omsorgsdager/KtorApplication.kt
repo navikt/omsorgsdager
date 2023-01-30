@@ -2,7 +2,6 @@ package no.nav.omsorgsdager
 
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.http.auth.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.plugins.callid.*
 import io.ktor.server.routing.*
@@ -14,7 +13,6 @@ import no.nav.helse.dusseldorf.ktor.core.*
 import no.nav.helse.dusseldorf.ktor.health.*
 import no.nav.k9.rapid.river.hentRequiredEnv
 import no.nav.omsorgsdager.Json.Companion.configured
-import no.nav.omsorgsdager.tilgangsstyring.TokenResolver.Companion.token
 import no.nav.omsorgsdager.vedtak.InnvilgedeVedtakApis
 import java.net.URI
 
@@ -40,28 +38,12 @@ internal fun Application.omsorgsdager(
         alias = "azure-v2"
     )
 
-    val openAm = Issuer(
-        issuer = applicationContext.env.hentRequiredEnv("OPEN_AM_ISSUER"),
-        jwksUri = URI(applicationContext.env.hentRequiredEnv("OPEN_AM_JWKS_URI")),
-        audience = null,
-        alias = "open-am"
-    )
-
     val issuers = mapOf(
         azureV2.alias() to azureV2,
-        openAm.alias() to openAm
     ).withoutAdditionalClaimRules()
 
     install(Authentication) {
-        multipleJwtIssuers(
-            issuers = issuers,
-            extractHttpAuthHeader = { call ->
-                when (val token = call.token()) {
-                    null -> null
-                    else -> HttpAuthHeader.Single("Bearer", token)
-                }
-            }
-        )
+        multipleJwtIssuers(issuers)
     }
 
     applicationContext.configure(this)
