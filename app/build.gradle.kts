@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.9.1"
-val k9rapidVersion = "1.20230104071822-3d215b8"
+val k9rapidVersion = "1.20230223071927-10b4a1f"
 val dusseldorfVersion = "3.2.2.2-d9c7672"
 val ktorVersion = "2.2.2"
 val jsonassertVersion = "1.5.1"
