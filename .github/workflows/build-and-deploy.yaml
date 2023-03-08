@@ -36,8 +36,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Sett image for nais deploy
-        run: echo "IMAGE=ghcr.io/${{ github.repository }}:$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      - name: Sett image for nais deploy & latest for k9-verdikjede
+        run: |
+          echo "IMAGE=ghcr.io/${{ github.repository }}:$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "IMAGE_LATEST=ghcr.io/${{ github.repository }}:latest" >> $GITHUB_ENV
 
       - uses: docker/build-push-action@v4
         id: docker-build
@@ -45,7 +47,7 @@ jobs:
           context: .
           push: true
           pull: true
-          tags: ${{ env.IMAGE }}, ${{ env.IMAGE }}:latest
+          tags: ${{ env.IMAGE }}, ${{ env.IMAGE_LATEST }}
 
       - name: Run Trivy vulnerability scanner on docker image
         uses: aquasecurity/trivy-action@master
