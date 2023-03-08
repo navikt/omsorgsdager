@@ -2,27 +2,29 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val junitJupiterVersion = "5.9.1"
-val k9rapidVersion = "1.20230104071822-3d215b8"
-val dusseldorfVersion = "3.2.2.2-d9c7672"
-val ktorVersion = "2.2.2"
+val junitJupiterVersion = "5.9.2"
+val k9rapidVersion = "1.20230223071927-10b4a1f"
+val dusseldorfVersion = "3.2.2.4-98ccf55"
+val ktorVersion = "2.2.4"
 val jsonassertVersion = "1.5.1"
-val mockkVersion = "1.13.3"
-val assertjVersion = "3.24.1"
+val mockkVersion = "1.13.4"
+val assertjVersion = "3.24.2"
 
 // Database
-val flywayVersion = "9.11.0"
+val flywayVersion = "9.15.1"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
-val postgresVersion = "42.5.1"
-val embeddedPostgres = "2.0.2"
+val postgresVersion = "42.5.4"
+val embeddedPostgres = "2.0.3"
 val embeddedPostgresBinaries = "12.9.0"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.8.0"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    kotlin("jvm") version "1.8.10"
+    id("com.github.johnrengelman.shadow") version "8.1.0"
+    id("org.sonarqube") version "4.0.0.2929"
+    jacoco
 }
 
 java {
@@ -109,6 +111,29 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "7.6"
+        gradleVersion = "8.0.2"
+    }
+}
+
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // tests are required to run before generating the report
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+    }
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "navikt_omsorgsdager")
+        property("sonar.organization", "navikt")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.login", System.getenv("SONAR_TOKEN"))
+        property("sonar.sourceEncoding", "UTF-8")
     }
 }

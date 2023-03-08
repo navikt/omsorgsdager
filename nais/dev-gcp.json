@@ -6,7 +6,7 @@
   "kafkaPool": "nav-dev",
   "clusterFss": "dev-fss",
   "ingresses": [
-    "https://omsorgsdager.dev.intern.nav.no"
+    "https://omsorgsdager.intern.dev.nav.no"
   ],
   "database": {
     "tier": "db-custom-1-3840",
