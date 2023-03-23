@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.9.2"
-val k9rapidVersion = "1.20230223071927-10b4a1f"
+val k9rapidVersion = "1.20230316100804-072b34b"
 val dusseldorfVersion = "3.2.2.4-98ccf55"
 val ktorVersion = "2.2.4"
 val jsonassertVersion = "1.5.1"
@@ -11,10 +11,10 @@ val mockkVersion = "1.13.4"
 val assertjVersion = "3.24.2"
 
 // Database
-val flywayVersion = "9.15.1"
+val flywayVersion = "9.16.1"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
-val postgresVersion = "42.5.4"
+val postgresVersion = "42.6.0"
 val embeddedPostgres = "2.0.3"
 val embeddedPostgresBinaries = "12.9.0"
 
@@ -22,7 +22,7 @@ val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
     kotlin("jvm") version "1.8.10"
-    id("com.github.johnrengelman.shadow") version "8.1.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "4.0.0.2929"
     jacoco
 }
@@ -74,7 +74,6 @@ repositories {
             password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
         }
     }
-    maven("https://jitpack.io")
     mavenCentral()
 }
 
