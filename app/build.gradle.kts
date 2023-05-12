@@ -2,16 +2,16 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val junitJupiterVersion = "5.9.2"
-val k9rapidVersion = "1.20230316100804-072b34b"
-val dusseldorfVersion = "3.2.2.4-98ccf55"
-val ktorVersion = "2.2.4"
+val junitJupiterVersion = "5.9.3"
+val k9rapidVersion = "1.20230426095941-a725ff7"
+val dusseldorfVersion = "3.2.3.0-7a92774"
+val ktorVersion = "2.3.0"
 val jsonassertVersion = "1.5.1"
-val mockkVersion = "1.13.4"
+val mockkVersion = "1.13.5"
 val assertjVersion = "3.24.2"
 
 // Database
-val flywayVersion = "9.16.3"
+val flywayVersion = "9.17.0"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.6.0"
@@ -21,7 +21,7 @@ val embeddedPostgresBinaries = "12.9.0"
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.8.10"
+    kotlin("jvm") version "1.8.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "4.0.0.2929"
     jacoco
@@ -110,7 +110,7 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "8.0.2"
+        gradleVersion = "8.1.1"
     }
 }
 
