@@ -9,3 +9,5 @@ jobs:
     name: Analyze
     uses: navikt/sif-gha-workflows/.github/workflows/codeql-analysis.yml@main
     secrets: inherit
+    with:
+      branch: main
