@@ -20,16 +20,6 @@ val embeddedPostgresBinaries = "12.9.0"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
-dependencyLocking {
-    lockAllConfigurations()
-}
-
-buildscript {
-    configurations.classpath {
-        resolutionStrategy.activateDependencyLocking()
-    }
-}
-
 plugins {
     kotlin("jvm") version "1.8.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
