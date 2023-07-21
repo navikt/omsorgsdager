@@ -30,7 +30,7 @@ jobs:
       security-events: write
     secrets: inherit
     with:
-      readertoken: true
+      readertoken: false
       package-command: './gradlew clean build -x test'
       branch: main
 
@@ -40,7 +40,7 @@ jobs:
       contents: read
     secrets: inherit
     with:
-      readertoken: true
+      readertoken: false
 
   build:
     uses: navikt/sif-gha-workflows/.github/workflows/gradle-build.yml@main
@@ -51,7 +51,7 @@ jobs:
     with:
       team: omsorgspenger
       dockercontext: .
-      readertoken: true
+      readertoken: false
 
   trivy:
     needs: [ build ]
