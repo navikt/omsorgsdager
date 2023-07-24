@@ -13,9 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         asset: [
-          build-mock.yml,
+          build-mock.yaml,
           build-pull-request.yaml,
-          test-build-deploy.yml
+          test-build-deploy.yaml
         ]
     steps:
       - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
