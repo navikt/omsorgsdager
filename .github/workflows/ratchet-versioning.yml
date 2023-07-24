@@ -7,6 +7,8 @@ on:
 jobs:
   ratchet:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -33,3 +35,4 @@ jobs:
         uses: actions-js/push@156f2b10c3aa000c44dbe75ea7018f32ae999772
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: $GITHUB_HEAD_REF
