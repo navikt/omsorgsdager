@@ -7,10 +7,9 @@ on:
       - '.gitignore'
       - 'LICENSE'
       - 'CODEOWNERS'
-
 jobs:
   test:
-    uses: navikt/sif-gha-workflows/.github/workflows/gradle-test.yml@main
+    uses: navikt/sif-gha-workflows/.github/workflows/gradle-test.yml@b5323898fce4dc43d69fafd031ce5eb607db9900 # ratchet:navikt/sif-gha-workflows/.github/workflows/gradle-test.yml@main
     permissions:
       contents: read
     secrets: inherit
