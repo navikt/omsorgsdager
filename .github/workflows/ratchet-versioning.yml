@@ -1,7 +1,6 @@
 name: Check and pin versions in workflows
 on:
   pull_request:
-    branches: [ main ]
     paths:
       - '.github/workflows/**'
 jobs:
@@ -36,5 +35,5 @@ jobs:
         uses: actions-js/push@156f2b10c3aa000c44dbe75ea7018f32ae999772
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${GITHUB_HEAD_REF}
+          branch: ${{ env.GITHUB_HEAD_REF }}
           message: Pinning versions in ${{matrix.asset}}
