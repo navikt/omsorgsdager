@@ -7,23 +7,20 @@ on:
       - 'mock/**'
 env:
   BASE_IMAGE: ghcr.io/${{ github.repository }}-mock
-
 jobs:
   build:
     permissions:
       packages: write
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: docker/login-action@v2
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # ratchet:actions/checkout@v3
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # ratchet:docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Sette Docker Tag
         run: echo "TAG=$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
       - name: Bygg & last opp Docker image
         run: |
           cd mock
