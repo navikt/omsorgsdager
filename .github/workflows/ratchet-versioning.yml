@@ -30,10 +30,12 @@ jobs:
         with:
           args: 'pin .github/workflows/${{matrix.asset}}'
           entrypoint: /ratchet
+      - name: Set PR branch
+        run: echo "PR_BRANCH=${GITHUB_REF}" >> $GITHUB_ENV
       - name: Commit & Push changes
         if: ${{ failure() }}
         uses: actions-js/push@156f2b10c3aa000c44dbe75ea7018f32ae999772
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ env.GITHUB_REF }}
+          branch: ${{ env.PR_BRANCH }}
           message: Pinning versions in ${{matrix.asset}}
