@@ -9,6 +9,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: read
+      workflows: write
     strategy:
       fail-fast: false
       matrix:
