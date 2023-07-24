@@ -7,6 +7,7 @@ jobs:
   ratchet:
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1 # Fails if more than 1 job tries to push at the same time
       fail-fast: false
       matrix:
         asset: [
