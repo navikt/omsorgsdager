@@ -35,5 +35,5 @@ jobs:
         uses: actions-js/push@156f2b10c3aa000c44dbe75ea7018f32ae999772
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${ github.ref }
+          branch: ${{ github.ref }}
           message: Pinning versions in ${{matrix.asset}}
