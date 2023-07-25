@@ -2,9 +2,9 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val junitJupiterVersion = "5.9.3"
+val junitJupiterVersion = "5.10.0"
 val k9rapidVersion = "1.20230721085317-ef25e22"
-val dusseldorfVersion = "3.2.3.2-80dded7"
+val dusseldorfVersion = "3.2.3.2-d1dc10f"
 val ktorVersion = "2.3.2"
 val jsonassertVersion = "1.5.1"
 val mockkVersion = "1.13.5"
