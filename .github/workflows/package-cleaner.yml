@@ -1,0 +1,22 @@
+name: Package cleaner
+on:
+  workflow_dispatch:
+
+jobs:
+  clean-mock:
+    uses: navikt/sif-gha-workflows/.github/workflows/package-cleaner.yml@main
+    permissions:
+      packages: write
+    secrets: inherit
+    with:
+      package: omsorgsdager-mock
+      versionstokeep: 2
+
+  clean:
+    uses: navikt/sif-gha-workflows/.github/workflows/package-cleaner.yml@main
+    permissions:
+      packages: write
+    secrets: inherit
+    with:
+      package: omsorgsdager
+      versionstokeep: 2
