@@ -15,7 +15,6 @@
   },
   "externalHosts": [
     "omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
-    "omsorgspenger-proxy.prod-fss-pub.nais.io",
     "pdl-api.prod-fss-pub.nais.io"
   ],
   "env": {
