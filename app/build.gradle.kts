@@ -4,14 +4,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.10.0"
 val k9rapidVersion = "1.20230823104755-1fc16e7"
-val dusseldorfVersion = "4.0.8"
+val dusseldorfVersion = "4.0.9"
 val ktorVersion = "2.3.4"
 val jsonassertVersion = "1.5.1"
 val mockkVersion = "1.13.7"
 val assertjVersion = "3.24.2"
 
 // Database
-val flywayVersion = "9.22.0"
+val flywayVersion = "9.22.1"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.6.0"
