@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val junitJupiterVersion = "5.10.0"
 val k9rapidVersion = "1.20231002100147-90c2022"
 val dusseldorfVersion = "4.0.10"
-val ktorVersion = "2.3.4"
+val ktorVersion = "2.3.5"
 val jsonassertVersion = "1.5.1"
 val mockkVersion = "1.13.8"
 val assertjVersion = "3.24.2"
@@ -23,7 +23,7 @@ val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 plugins {
     kotlin("jvm") version "1.9.10"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("org.sonarqube") version "4.4.0.3356"
+    id("org.sonarqube") version "4.4.1.3373"
     jacoco
 }
 
