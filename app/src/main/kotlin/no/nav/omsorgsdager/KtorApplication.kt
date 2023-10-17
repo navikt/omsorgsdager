@@ -72,14 +72,11 @@ internal fun Application.omsorgsdager(
     )
 
     install(CallId) {
-        fromXCorrelationIdHeader(
-            generateOnInvalid = true
-        )
+        header("callId")
     }
 
     install(CallLogging) {
         logRequests()
-        correlationIdAndRequestIdInMdc()
         callIdMdc("callId")
     }
 

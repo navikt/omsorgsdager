@@ -24,7 +24,7 @@ internal data class CorrelationId private constructor(private val value: String)
         private val Regex = "[a-zA-Z0-9_.\\-æøåÆØÅ]{5,200}".toRegex()
         internal fun genererCorrelationId() = CorrelationId("omsorgsdager-${UUID.randomUUID()}")
         internal fun String.somCorrelationId() = CorrelationId(this)
-        internal fun ApplicationCall.correlationId() = requireNotNull(callId).somCorrelationId()
+        internal fun ApplicationCall.correlationId() = callId?.somCorrelationId() ?: genererCorrelationId()
     }
 }
 
