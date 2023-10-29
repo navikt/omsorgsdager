@@ -5,27 +5,23 @@ on:
       - main
     paths:
       - 'mock/**'
-env:
-  BASE_IMAGE: ghcr.io/${{ github.repository }}-mock
 
 jobs:
   build:
     permissions:
-      packages: write
+      id-token: write
+      contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # ratchet:actions/checkout@v4
+      - uses: nais/docker-build-push@3257289fd8cb0018ce0bda55db86ee54c21669b1 # ratchet:nais/docker-build-push@v0
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Sette Docker Tag
-        run: echo "TAG=$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-      - name: Bygg & last opp Docker image
-        run: |
-          cd mock
-          docker build --pull --tag ${BASE_IMAGE}:${TAG} --tag ${BASE_IMAGE}:latest .
-          docker push ${BASE_IMAGE} --all-tags
+          team: omsorgspenger
+          push_image: true
+          tag: latest
+          pull: true
+          dockerfile: mock/Dockerfile
+          docker_context: mock/
+          salsa: false # mock image, not deployed to NAIS
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
