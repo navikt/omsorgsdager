@@ -19,7 +19,7 @@ jobs:
           team: omsorgspenger
           push_image: true
           tag: latest
-          image_suffix: -mock
+          image_suffix: mock
           pull: true
           dockerfile: mock/Dockerfile
           docker_context: mock/
