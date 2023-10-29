@@ -1,4 +1,4 @@
-FROM wiremock/wiremock:2.32.0
+FROM wiremock/wiremock:3.2.0-alpine
 LABEL org.opencontainers.image.source=https://github.com/navikt/omsorgsdager/mock
 COPY mappings/ /home/wiremock/mappings/
 COPY __files/ /home/wiremock/__files/
