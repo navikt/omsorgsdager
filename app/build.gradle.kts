@@ -11,7 +11,7 @@ val mockkVersion = "1.13.8"
 val assertjVersion = "3.24.2"
 
 // Database
-val flywayVersion = "9.22.3"
+val flywayVersion = "10.0.0"
 val hikariVersion = "5.0.1"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.6.0"
@@ -21,7 +21,7 @@ val embeddedPostgresBinaries = "12.9.0"
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm") version "1.9.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "4.4.1.3373"
     jacoco
