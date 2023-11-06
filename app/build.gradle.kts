@@ -2,7 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val junitJupiterVersion = "5.10.0"
+val junitJupiterVersion = "5.10.1"
 val k9rapidVersion = "1.20231002100147-90c2022"
 val dusseldorfVersion = "4.1.0"
 val ktorVersion = "2.3.5"
