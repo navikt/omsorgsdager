@@ -1,10 +1,9 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val junitJupiterVersion = "5.10.1"
 val k9rapidVersion = "1.20231002100147-90c2022"
-val dusseldorfVersion = "4.1.0"
+val dusseldorfVersion = "4.1.1"
 val ktorVersion = "2.3.6"
 val jsonassertVersion = "1.5.1"
 val mockkVersion = "1.13.8"
@@ -49,6 +48,7 @@ dependencies {
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
     testImplementation("io.zonky.test:embedded-postgres:$embeddedPostgres")
