@@ -10,7 +10,7 @@ val mockkVersion = "1.13.8"
 val assertjVersion = "3.24.2"
 
 // Database
-val flywayVersion = "10.0.1"
+val flywayVersion = "9.22.3"
 val hikariVersion = "5.1.0"
 val kotliqueryVersion = "1.9.0"
 val postgresVersion = "42.6.0"
@@ -48,7 +48,7 @@ dependencies {
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
+    //implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
     testImplementation("io.zonky.test:embedded-postgres:$embeddedPostgres")
