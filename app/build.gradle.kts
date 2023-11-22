@@ -10,10 +10,10 @@ val mockkVersion = "1.13.8"
 val assertjVersion = "3.24.2"
 
 // Database
-val flywayVersion = "9.22.3"
+val flywayVersion = "10.1.0"
 val hikariVersion = "5.1.0"
 val kotliqueryVersion = "1.9.0"
-val postgresVersion = "42.6.0"
+val postgresVersion = "42.7.0"
 val embeddedPostgres = "2.0.4"
 val embeddedPostgresBinaries = "12.9.0"
 
