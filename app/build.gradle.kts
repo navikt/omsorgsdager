@@ -3,24 +3,24 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
 val junitJupiterVersion = "5.10.1"
 val k9rapidVersion = "1.20231002100147-90c2022"
-val dusseldorfVersion = "4.1.1"
-val ktorVersion = "2.3.6"
+val dusseldorfVersion = "4.1.4"
+val ktorVersion = "2.3.7"
 val jsonassertVersion = "1.5.1"
 val mockkVersion = "1.13.8"
 val assertjVersion = "3.24.2"
 
 // Database
-val flywayVersion = "9.22.3"
+val flywayVersion = "10.3.0"
 val hikariVersion = "5.1.0"
 val kotliqueryVersion = "1.9.0"
-val postgresVersion = "42.6.0"
-val embeddedPostgres = "2.0.4"
+val postgresVersion = "42.7.1"
+val embeddedPostgres = "2.0.6"
 val embeddedPostgresBinaries = "12.9.0"
 
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "1.9.20"
+    kotlin("jvm") version "1.9.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "4.4.1.3373"
     jacoco
@@ -47,8 +47,7 @@ dependencies {
 
     // Database
     implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
-    //implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
+    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
     implementation("com.github.seratch:kotliquery:$kotliqueryVersion")
     runtimeOnly("org.postgresql:postgresql:$postgresVersion")
     testImplementation("io.zonky.test:embedded-postgres:$embeddedPostgres")
@@ -88,6 +87,7 @@ tasks {
             showCauses = true
             showStackTraces = true
         }
+        finalizedBy(jacocoTestReport) // report is always generated after tests run
     }
 
     withType<ShadowJar> {
@@ -103,21 +103,16 @@ tasks {
     }
 
     withType<Wrapper> {
-        gradleVersion = "8.4"
+        gradleVersion = "8.5"
     }
-}
 
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test) // tests are required to run before generating the report
-    reports {
-        xml.required.set(true)
-        csv.required.set(false)
+    withType<JacocoReport> {
+        dependsOn(test) // tests are required to run before generating the report
+        reports {
+            xml.required.set(true)
+            csv.required.set(false)
+        }
     }
-}
-
-tasks.test {
-    finalizedBy(tasks.jacocoTestReport) // report is always generated after tests run
 }
 
 sonarqube {
