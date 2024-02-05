@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # ratchet:actions/checkout@v4
-      - uses: nais/docker-build-push@1d8fa37371227a83cc5f1f491d528f572341eb09 # ratchet:nais/docker-build-push@v0
+      - uses: nais/docker-build-push@14cd7a0a656477da33aa7d627123330990ef3807 # ratchet:nais/docker-build-push@v0
         with:
           team: omsorgspenger
           push_image: true
