@@ -1,13 +1,13 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
-val junitJupiterVersion = "5.10.1"
+val junitJupiterVersion = "5.10.2"
 val k9rapidVersion = "1.20240115061003-339d641"
-val dusseldorfVersion = "4.2.0"
+val dusseldorfVersion = "4.2.1"
 val ktorVersion = "2.3.8"
 val jsonassertVersion = "1.5.1"
 val mockkVersion = "1.13.9"
-val assertjVersion = "3.25.2"
+val assertjVersion = "3.25.3"
 
 // Database
 val flywayVersion = "10.7.1"
