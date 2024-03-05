@@ -20,6 +20,7 @@ spec:
         - application: omsorgspenger-tilgangsstyring
         - application: omsorgspenger-sak
         - application: omsorgspenger-rammemeldinger
+        - application: omsorgspenger-infotrygd-rammevedtak
       external:
       {{#each externalHosts as |host|}}
          - host: {{host}}
