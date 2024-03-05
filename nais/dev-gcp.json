@@ -18,7 +18,6 @@
   ],
   "env": {
     "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-infotrygd-rammevedtak/.default",
-    "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL": "http://omsorgspenger-infotrygd-rammevedtak.omsorgspenger.svc.cluster.local",
     "OMSORGSPENGER_SAK_SCOPES": "api://dev-gcp.omsorgspenger.omsorgspenger-sak/.default",
     "PDL_BASE_URL": "https://pdl-api.dev-fss-pub.nais.io",
     "PDL_SCOPES": "api://dev-fss.pdl.pdl-api/.default",
