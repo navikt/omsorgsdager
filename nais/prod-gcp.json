@@ -14,12 +14,10 @@
     "highAvailability": "true"
   },
   "externalHosts": [
-    "omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
     "pdl-api.prod-fss-pub.nais.io"
   ],
   "env": {
-    "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES": "api://prod-fss.omsorgspenger.omsorgspenger-infotrygd-rammevedtak/.default",
-    "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL": "https://omsorgspenger-infotrygd-rammevedtak.prod-fss-pub.nais.io",
+    "OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_SCOPES": "api://prod-gcp.omsorgspenger.omsorgspenger-infotrygd-rammevedtak/.default",
     "OMSORGSPENGER_SAK_SCOPES": "api://prod-gcp.omsorgspenger.omsorgspenger-sak/.default",
     "PDL_BASE_URL": "https://pdl-api.prod-fss-pub.nais.io",
     "PDL_SCOPES": "api://prod-fss.pdl.pdl-api/.default",

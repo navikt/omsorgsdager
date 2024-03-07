@@ -20,6 +20,7 @@ spec:
         - application: omsorgspenger-tilgangsstyring
         - application: omsorgspenger-sak
         - application: omsorgspenger-rammemeldinger
+        - application: omsorgspenger-infotrygd-rammevedtak
       external:
       {{#each externalHosts as |host|}}
          - host: {{host}}
@@ -80,6 +81,8 @@ spec:
       value: http://omsorgspenger-sak.omsorgspenger.svc.cluster.local
     - name: OMSORGSPENGER_RAMMEMELDINGER_BASE_URL
       value: http://omsorgspenger-rammemeldinger.omsorgspenger.svc.cluster.local
+    - name: OMSORGSPENGER_INFOTRYGD_RAMMEVEDTAK_BASE_URL
+      value: http://omsorgspenger-infotrygd-rammevedtak.omsorgspenger.svc.cluster.local
     - name: KAFKA_RAPID_TOPIC
       value: omsorgspenger.k9-rapid-v2
     - name: KAFKA_CONSUMER_GROUP_ID
