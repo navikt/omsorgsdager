@@ -88,7 +88,7 @@ internal class PdlPersonInfoGateway(
         private val ConsumerId = "Nav-Consumer-Id" to "omsorgsdager"
         private val Tema = "TEMA" to "OMS"
             // https://behandlingskatalog.intern.nav.no/process/purpose/PLEIE_OMSORGS_OG_OPPLAERINGSPENGER/4a1c9324-9c5e-4ddb-ac7f-c55d1dcd9736
-        private const val OmsorgspengerRammemelding = "Behandlingsnummer" to "B142"
+        private val OmsorgspengerRammemelding = "Behandlingsnummer" to "B142"
 
         private val Query = """
         query(${"$"}identer: [ID!]!) {
