@@ -43,6 +43,7 @@ internal class PdlPersonInfoGateway(
             it.header(CorrelationIdHeaderKey, "$correlationId")
             it.header(ConsumerId.first, ConsumerId.second)
             it.header(Tema.first, Tema.second)
+            it.header(OmsorgspengerRammemelding.first, OmsorgspengerRammemelding.second)
             it.accept(ContentType.Application.Json)
             it.jsonBody(pdlRequest)
         }.readTextOrThrow()
@@ -86,6 +87,8 @@ internal class PdlPersonInfoGateway(
         private const val CorrelationIdHeaderKey = "Nav-Call-Id"
         private val ConsumerId = "Nav-Consumer-Id" to "omsorgsdager"
         private val Tema = "TEMA" to "OMS"
+            // https://behandlingskatalog.intern.nav.no/process/purpose/PLEIE_OMSORGS_OG_OPPLAERINGSPENGER/4a1c9324-9c5e-4ddb-ac7f-c55d1dcd9736
+        private val OmsorgspengerRammemelding = "Behandlingsnummer" to "B142"
 
         private val Query = """
         query(${"$"}identer: [ID!]!) {
