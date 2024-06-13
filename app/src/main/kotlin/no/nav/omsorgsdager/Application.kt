@@ -2,9 +2,9 @@ package no.nav.omsorgsdager
 
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
-import no.nav.helse.rapids_rivers.KtorBuilder
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.k9.rapid.river.hentOptionalEnv
+import no.nav.omsorgsdager.ktor.KtorBuilder
 import org.slf4j.LoggerFactory
 
 fun main() {
