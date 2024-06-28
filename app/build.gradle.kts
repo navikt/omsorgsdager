@@ -1,11 +1,11 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 
-val junitJupiterVersion = "5.10.2"
+val junitJupiterVersion = "5.10.3"
 val k9rapidVersion = "1.20240510083323-9f05ca1"
-val dusseldorfVersion = "5.0.0"
-val ktorVersion = "2.3.11"
-val jsonassertVersion = "1.5.1"
+val dusseldorfVersion = "5.0.1"
+val ktorVersion = "2.3.12"
+val jsonassertVersion = "1.5.3"
 val mockkVersion = "1.13.11"
 val assertjVersion = "3.26.0"
 
