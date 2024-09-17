@@ -85,7 +85,7 @@ internal object KroniskSyktBarnOperasjoner : BehandlingOperasjoner<KroniskSyktBa
         )
 
         if (behandling.periode.tom.isAfter(sisteDagIÅretBarnetFyller18.plusYears(3))) {
-            logger.warn("Forventet at perioden skulle maks vare ut året barnet fyller 18 plus buffer på tre år. Forventet=[$sisteDagIÅretBarnetFyller18], Var=[${behandling.periode.tom}]")
+            logger.warn("Forventet at perioden skulle maks vare ut året barnet fyller 18 plus buffer på tre år. Forventet=[${sisteDagIÅretBarnetFyller18.plusYears(3)}], Var=[${behandling.periode.tom}]")
         }
 
         return behandling to listOf(søkeren, barnet)
