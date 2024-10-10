@@ -5,7 +5,7 @@ import io.ktor.server.auth.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.plugins.callid.*
 import io.ktor.server.routing.*
-import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.*
 import no.nav.helse.dusseldorf.ktor.auth.*
