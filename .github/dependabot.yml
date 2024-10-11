@@ -24,15 +24,18 @@ updates:
         patterns:
           - "*no.nav*"
         exclude-patterns:
-            - "*ktor*"
+          - "*ktor*"
+          - "*dusseldorf*"
       ktor-deps:
         patterns:
           - "*ktor*"
+          - "*dusseldorf*"
       annet-deps:
         patterns:
           - "*"
         exclude-patterns:
           - "*ktor*"
+          - "*dusseldorf*"
           - "*no.nav*"
     registries:
       - k9-rapid
