@@ -20,9 +20,20 @@ updates:
     schedule:
       interval: daily
     groups:
-      gradle:
+      nav-deps:
+        patterns:
+          - "*no.nav*"
+        exclude-patterns:
+            - "*ktor*"
+      ktor-deps:
+        patterns:
+          - "*ktor*"
+      annet-deps:
         patterns:
           - "*"
+        exclude-patterns:
+          - "*ktor*"
+          - "*no.nav*"
     registries:
       - k9-rapid
 
