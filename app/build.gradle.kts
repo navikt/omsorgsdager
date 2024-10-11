@@ -6,7 +6,7 @@ val k9rapidVersion = "1.20240510083323-9f05ca1"
 val dusseldorfVersion = "5.0.9"
 val ktorVersion = "2.3.12"
 val jsonassertVersion = "1.5.3"
-val mockkVersion = "1.13.12"
+val mockkVersion = "1.13.13"
 val assertjVersion = "3.26.3"
 
 // Database
@@ -20,7 +20,7 @@ val embeddedPostgresBinaries = "12.9.0"
 val mainClass = "no.nav.omsorgsdager.ApplicationKt"
 
 plugins {
-    kotlin("jvm") version "2.0.20"
+    kotlin("jvm") version "2.0.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.sonarqube") version "5.1.0.4882"
     jacoco
