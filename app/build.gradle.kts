@@ -7,13 +7,13 @@ val dusseldorfVersion = "5.0.16"
 val ktorVersion = "2.3.13"
 val jsonassertVersion = "1.5.3"
 val mockkVersion = "1.13.16"
-val assertjVersion = "3.27.2"
+val assertjVersion = "3.27.3"
 
 // Database
-val flywayVersion = "11.1.1"
+val flywayVersion = "11.2.0"
 val hikariVersion = "6.2.1"
 val kotliqueryVersion = "1.9.1"
-val postgresVersion = "42.7.4"
+val postgresVersion = "42.7.5"
 val embeddedPostgres = "2.1.0"
 val embeddedPostgresBinaries = "12.9.0"
 
