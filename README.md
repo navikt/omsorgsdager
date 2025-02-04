@@ -1,5 +1,8 @@
 omsorgsdager
 ================
+
+Dette repoet er nå arkivert fordi det er erstattet av kode i k9-sak og k9-aarskvantum.
+
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=navikt_omsorgsdager&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=navikt_omsorgsdager)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=navikt_omsorgsdager&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=navikt_omsorgsdager)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=navikt_omsorgsdager&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=navikt_omsorgsdager)
